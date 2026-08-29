@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="PANACEA · Catálogo y pedidos de productos de repostería, panadería y otros productos.">
+  <title>PANACEA · Catálogo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a class="brand" href="#inicio" aria-label="Panacea inicio"><span class="brand-mark">P</span><span>PANACEA</span></a>
+      <nav class="desktop-nav" aria-label="Navegación principal">
+        <a href="#catalogo">Catálogo</a>
+        <a href="#contacto">Contacto</a>
+        <button class="cart-button" id="openCart" type="button">🛒 Carrito <span id="cartCount">0</span></button>
+      </nav>
+      <button class="mobile-cart" id="openCartMobile" type="button" aria-label="Abrir carrito">🛒 <span id="cartCountMobile">0</span></button>
+    </div>
+  </header>
+
+  <main id="inicio">
+    <section class="hero">
+      <div class="container hero-grid">
+        <div>
+          <p class="eyebrow">Catálogo 2026</p>
+          <h1>Todo lo que necesitas,<br><em>en un solo lugar.</em></h1>
+          <p class="hero-copy">Descubre productos para repostería y panadería, además de otras soluciones para tu día a día.</p>
+          <div class="hero-actions">
+            <a class="primary-btn" href="#catalogo">Ver catálogo</a>
+            <button class="secondary-btn" id="heroCart" type="button">Ver mi carrito</button>
+          </div>
+        </div>
+        <div class="hero-card">
+          <div class="hero-card-inner">
+            <span>🌿</span>
+            <strong>PANACEA</strong>
+            <p>Calidad, variedad y atención directa.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="categories section" aria-labelledby="cat-title">
+      <div class="container">
+        <div class="section-heading"><p class="eyebrow">Explora</p><h2 id="cat-title">Nuestras categorías</h2></div>
+        <div class="category-grid">
+          <button class="category-card active" data-category="all"><span>✦</span><strong>Todos</strong><small>Ver catálogo completo</small></button>
+          <button class="category-card" data-category="reposteria-panaderia"><span>🍰</span><strong>Repostería y Panadería</strong><small>Ingredientes y productos</small></button>
+          <button class="category-card" data-category="aseo"><span>🧹</span><strong>Aseo y Limpieza</strong><small>Para el hogar</small></button>
+          <button class="category-card" data-category="ferreteria"><span>🔨</span><strong>Ferretería</strong><small>Herramientas y soluciones</small></button>
+          <button class="category-card" data-category="otros"><span>📦</span><strong>Otros</strong><small>Más productos</small></button>
+        </div>
+      </div>
+    </section>
+
+    <section class="catalog section" id="catalogo" aria-labelledby="catalog-title">
+      <div class="container">
+        <div class="catalog-toolbar">
+          <div class="section-heading"><p class="eyebrow">PANACEA</p><h2 id="catalog-title">Catálogo de productos</h2></div>
+          <label class="search"><span>⌕</span><input id="searchInput" type="search" placeholder="Buscar productos..." aria-label="Buscar productos"></label>
+        </div>
+        <div class="availability-filters" role="group" aria-label="Filtrar disponibilidad">
+          <button class="filter active" data-availability="all">Todos</button>
+          <button class="filter" data-availability="available">Disponibles</button>
+          <button class="filter" data-availability="out">Agotados</button>
+        </div>
+        <div id="productGrid" class="product-grid"></div>
+        <div id="emptyState" class="empty-state" hidden><div>🔎</div><h3>No encontramos productos</h3><p>Prueba con otro término o categoría.</p></div>
+      </div>
+    </section>
+
+    <section class="how section">
+      <div class="container how-card">
+        <div><p class="eyebrow">Compra fácil</p><h2>Elige, agrega y envía tu pedido.</h2></div>
+        <div class="steps"><div><b>01</b><span>Explora el catálogo</span></div><div><b>02</b><span>Agrega al carrito</span></div><div><b>03</b><span>Completa tus datos</span></div><div><b>04</b><span>Envía por WhatsApp</span></div></div>
+      </div>
+    </section>
+
+    <section class="contact section" id="contacto" aria-labelledby="contact-title">
+      <div class="container contact-grid">
+        <div><p class="eyebrow">Estamos para ayudarte</p><h2 id="contact-title">Oficinas y contacto</h2><p class="contact-copy">Consulta tus pedidos y comunícate directamente con PANACEA.</p></div>
+        <div class="contact-details">
+          <div>
+            <span>📍</span>
+            <div>
+              <b>Facturación</b>
+              <p>Calle Protestante esq. Colón, Nuevo Vedado</p>
+              <a class="contact-map-btn" href="https://maps.app.goo.gl/YnxufsbyP7q7ynfH6?g_st=a" target="_blank" rel="noopener noreferrer">📍 Ver en Google Maps</a>
+            </div>
+          </div>
+
+          <div>
+            <span>📦</span>
+            <div>
+              <b>Almacén</b>
+              <p>Calle Colón e/ Vía Blanca y Velarde, Agro EJT Ciudad Deportiva</p>
+              <a class="contact-map-btn" href="https://maps.app.goo.gl/DZFWsBHCJNd5q2Xj9?g_st=a" target="_blank" rel="noopener noreferrer">📍 Ver en Google Maps</a>
+            </div>
+          </div>
+
+          <div>
+            <span>🕘</span>
+            <div>
+              <b>Horario</b>
+              <p>Lunes a viernes · 10:00 a.m. a 4:00 p.m.<br>Sábado · 9:30 a.m. a 2:00 p.m.</p>
+            </div>
+          </div>
+
+          <div>
+            <span>📞</span>
+            <div>
+              <b>Teléfono / WhatsApp</b>
+              <p><a href="tel:+5358051138">+53 58051138</a></p>
+              <a class="contact-whatsapp-btn" href="https://wa.me/5358051138" target="_blank" rel="noopener noreferrer">💬 Escribir por WhatsApp</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer"><div class="container footer-inner"><div><strong>PANACEA</strong><p>Todo lo que necesitas, en un solo lugar.</p></div><small>© 2026 PANACEA · Catálogo online</small></div></footer>
+
+  <aside class="cart-drawer" id="cartDrawer" aria-hidden="true">
+    <div class="drawer-header"><div><p class="eyebrow">Tu selección</p><h2>Mi carrito</h2></div><button id="closeCart" type="button" aria-label="Cerrar carrito">×</button></div>
+    <div id="cartItems" class="cart-items"></div>
+    <div class="cart-empty" id="cartEmpty"><div>🛒</div><h3>Tu carrito está vacío</h3><p>Agrega productos del catálogo para comenzar.</p></div>
+    <div class="cart-footer" id="cartFooter" hidden>
+      <div class="cart-total"><span>Total</span><strong id="cartTotal">0 CUP</strong></div>
+      <button class="primary-btn full" id="checkoutBtn" type="button">Continuar al pedido</button>
+    </div>
+  </aside>
+  <div class="overlay" id="overlay"></div>
+
+  <dialog id="checkoutDialog" class="checkout-dialog">
+    <form method="dialog" id="checkoutForm">
+      <button class="dialog-close" type="button" id="closeCheckout" aria-label="Cerrar">×</button>
+      <p class="eyebrow">Último paso</p><h2>Datos del cliente</h2>
+      <p class="dialog-copy">Los datos se incluirán en el mensaje que enviaremos a WhatsApp.</p>
+      <label>Nombre completo<input id="customerName" required maxlength="100" autocomplete="name" placeholder="Tu nombre"></label>
+      <label>Teléfono de contacto<input id="customerPhone" required maxlength="30" inputmode="tel" autocomplete="tel" placeholder="Ej. 5XXXXXXX"></label>
+      <div class="order-preview"><span>Resumen</span><strong id="checkoutSummary"></strong></div>
+      <button class="primary-btn full" value="default" type="submit">📲 Generar pedido en WhatsApp</button>
+    </form>
+  </dialog>
+
+  <script src="products.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
