@@ -160,7 +160,7 @@
 
     /* 4. QUITAR EL GRAN ESPACIO ANTES DEL BOTÓN */
     .product-actions{
-        margin-top:0;
+        margin-top:5px;
     }
 
     /* 5. BOTÓN UN POCO MÁS COMPACTO */
@@ -183,10 +183,10 @@
     }
 
     .price{
-        margin:4px 0 8px;
+        margin:4px 0 4px;
     }
 
     .product-actions{
-        margin-top:0;
+        margin-top:4px;
     }
 }
