@@ -134,22 +134,59 @@
         gap:10px;
     }
 }
+/* ==========================================
+   TARJETAS DE PRODUCTOS UNIFORMES
+   ========================================== */
+
 @media(max-width:700px){
+
+    .product-card{
+        height:520px;
+    }
 
     .product-body{
         padding:14px;
+        display:flex;
+        flex-direction:column;
     }
 
-    .description{
+    /* Todos los nombres reservan espacio para 2 líneas */
+    .product-body h3{
+        min-height:38px;
+        margin:0 0 7px;
+        line-height:1.25;
+        display:-webkit-box;
+        -webkit-line-clamp:2;
+        -webkit-box-orient:vertical;
+        overflow:hidden;
+    }
+
+    /* Todas las presentaciones reservan espacio */
+    .product-body .presentation{
+        min-height:40px;
+        line-height:1.5;
+    }
+
+    /* Todas las descripciones reservan espacio,
+       incluso cuando están vacías */
+    .product-body .description{
+        min-height:40px;
         margin-top:4px;
-        min-height:0;
+        line-height:1.5;
+        display:-webkit-box;
+        -webkit-line-clamp:2;
+        -webkit-box-orient:vertical;
+        overflow:hidden;
     }
 
-    .price{
+    /* El precio ocupa siempre el mismo espacio */
+    .product-body .price{
+        min-height:28px;
         margin:8px 0;
     }
 
-    .product-actions{
-        margin-top:4px;
+    /* El botón siempre queda en la misma posición */
+    .product-body .product-actions{
+        margin-top:auto;
     }
 }
