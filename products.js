@@ -127,7 +127,7 @@ const PRODUCTS = [
     availability: 'out',
     stock: 0,
     image: 'assets/products/reposteria-panaderia/costa-brava.jpg',
-    description: 'Origen España. Se obtiene del saín del cerdo. Ideal para panadería y repostería.LA COMPRA MÁXIMA POR CLIENTE PARA ESTE PRODUCTO ES DE XX UNIDADES'
+    description: 'LA COMPRA MÁXIMA POR CLIENTE PARA ESTE PRODUCTO ES DE XX UNIDADES'
   },
   {
     id: 'margarina-hojaldre',
