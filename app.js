@@ -238,7 +238,7 @@ document.querySelectorAll('.category-card').forEach(btn=>btn.addEventListener('c
 }));
 document.querySelectorAll('.filter').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('.filter').forEach(x=>x.classList.remove('active'));btn.classList.add('active');activeAvailability=btn.dataset.availability;renderProducts();}));
 document.getElementById('searchInput').addEventListener('input',e=>{searchTerm=e.target.value.trim();renderProducts();});
-['openCart','openCartMobile','heroCart'].forEach(id=>document.getElementById(id).addEventListener('click',openCart));
+['openCart','openCartMobile'].forEach(id=>document.getElementById(id).addEventListener('click',openCart));
 document.getElementById('closeCart').addEventListener('click',closeCart);document.getElementById('overlay').addEventListener('click',closeCart);document.getElementById('checkoutBtn').addEventListener('click',checkout);
 document.getElementById('closeCheckout').addEventListener('click',()=>{
   document.getElementById('checkoutDialog').close();
