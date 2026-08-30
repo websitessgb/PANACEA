@@ -134,3 +134,22 @@
         gap:10px;
     }
 }
+@media(max-width:700px){
+
+    .product-body{
+        padding:14px;
+    }
+
+    .description{
+        margin-top:4px;
+        min-height:0;
+    }
+
+    .price{
+        margin:8px 0;
+    }
+
+    .product-actions{
+        margin-top:4px;
+    }
+}
