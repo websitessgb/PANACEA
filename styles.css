@@ -149,14 +149,15 @@
 
     /* 2. REDUCIR EL ESPACIO INTERNO DE LA INFORMACIÓN */
     .product-body{
-        flex:none;
+        flex:1;
         padding:12px;
     }
 
     /* 3. MENOS ESPACIO ENTRE NOMBRE/MEDIDAS Y PRECIO */
     .price{
-        margin:5px 0 8px;
-    }
+        margin-top:auto;
+        margin-bottom:5px;
+        font-size:18px;
 
     /* 4. QUITAR EL GRAN ESPACIO ANTES DEL BOTÓN */
     .product-actions{
@@ -183,7 +184,8 @@
     }
 
     .price{
-        margin:4px 0 4px;
+        margin-top:auto;
+        margin-bottom:4px;
     }
 
     .product-actions{
