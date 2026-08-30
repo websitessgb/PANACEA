@@ -3,3 +3,34 @@
 @media(max-width:980px){.hero-grid,.how-card,.contact-grid{grid-template-columns:1fr}.hero-card{min-height:240px}.category-grid{grid-template-columns:repeat(2,1fr)}.product-grid{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:700px){.container{width:min(100% - 24px,1160px)}.desktop-nav{display:none}.mobile-cart{display:block}.nav-wrap{height:68px}.hero{padding:55px 0}.hero h1{font-size:46px}.hero-copy{font-size:16px}.section{padding:55px 0}.section-heading h2{font-size:34px}.category-grid{grid-template-columns:1fr 1fr}.category-card{min-height:125px;padding:16px}.catalog-toolbar{display:block}.search{margin-top:22px;width:100%}.product-grid{grid-template-columns:1fr 1fr;gap:12px}.product-image{height:180px}.product-body{padding:14px}.product-body h3{font-size:15px}.description{display:none}.price{font-size:18px;margin:11px 0}.how-card{padding:28px}.how-card h2{font-size:32px}.steps{grid-template-columns:1fr}.contact h2{font-size:40px}.footer-inner{display:block}.footer small{display:block;margin-top:15px}.cart-drawer{width:100%}}
 @media(max-width:430px){.category-grid,.product-grid{grid-template-columns:1fr}.product-image{height:220px}.hero-actions>*{width:100%}.availability-filters{overflow:auto;padding-bottom:4px}.filter{white-space:nowrap}}
+/* ACCESO DIRECTO A OFICINAS Y CONTACTO EN MÓVIL */
+
+.mobile-actions {
+    display: none;
+    align-items: center;
+    gap: 8px;
+}
+
+.mobile-contact-btn {
+    display: inline-flex;
+    width: 38px;
+    height: 38px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--ink);
+    color: #fff;
+    text-decoration: none;
+    font-size: 18px;
+    line-height: 1;
+}
+
+@media (max-width: 700px) {
+    .mobile-actions {
+        display: flex;
+    }
+
+    .mobile-cart {
+        display: block;
+    }
+}
