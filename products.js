@@ -228,7 +228,7 @@ const PRODUCTS = [
     price: 41000,
     currency: 'CUP',
     priceLabel: 'por caja',
-    availability: 'inlimited,
+    availability: 'unlimited',
     stock: null,
     image: 'assets/products/reposteria-panaderia/levadurafabao.jpg',
     description: 'Levadura seca instantánea, presentación Pack 500 gr'
@@ -241,7 +241,7 @@ const PRODUCTS = [
     price: 6000,
     currency: 'CUP',
     priceLabel: 'por caja',
-    availability: 'inlimited',
+    availability: 'unlimited',
     stock: null,
     image: 'assets/products/aseo/desodorantehombremujer.jpg',
     description: 'Frascos de 50 ml'
@@ -254,7 +254,7 @@ const PRODUCTS = [
     price: 9700,
     currency: 'CUP',
     priceLabel: 'por caja',
-    availability: 'inlimited',
+    availability: 'unlimited',
     stock: null,
     image: 'assets/products/aseo/limpiacristales.jpg',
     description: 'Frascos de 1L'
@@ -267,7 +267,7 @@ const PRODUCTS = [
     price: 13500,
     currency: 'CUP',
     priceLabel: 'por caja',
-    availability: 'inlimited',
+    availability: 'unlimited',
     stock: null,
     image: 'assets/products/aseo/lavavajillas.jpg',
     description: 'Frascos de 1L'
@@ -280,7 +280,7 @@ const PRODUCTS = [
     price: 9900,
     currency: 'CUP',
     priceLabel: 'por pack',
-    availability: 'inlimited',
+    availability: 'unlimited',
     stock: null,
     image: 'assets/products/aseo/cepillo-dental-exceed.jpg',
     description: ''
@@ -293,7 +293,7 @@ const PRODUCTS = [
     price: 8100,
     currency: 'CUP',
     priceLabel: 'por pack',
-    availability: 'inlimited',
+    availability: 'unlimited',
     stock: null,
     image: 'assets/products/aseo/cepillo-dental-medio.jpg',
     description: ''
@@ -306,7 +306,7 @@ const PRODUCTS = [
     price: 6800,
     currency: 'CUP',
     priceLabel: 'por pack',
-    availability: 'inlimited',
+    availability: 'unlimited',
     stock: null,
     image: 'assets/products/aseo/pasta-dental-closeup.jpg',
     description: ''
@@ -319,7 +319,7 @@ const PRODUCTS = [
     price: 9625,
     currency: 'CUP',
     priceLabel: 'por pack',
-    availability: 'inlimited',
+    availability: 'unlimited',
     stock: null,
     image: 'assets/products/aseo/pasta-dental-closeup-infantil.jpg',
     description: ''
@@ -332,7 +332,7 @@ const PRODUCTS = [
     price: 11000,
     currency: 'CUP',
     priceLabel: 'por pack',
-    availability: 'inlimited',
+    availability: 'unlimited',
     stock: null,
     image: 'assets/products/aseo/pasta-dental-colgate.jpg',
     description: ''
@@ -345,7 +345,7 @@ const PRODUCTS = [
     price: 25500,
     currency: 'CUP',
     priceLabel: 'por caja',
-    availability: 'inlimited',
+    availability: 'unlimited',
     stock: null,
     image: 'assets/products/aseo/servilleta-100hojas.jpg',
     description: ''
@@ -358,7 +358,7 @@ const PRODUCTS = [
     price: 54300,
     currency: 'CUP',
     priceLabel: 'por caja',
-    availability: 'inlimited',
+    availability: 'unlimited',
     stock: null,
     image: 'assets/products/aseo/servilleta-140hojas.jpg',
     description: ''
@@ -371,7 +371,7 @@ const PRODUCTS = [
     price: 1600,
     currency: 'CUP',
     priceLabel: 'por pack',
-    availability: 'inlimited',
+    availability: 'unlimited',
     stock: null,
     image: 'assets/products/aseo/toallas-de-microfibra.jpg',
     description: ''
@@ -384,7 +384,7 @@ const PRODUCTS = [
     price: 36,
     currency: 'USD',
     priceLabel: 'por unidad',
-    availability: 'inlimited',
+    availability: 'unlimited',
     stock: null,
     image: 'assets/products/ferreteria/aceite-castrol.jpg',
     description: ''
@@ -397,7 +397,7 @@ const PRODUCTS = [
     price: 24,
     currency: 'USD',
     priceLabel: 'por caja',
-    availability: 'inlimited',
+    availability: 'unlimited',
     stock: null,
     image: 'assets/products/ferreteria/losa-gravel-calacatta-gold.jpg',
     description: 'Medidas 60x120cm'
@@ -410,7 +410,7 @@ const PRODUCTS = [
     price: 24,
     currency: 'USD',
     priceLabel: 'por caja',
-    availability: 'inlimited',
+    availability: 'unlimited',
     stock: null,
     image: 'assets/products/ferreteria/losa-vanity-silver.jpg',
     description: 'Medidas 60x120cm'
@@ -423,7 +423,7 @@ const PRODUCTS = [
     price: 27,
     currency: 'USD',
     priceLabel: 'por caja',
-    availability: 'inlimited',
+    availability: 'unlimited',
     stock: null,
     image: 'assets/products/ferreteria/losa-marmol-carrara.jpg',
     description: 'Medidas 60x120cm'
@@ -436,7 +436,7 @@ const PRODUCTS = [
     price: 24,
     currency: 'USD',
     priceLabel: 'por caja',
-    availability: 'inlimited',
+    availability: 'unlimited',
     stock: null,
     image: 'assets/products/ferreteria/losa-mainstream-sand-polish.jpg',
     description: 'Medidas 60x120cm'
@@ -449,7 +449,7 @@ const PRODUCTS = [
     price: 24,
     currency: 'USD',
     priceLabel: 'por caja',
-    availability: 'inlimited',
+    availability: 'unlimited',
     stock: null,
     image: 'assets/products/ferreteria/losa-denali-ash-polished.jpg',
     description: 'Medidas 60x60cm'
@@ -462,7 +462,7 @@ const PRODUCTS = [
     price: 24,
     currency: 'USD',
     priceLabel: 'por caja',
-    availability: 'inlimited',
+    availability: 'unlimited',
     stock: null,
     image: 'assets/products/ferreteria/losa-meek-pearl-pulida.jpg',
     description: 'Medidas 60x60cm'
