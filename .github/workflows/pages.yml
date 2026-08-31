@@ -29,9 +29,12 @@ jobs:
       - name: Prepare site
         run: |
           mkdir -p _site
-          cp -R . _site/
-          rm -rf _site/.git
-          rm -rf _site/.github
+
+          rsync -av \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='_site' \
+            ./ _site/
 
           VERSION="${GITHUB_SHA}"
 
