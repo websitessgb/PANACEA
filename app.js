@@ -439,13 +439,15 @@ ${totals}
 
 ✅ Usted será atendido por: Alejandro - Gestor de Ventas.`;
 
-    window.open(
-      `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`,
-      '_blank'
-    );
+    window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`,'_blank');
 
-    document.getElementById('checkoutDialog').close();
-  });
+// Vaciar completamente el carrito después de generar el pedido
+cart = {};
+localStorage.removeItem('panacea-cart');
+renderCart();
+
+document.getElementById('checkoutDialog').close();
+closeCart();
 
 renderProducts();
 renderCart();
