@@ -1,1 +1,49 @@
+name: Deploy PANACEA to GitHub Pages
 
+"on":
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Prepare site
+        run: |
+          mkdir -p _site
+          cp -R . _site/
+          rm -rf _site/.git
+          rm -rf _site/.github
+
+          VERSION="${GITHUB_SHA}"
+
+          sed -i "s#styles.css#styles.css?v=${VERSION}#g" _site/index.html
+          sed -i "s#products.js#products.js?v=${VERSION}#g" _site/index.html
+          sed -i "s#app.js#app.js?v=${VERSION}#g" _site/index.html
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
