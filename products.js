@@ -85,8 +85,8 @@ const PRODUCTS = [
     price: 33500,
     currency: 'CUP',
     priceLabel: 'por caja',
-    availability: 'out',
-    stock: 0,
+    availability: 'limited',
+    stock: 80,
     image: 'assets/products/reposteria-panaderia/macomsa.jpg',
     description: 'LA COMPRA MÁXIMA POR CLIENTE PARA ESTE PRODUCTO ES DE XX UNIDADES'
   },
