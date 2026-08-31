@@ -30,34 +30,59 @@ function renderProducts(){
   const grid = document.getElementById('productGrid');
   const empty = document.getElementById('emptyState');
   const list = filteredProducts();
+
   grid.innerHTML = list.map(p => {
     const [label, cls] = availabilityLabel(p);
     const disabled = p.availability === 'out' ? 'disabled' : '';
     const low = p.availability === 'limited' && p.stock <= 3 ? ' · últimas unidades' : '';
+
     return `<article class="product-card">
-      <div class="product-image"><img src="${p.image}" alt="${p.name}" loading="lazy"><span class="badge ${cls}">${label}${low}</span></div>
+      <div class="product-image">
+        <img src="${p.image}" alt="${p.name}" loading="lazy">
+        <span class="badge ${cls}">${label}${low}</span>
+      </div>
+
       <div class="product-body">
         <h3>${p.name}</h3>
         <p class="presentation">${p.presentation}</p>
         <p class="description">${p.description}</p>
-        <div class="price">${money(p.price,p.currency)} <small>${p.priceLabel || 'por presentación'}</small></div>
-        <div class="product-actions"><button class="add-btn" data-add="${p.id}" ${disabled}>${p.availability === 'out' ? 'Agotado' : '🛒 Agregar al carrito'}</button></div>
+
+        <div class="price">
+          ${money(p.price,p.currency)}
+          <small>${p.priceLabel || 'por presentación'}</small>
+        </div>
+
+        <div class="product-actions">
+          <button class="add-btn" data-add="${p.id}" ${disabled}>
+            ${p.availability === 'out' ? 'Agotado' : '🛒 Agregar al carrito'}
+          </button>
+        </div>
       </div>
     </article>`;
   }).join('');
+
   empty.hidden = list.length !== 0;
-  grid.querySelectorAll('[data-add]').forEach(btn => btn.addEventListener('click', () => addToCart(btn.dataset.add, 1)));
+
+  grid.querySelectorAll('[data-add]').forEach(btn =>
+    btn.addEventListener('click', () => addToCart(btn.dataset.add, 1))
+  );
 }
 
 function addToCart(id, qty){
-  const p = productById(id); if(!p || p.availability === 'out') return;
+  const p = productById(id);
+  if(!p || p.availability === 'out') return;
+
   const current = cart[id] || 0;
   const next = current + qty;
+
   if(next > maxQty(p)){
     alert(`Solo quedan ${p.stock} unidades disponibles de ${p.name}.`);
     return;
   }
-  cart[id] = next; saveCart(); openCart();
+
+  cart[id] = next;
+  saveCart();
+  openCart();
 }
 
 function removeFromCart(id){
@@ -193,6 +218,7 @@ function renderCart(){
       qty = Math.floor(qty);
 
       const p = productById(id);
+
       if(p && p.availability === 'limited' && qty > Number(p.stock)){
         alert(`Solo quedan ${p.stock} unidades disponibles de ${p.name}.`);
         qty = Number(p.stock);
@@ -216,43 +242,210 @@ function renderCart(){
     });
   });
 
-  const total = entries.reduce(
-    (sum,{p,qty}) => sum + p.price * qty,
+  /* ==========================================
+     TOTALES SEPARADOS POR MONEDA
+     ========================================== */
+
+  const totalCUP = entries.reduce(
+    (sum,{p,qty}) =>
+      p.currency === 'CUP'
+        ? sum + p.price * qty
+        : sum,
     0
   );
 
-  document.getElementById('cartTotal').textContent = money(total);
+  const totalUSD = entries.reduce(
+    (sum,{p,qty}) =>
+      p.currency === 'USD'
+        ? sum + p.price * qty
+        : sum,
+    0
+  );
+
+  const totals = [];
+
+  if(totalCUP > 0){
+    totals.push(`Total CUP: ${money(totalCUP,'CUP')}`);
+  }
+
+  if(totalUSD > 0){
+    totals.push(`Total USD: ${money(totalUSD,'USD')}`);
+  }
+
+  document.getElementById('cartTotal').innerHTML =
+    totals.join('<br>');
 }
 
-function openCart(){document.getElementById('cartDrawer').classList.add('open');document.getElementById('cartDrawer').setAttribute('aria-hidden','false');document.getElementById('overlay').classList.add('show');}
-function closeCart(){document.getElementById('cartDrawer').classList.remove('open');document.getElementById('cartDrawer').setAttribute('aria-hidden','true');document.getElementById('overlay').classList.remove('show');}
+function openCart(){
+  document.getElementById('cartDrawer').classList.add('open');
+  document.getElementById('cartDrawer').setAttribute('aria-hidden','false');
+  document.getElementById('overlay').classList.add('show');
+}
+
+function closeCart(){
+  document.getElementById('cartDrawer').classList.remove('open');
+  document.getElementById('cartDrawer').setAttribute('aria-hidden','true');
+  document.getElementById('overlay').classList.remove('show');
+}
+
 function checkout(){
-  const entries=cartEntries(); if(!entries.length) return;
-  const total=entries.reduce((s,{p,qty})=>s+p.price*qty,0);
-  document.getElementById('checkoutSummary').textContent=`${entries.reduce((s,x)=>s+x.qty,0)} unidades · ${money(total)}`;
+  const entries = cartEntries();
+  if(!entries.length) return;
+
+  const totalCUP = entries.reduce(
+    (sum,{p,qty}) =>
+      p.currency === 'CUP'
+        ? sum + p.price * qty
+        : sum,
+    0
+  );
+
+  const totalUSD = entries.reduce(
+    (sum,{p,qty}) =>
+      p.currency === 'USD'
+        ? sum + p.price * qty
+        : sum,
+    0
+  );
+
+  const totals = [];
+
+  if(totalCUP > 0){
+    totals.push(`Total CUP: ${money(totalCUP,'CUP')}`);
+  }
+
+  if(totalUSD > 0){
+    totals.push(`Total USD: ${money(totalUSD,'USD')}`);
+  }
+
+  document.getElementById('checkoutSummary').innerHTML =
+    `${entries.reduce((s,x) => s + x.qty, 0)} unidades<br>${totals.join('<br>')}`;
+
   document.getElementById('checkoutDialog').showModal();
 }
 
-document.querySelectorAll('.category-card').forEach(btn=>btn.addEventListener('click',()=>{
-  document.querySelectorAll('.category-card').forEach(x=>x.classList.remove('active')); btn.classList.add('active'); activeCategory=btn.dataset.category; renderProducts(); document.getElementById('catalogo').scrollIntoView({behavior:'smooth'});
-}));
-document.querySelectorAll('.filter').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('.filter').forEach(x=>x.classList.remove('active'));btn.classList.add('active');activeAvailability=btn.dataset.availability;renderProducts();}));
-document.getElementById('searchInput').addEventListener('input',e=>{searchTerm=e.target.value.trim();renderProducts();});
-['openCart','openCartMobile'].forEach(id=>document.getElementById(id).addEventListener('click',openCart));
-document.getElementById('closeCart').addEventListener('click',closeCart);document.getElementById('overlay').addEventListener('click',closeCart);document.getElementById('checkoutBtn').addEventListener('click',checkout);
-document.getElementById('closeCheckout').addEventListener('click',()=>{
-  document.getElementById('checkoutDialog').close();
-});
+document.querySelectorAll('.category-card').forEach(btn =>
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.category-card')
+      .forEach(x => x.classList.remove('active'));
 
-document.getElementById('checkoutForm').addEventListener('submit',e=>{
-  e.preventDefault();
-  const name=document.getElementById('customerName').value.trim(); const phone=document.getElementById('customerPhone').value.trim();
-  if(!name||!phone) return;
-  const entries=cartEntries(); const total=entries.reduce((s,{p,qty})=>s+p.price*qty,0);
-  const lines=entries.map(({p,qty})=>`• ${p.name} — ${qty} × ${money(p.price,p.currency)} = ${money(p.price*qty,p.currency)}`);
-  const msg=`🛍️ PEDIDO PANACEA\n\n👤 Cliente: ${name}\n📞 Teléfono: ${phone}\n\n📦 PRODUCTOS\n${lines.join('\n')}\n\n💰 TOTAL: ${money(total)}\n\n❗️Esta solicitud generada no reserva su producto. La compra solo está asegurada una vez obtenga la factura del producto en nuestra oficina (ver en google maps en el final de la página)❗️\n\n✅Usted será atendido por: Alejandro - Gestor de Ventas.`;
-  window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`,'_blank');
-  document.getElementById('checkoutDialog').close();
-});
+    btn.classList.add('active');
+    activeCategory = btn.dataset.category;
 
-renderProducts(); renderCart();
+    renderProducts();
+
+    document.getElementById('catalogo')
+      .scrollIntoView({behavior:'smooth'});
+  })
+);
+
+document.querySelectorAll('.filter').forEach(btn =>
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.filter')
+      .forEach(x => x.classList.remove('active'));
+
+    btn.classList.add('active');
+    activeAvailability = btn.dataset.availability;
+
+    renderProducts();
+  })
+);
+
+document.getElementById('searchInput')
+  .addEventListener('input',e=>{
+    searchTerm = e.target.value.trim();
+    renderProducts();
+  });
+
+['openCart','openCartMobile'].forEach(id =>
+  document.getElementById(id)
+    .addEventListener('click',openCart)
+);
+
+document.getElementById('closeCart')
+  .addEventListener('click',closeCart);
+
+document.getElementById('overlay')
+  .addEventListener('click',closeCart);
+
+document.getElementById('checkoutBtn')
+  .addEventListener('click',checkout);
+
+document.getElementById('closeCheckout')
+  .addEventListener('click',()=>{
+    document.getElementById('checkoutDialog').close();
+  });
+
+/* ==========================================
+   ENVÍO DEL PEDIDO A WHATSAPP
+   ========================================== */
+
+document.getElementById('checkoutForm')
+  .addEventListener('submit',e=>{
+    e.preventDefault();
+
+    const name =
+      document.getElementById('customerName').value.trim();
+
+    const phone =
+      document.getElementById('customerPhone').value.trim();
+
+    if(!name || !phone) return;
+
+    const entries = cartEntries();
+
+    const totalCUP = entries.reduce(
+      (sum,{p,qty}) =>
+        p.currency === 'CUP'
+          ? sum + p.price * qty
+          : sum,
+      0
+    );
+
+    const totalUSD = entries.reduce(
+      (sum,{p,qty}) =>
+        p.currency === 'USD'
+          ? sum + p.price * qty
+          : sum,
+      0
+    );
+
+    const lines = entries.map(({p,qty}) =>
+      `• ${p.name} — ${qty} × ${money(p.price,p.currency)} = ${money(p.price * qty,p.currency)}`
+    );
+
+    let totals = '';
+
+    if(totalCUP > 0){
+      totals += `💰 TOTAL CUP: ${money(totalCUP,'CUP')}\n`;
+    }
+
+    if(totalUSD > 0){
+      totals += `💵 TOTAL USD: ${money(totalUSD,'USD')}\n`;
+    }
+
+    const msg =
+`🛍️ PEDIDO PANACEA
+
+👤 Cliente: ${name}
+📞 Teléfono: ${phone}
+
+📦 PRODUCTOS
+${lines.join('\n')}
+
+━━━━━━━━━━━━━━
+${totals}
+❗️Esta solicitud generada no reserva su producto. La compra solo está asegurada una vez obtenga la factura del producto en nuestra oficina (ver en google maps en el final de la página)❗️
+
+✅ Usted será atendido por: Alejandro - Gestor de Ventas.`;
+
+    window.open(
+      `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`,
+      '_blank'
+    );
+
+    document.getElementById('checkoutDialog').close();
+  });
+
+renderProducts();
+renderCart();
