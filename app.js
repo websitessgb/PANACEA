@@ -413,7 +413,7 @@ document.getElementById('checkoutForm')
     );
 
     const lines = entries.map(({p,qty}) =>
-      `• ${p.name} — ${qty} × ${money(p.price,p.currency)} = ${money(p.price * qty,p.currency)}`
+      `• ${p.name} — ${qty} ${p.priceLabel || ''} × ${money(p.price,p.currency)} = ${money(p.price * qty,p.currency)}`
     );
 
     let totals = '';
