@@ -381,7 +381,7 @@ document.getElementById('closeCheckout')
    ========================================== */
 
 document.getElementById('checkoutForm')
-  .addEventListener('submit',e=>{
+  .addEventListener('submit', e => {
     e.preventDefault();
 
     const name =
@@ -393,6 +393,8 @@ document.getElementById('checkoutForm')
     if(!name || !phone) return;
 
     const entries = cartEntries();
+
+    if(!entries.length) return;
 
     const totalCUP = entries.reduce(
       (sum,{p,qty}) =>
@@ -439,15 +441,28 @@ ${totals}
 
 ✅ Usted será atendido por: Alejandro - Gestor de Ventas.`;
 
-    window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`,'_blank');
+    const whatsappUrl =
+      `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`;
 
-// Vaciar completamente el carrito después de generar el pedido
-cart = {};
-localStorage.removeItem('panacea-cart');
-renderCart();
+    // Abrir WhatsApp
+    const whatsappWindow = window.open(
+      whatsappUrl,
+      '_blank'
+    );
 
-document.getElementById('checkoutDialog').close();
-closeCart();
+    // Solo vaciar el carrito si WhatsApp se pudo abrir
+    if(whatsappWindow){
+      cart = {};
+      localStorage.removeItem('panacea-cart');
 
-renderProducts();
-renderCart();
+      renderCart();
+
+      document.getElementById('checkoutDialog').close();
+      closeCart();
+    } else {
+      alert(
+        'No se pudo abrir WhatsApp. ' +
+        'Por favor, permite las ventanas emergentes para este sitio.'
+      );
+    }
+  });
