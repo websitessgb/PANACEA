@@ -250,7 +250,7 @@ document.getElementById('checkoutForm').addEventListener('submit',e=>{
   if(!name||!phone) return;
   const entries=cartEntries(); const total=entries.reduce((s,{p,qty})=>s+p.price*qty,0);
   const lines=entries.map(({p,qty})=>`• ${p.name} — ${qty} × ${money(p.price,p.currency)} = ${money(p.price*qty,p.currency)}`);
-  const msg=`🛍️ PEDIDO PANACEA\n\n👤 Cliente: ${name}\n📞 Teléfono: ${phone}\n\n📦 PRODUCTOS\n${lines.join('\n')}\n\n💰 TOTAL: ${money(total)}\n\nSolicitud generada desde el catálogo PANACEA.`;
+  const msg=`🛍️ PEDIDO PANACEA\n\n👤 Cliente: ${name}\n📞 Teléfono: ${phone}\n\n📦 PRODUCTOS\n${lines.join('\n')}\n\n💰 TOTAL: ${money(total)}\n\n❗️Esta solicitud generada no reserva su producto. La compra solo esta asegurada una vez obtenga la factura del producto en nuestra oficina (ver en google maps en el final de la página)❗️\n\n✅Usted ha sido atendido por: Alejandro - Gestor de Ventas.`;
   window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`,'_blank');
   document.getElementById('checkoutDialog').close();
 });
