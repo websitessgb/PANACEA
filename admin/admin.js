@@ -786,7 +786,6 @@ ${lines.join('\n')}
 📌 Estado: ${state}.
 
 ❗️Esta preorden no reserva su producto. La compra solo está asegurada una vez obtenga la factura del producto en nuestra oficina❗️
-
 ✅ Usted fue atendido por: *Alejandro* - Gestor de Ventas. Información que debe comunicar a la facturadora que lo atienda.
 
 Disfrute su producto🔖`;
