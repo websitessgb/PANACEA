@@ -719,6 +719,11 @@ body{
   background:#f4f2ec;
 }
 
+.detail-actions button:disabled{
+  opacity:.45;
+  cursor:not-allowed;
+}
+
 .detail-actions .danger{
   color:var(--admin-danger);
 }
@@ -748,6 +753,453 @@ body{
 .admin-toast.show{
   opacity:1;
   transform:translate(-50%,0);
+}
+
+
+/* =========================================================
+   ESTADO DEL PEDIDO
+   ========================================================= */
+
+[data-status-editor]{
+  margin-top:18px!important;
+  padding:16px!important;
+  background:#f6f4ef!important;
+  border:1px solid var(--admin-line)!important;
+  border-radius:16px!important;
+}
+
+[data-status-editor] label{
+  font-size:13px!important;
+  color:var(--admin-ink);
+}
+
+[data-status-editor] select{
+  font-size:13px!important;
+  padding:10px 12px!important;
+  color:var(--admin-ink);
+}
+
+[data-status-editor] button{
+  font-size:11px!important;
+  padding:10px 13px!important;
+  border-radius:11px!important;
+  font-weight:800;
+}
+
+
+/* =========================================================
+   CALENDARIO / FILTROS DE PEDIDOS
+   ========================================================= */
+
+.admin-nav-actions{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:14px;
+}
+
+
+/* =========================================================
+   BOTÓN DEL CALENDARIO
+   ========================================================= */
+
+.calendar-wrap{
+  position:relative;
+}
+
+.calendar-toggle{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  min-height:38px;
+  padding:8px 13px;
+  border:1px solid var(--admin-line);
+  border-radius:999px;
+  background:#fff;
+  color:var(--admin-ink);
+  font-family:'DM Sans',sans-serif;
+  font-size:12px;
+  font-weight:800;
+  cursor:pointer;
+  transition:.2s;
+}
+
+.calendar-toggle:hover{
+  background:#f4f2ec;
+  border-color:#bdcbbd;
+}
+
+.calendar-toggle.active{
+  background:var(--admin-sage-dark);
+  border-color:var(--admin-sage-dark);
+  color:#fff;
+}
+
+
+/* =========================================================
+   PANEL
+   ========================================================= */
+
+.calendar-panel{
+  position:absolute;
+  top:calc(100% + 12px);
+  right:0;
+  width:350px;
+  max-width:calc(100vw - 24px);
+  padding:16px;
+  background:#fff;
+  border:1px solid var(--admin-line);
+  border-radius:20px;
+  box-shadow:0 20px 55px rgba(42,57,48,.18);
+  z-index:100;
+}
+
+.calendar-panel[hidden]{
+  display:none;
+}
+
+
+/* =========================================================
+   CABECERA
+   ========================================================= */
+
+.calendar-panel-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:13px;
+}
+
+.calendar-panel-header strong{
+  font-size:14px;
+}
+
+.calendar-close{
+  width:30px;
+  height:30px;
+  border:0;
+  border-radius:50%;
+  background:#f4f2ec;
+  color:var(--admin-muted);
+  font-size:21px;
+  line-height:1;
+  cursor:pointer;
+}
+
+.calendar-close:hover{
+  background:#e9e6de;
+}
+
+
+/* =========================================================
+   FILTROS
+   ========================================================= */
+
+.calendar-quick-filters{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+  margin-bottom:15px;
+}
+
+.calendar-quick-filters button{
+  min-height:36px;
+  border:1px solid var(--admin-line);
+  background:#faf9f6;
+  color:var(--admin-ink);
+  border-radius:10px;
+  padding:8px 7px;
+  font-family:'DM Sans',sans-serif;
+  font-size:10px;
+  font-weight:800;
+  cursor:pointer;
+  transition:.2s;
+}
+
+.calendar-quick-filters button:hover{
+  background:#eef3ee;
+  border-color:#bdcbbd;
+}
+
+.calendar-quick-filters button.active{
+  background:var(--admin-sage-dark);
+  border-color:var(--admin-sage-dark);
+  color:#fff;
+}
+
+
+/* =========================================================
+   CABECERA DEL MES
+   ========================================================= */
+
+.calendar-month-header{
+  display:grid;
+  grid-template-columns:36px 1fr 36px;
+  align-items:center;
+  gap:6px;
+  margin-bottom:10px;
+}
+
+.calendar-month-header strong{
+  text-align:center;
+  font-size:13px;
+  text-transform:capitalize;
+}
+
+.calendar-month-header button{
+  width:36px;
+  height:32px;
+  border:1px solid var(--admin-line);
+  border-radius:9px;
+  background:#fff;
+  color:var(--admin-ink);
+  font-size:21px;
+  cursor:pointer;
+}
+
+.calendar-month-header button:hover{
+  background:#f4f2ec;
+}
+
+
+/* =========================================================
+   ENCABEZADO DE DÍAS
+   ========================================================= */
+
+.calendar-weekdays{
+  display:grid;
+  grid-template-columns:32px repeat(7,1fr);
+  gap:3px;
+  margin-bottom:4px;
+}
+
+.calendar-weekdays span{
+  min-width:0;
+  text-align:center;
+  color:var(--admin-muted);
+  font-size:9px;
+  font-weight:800;
+}
+
+.calendar-week-corner{
+  display:block;
+}
+
+
+/* =========================================================
+   CUADRÍCULA
+   ========================================================= */
+
+.calendar-grid{
+  display:grid;
+  gap:3px;
+}
+
+.calendar-row{
+  display:grid;
+  grid-template-columns:32px repeat(7,1fr);
+  gap:3px;
+  align-items:center;
+  border-radius:9px;
+}
+
+.calendar-row.current-week{
+  background:#f4f7f3;
+}
+
+.calendar-row.selected-week-row{
+  background:#edf3ee;
+}
+
+
+/* =========================================================
+   NÚMERO DE SEMANA
+   ========================================================= */
+
+.calendar-week-number{
+  width:32px;
+  height:32px;
+  display:grid;
+  place-items:center;
+  border:0;
+  border-radius:8px;
+  background:#eef3ee;
+  color:var(--admin-sage-dark);
+  font-family:'DM Sans',sans-serif;
+  font-size:9px;
+  font-weight:800;
+  cursor:pointer;
+  padding:0;
+}
+
+.calendar-week-number:hover{
+  background:#dfe9df;
+}
+
+.calendar-week-number.selected{
+  background:var(--admin-sage-dark);
+  color:#fff;
+}
+
+
+/* =========================================================
+   DÍAS
+   ========================================================= */
+
+.calendar-day{
+  position:relative;
+  width:100%;
+  height:32px;
+  border:0;
+  border-radius:8px;
+  background:transparent;
+  color:var(--admin-ink);
+  font-family:'DM Sans',sans-serif;
+  font-size:11px;
+  font-weight:600;
+  cursor:pointer;
+  padding:0;
+  transition:.15s;
+}
+
+.calendar-day:hover{
+  background:#eef3ee;
+}
+
+.calendar-day.other-month{
+  color:#c5c9c5;
+}
+
+.calendar-day.today{
+  font-weight:900;
+  box-shadow:inset 0 0 0 2px var(--admin-sage);
+}
+
+.calendar-day.selected{
+  background:var(--admin-sage-dark);
+  color:#fff;
+  font-weight:900;
+}
+
+.calendar-day.selected.today{
+  box-shadow:none;
+}
+
+.calendar-day.selected-week{
+  background:#dfe9df;
+  color:var(--admin-sage-dark);
+  font-weight:800;
+}
+
+.calendar-day.selected-week.other-month{
+  color:#9da99e;
+}
+
+.calendar-day.selected-month{
+  background:#edf3ee;
+  color:var(--admin-sage-dark);
+  font-weight:800;
+}
+
+.calendar-day.selected-month.other-month{
+  background:transparent;
+  color:#c5c9c5;
+}
+
+.calendar-day-number{
+  display:grid;
+  width:100%;
+  height:100%;
+  place-items:center;
+}
+
+
+/* =========================================================
+   FILTRO ACTIVO
+   ========================================================= */
+
+.calendar-active-filter{
+  margin-top:13px;
+  padding:10px 11px;
+  border-radius:11px;
+  background:#f4f2ec;
+  color:var(--admin-ink);
+  font-size:11px;
+  font-weight:800;
+  line-height:1.4;
+}
+
+.calendar-active-filter.filtered{
+  background:#e8f0e9;
+  color:var(--admin-sage-dark);
+}
+
+
+/* =========================================================
+   QUITAR FILTRO
+   ========================================================= */
+
+.calendar-clear{
+  width:100%;
+  margin-top:8px;
+  padding:9px;
+  border:1px solid var(--admin-line);
+  border-radius:10px;
+  background:#fff;
+  color:var(--admin-muted);
+  font-family:'DM Sans',sans-serif;
+  font-size:11px;
+  font-weight:800;
+  cursor:pointer;
+}
+
+.calendar-clear:hover{
+  background:#f4f2ec;
+  color:var(--admin-ink);
+}
+
+
+/* =========================================================
+   RESUMEN DE ESTADOS
+   ========================================================= */
+
+.date-filter-summary{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:6px;
+  margin-top:6px;
+  color:var(--admin-muted);
+  font-size:11px;
+  line-height:1.4;
+}
+
+.date-filter-summary strong{
+  color:var(--admin-ink);
+  width:100%;
+}
+
+.date-summary-count{
+  color:var(--admin-ink);
+  font-weight:700;
+}
+
+.date-summary-status{
+  font-weight:800;
+}
+
+.date-summary-status.pending{
+  color:var(--admin-warning);
+}
+
+.date-summary-status.invoiced{
+  color:#49637d;
+}
+
+.date-summary-status.cancelled{
+  color:var(--admin-danger);
 }
 
 
@@ -871,398 +1323,6 @@ body{
     width:100%;
   }
 
-}
-
-
-@media(max-width:430px){
-
-  .admin-stats{
-    grid-template-columns:1fr;
-  }
-
-  .admin-brand small{
-    display:none;
-  }
-
-                               }
-
-/* ESTADO DEL PEDIDO */
-[data-status-editor]{
-  margin-top:18px!important;
-  padding:16px!important;
-  background:#f6f4ef!important;
-  border:1px solid var(--admin-line)!important;
-  border-radius:16px!important;
-}
-
-[data-status-editor] label{
-  font-size:13px!important;
-  color:var(--admin-ink);
-}
-
-[data-status-editor] select{
-  font-size:13px!important;
-  padding:10px 12px!important;
-  color:var(--admin-ink);
-}
-
-[data-status-editor] button{
-  font-size:11px!important;
-  padding:10px 13px!important;
-  border-radius:11px!important;
-  font-weight:800;
-}
-
-/* =========================================================
-   CALENDARIO / FILTROS DE PEDIDOS
-   ========================================================= */
-
-.admin-nav-actions{
-  display:flex;
-  align-items:center;
-  justify-content:flex-end;
-  gap:14px;
-}
-
-
-/* BOTÓN DEL CALENDARIO */
-
-.calendar-wrap{
-  position:relative;
-}
-
-.calendar-toggle{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:6px;
-  min-height:38px;
-  padding:8px 13px;
-  border:1px solid var(--admin-line);
-  border-radius:999px;
-  background:#fff;
-  color:var(--admin-ink);
-  font-family:'DM Sans',sans-serif;
-  font-size:12px;
-  font-weight:800;
-  cursor:pointer;
-  transition:.2s;
-}
-
-.calendar-toggle:hover{
-  background:#f4f2ec;
-  border-color:#bdcbbd;
-}
-
-.calendar-toggle.active{
-  background:var(--admin-sage-dark);
-  border-color:var(--admin-sage-dark);
-  color:#fff;
-}
-
-
-/* PANEL */
-
-.calendar-panel{
-  position:absolute;
-  top:calc(100% + 12px);
-  right:0;
-  width:350px;
-  max-width:calc(100vw - 24px);
-  padding:16px;
-  background:#fff;
-  border:1px solid var(--admin-line);
-  border-radius:20px;
-  box-shadow:0 20px 55px rgba(42,57,48,.18);
-  z-index:100;
-}
-
-.calendar-panel[hidden]{
-  display:none;
-}
-
-
-/* CABECERA */
-
-.calendar-panel-header{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  margin-bottom:13px;
-}
-
-.calendar-panel-header strong{
-  font-size:14px;
-}
-
-.calendar-close{
-  width:30px;
-  height:30px;
-  border:0;
-  border-radius:50%;
-  background:#f4f2ec;
-  color:var(--admin-muted);
-  font-size:21px;
-  line-height:1;
-  cursor:pointer;
-}
-
-.calendar-close:hover{
-  background:#e9e6de;
-}
-
-
-/* FILTROS RÁPIDOS */
-
-.calendar-quick-filters{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:7px;
-  margin-bottom:15px;
-}
-
-.calendar-quick-filters button{
-  border:1px solid var(--admin-line);
-  background:#faf9f6;
-  color:var(--admin-ink);
-  border-radius:10px;
-  padding:9px 7px;
-  font-family:'DM Sans',sans-serif;
-  font-size:11px;
-  font-weight:800;
-  cursor:pointer;
-  transition:.2s;
-}
-
-.calendar-quick-filters button:hover{
-  background:#eef3ee;
-  border-color:#bdcbbd;
-}
-
-.calendar-quick-filters button.active{
-  background:var(--admin-sage-dark);
-  border-color:var(--admin-sage-dark);
-  color:#fff;
-}
-
-
-/* CABECERA DEL MES */
-
-.calendar-month-header{
-  display:grid;
-  grid-template-columns:36px 1fr 36px;
-  align-items:center;
-  gap:6px;
-  margin-bottom:10px;
-}
-
-.calendar-month-header strong{
-  text-align:center;
-  font-size:13px;
-  text-transform:capitalize;
-}
-
-.calendar-month-header button{
-  width:36px;
-  height:32px;
-  border:1px solid var(--admin-line);
-  border-radius:9px;
-  background:#fff;
-  color:var(--admin-ink);
-  font-size:21px;
-  cursor:pointer;
-}
-
-.calendar-month-header button:hover{
-  background:#f4f2ec;
-}
-
-
-/* DÍAS */
-
-.calendar-weekdays{
-  display:grid;
-  grid-template-columns:32px repeat(7,1fr);
-  gap:3px;
-  margin-bottom:4px;
-}
-
-.calendar-weekdays span{
-  text-align:center;
-  color:var(--admin-muted);
-  font-size:9px;
-  font-weight:800;
-}
-
-
-/* CUADRÍCULA */
-
-.calendar-grid{
-  display:grid;
-  gap:3px;
-}
-
-.calendar-row{
-  display:grid;
-  grid-template-columns:32px repeat(7,1fr);
-  gap:3px;
-  align-items:center;
-}
-
-.calendar-week-number{
-  height:32px;
-  display:grid;
-  place-items:center;
-  border:0;
-  border-radius:8px;
-  background:#eef3ee;
-  color:var(--admin-sage-dark);
-  font-size:9px;
-  font-weight:800;
-  cursor:pointer;
-}
-
-.calendar-week-number:hover{
-  background:#dfe9df;
-}
-
-.calendar-week-number.selected{
-  background:var(--admin-sage-dark);
-  color:#fff;
-}
-
-.calendar-day{
-  position:relative;
-  height:32px;
-  border:0;
-  border-radius:8px;
-  background:transparent;
-  color:var(--admin-ink);
-  font-family:'DM Sans',sans-serif;
-  font-size:11px;
-  font-weight:600;
-  cursor:pointer;
-}
-
-.calendar-day:hover{
-  background:#eef3ee;
-}
-
-.calendar-day.other-month{
-  color:#c5c9c5;
-}
-
-.calendar-day.today{
-  font-weight:900;
-  box-shadow:inset 0 0 0 2px var(--admin-sage);
-}
-
-.calendar-day.selected{
-  background:var(--admin-sage-dark);
-  color:#fff;
-  font-weight:900;
-}
-
-.calendar-day.selected.today{
-  box-shadow:none;
-}
-
-
-/* SEMANA ACTUAL */
-
-.calendar-row.current-week{
-  background:#f4f7f3;
-  border-radius:9px;
-}
-
-.calendar-row.current-week .calendar-week-number{
-  background:#dfe9df;
-  color:var(--admin-sage-dark);
-}
-
-
-/* FILTRO ACTIVO */
-
-.calendar-active-filter{
-  margin-top:13px;
-  padding:10px 11px;
-  border-radius:11px;
-  background:#f4f2ec;
-  color:var(--admin-ink);
-  font-size:11px;
-  font-weight:800;
-  line-height:1.4;
-}
-
-.calendar-active-filter.filtered{
-  background:#e8f0e9;
-  color:var(--admin-sage-dark);
-}
-
-
-/* QUITAR FILTRO */
-
-.calendar-clear{
-  width:100%;
-  margin-top:8px;
-  padding:9px;
-  border:1px solid var(--admin-line);
-  border-radius:10px;
-  background:#fff;
-  color:var(--admin-muted);
-  font-family:'DM Sans',sans-serif;
-  font-size:11px;
-  font-weight:800;
-  cursor:pointer;
-}
-
-.calendar-clear:hover{
-  background:#f4f2ec;
-  color:var(--admin-ink);
-}
-
-
-/* RESUMEN DE ESTADOS */
-
-.date-filter-summary{
-  display:flex;
-  flex-wrap:wrap;
-  align-items:center;
-  gap:6px;
-  margin-top:6px;
-  color:var(--admin-muted);
-  font-size:11px;
-}
-
-.date-filter-summary strong{
-  color:var(--admin-ink);
-}
-
-.date-filter-summary .summary-pending{
-  color:var(--admin-warning);
-  font-weight:800;
-}
-
-.date-filter-summary .summary-invoiced{
-  color:#49637d;
-  font-weight:800;
-}
-
-.date-filter-summary .summary-cancelled{
-  color:var(--admin-danger);
-  font-weight:800;
-}
-
-
-/* RESPONSIVE */
-
-@media(max-width:650px){
-
-  .admin-nav-actions{
-    gap:7px;
-  }
-
   .calendar-toggle span{
     display:none;
   }
@@ -1276,18 +1336,32 @@ body{
     overflow-y:auto;
   }
 
-  .admin-public-link{
-    white-space:nowrap;
-  }
-
 }
 
+
 @media(max-width:430px){
+
+  .admin-stats{
+    grid-template-columns:1fr;
+  }
+
+  .admin-brand small{
+    display:none;
+  }
 
   .calendar-panel{
     left:12px;
     right:12px;
     width:auto;
+  }
+
+  .calendar-weekdays,
+  .calendar-row{
+    grid-template-columns:30px repeat(7,1fr);
+  }
+
+  .calendar-week-number{
+    width:30px;
   }
 
 }
