@@ -53,7 +53,6 @@
 
       <div class="admin-nav-actions">
 
-
         <!-- ==========================================
              CALENDARIO / FILTROS
              ========================================== -->
@@ -68,7 +67,7 @@
             aria-expanded="false"
           >
             📅
-            <span>Semanas</span>
+            <span>Calendario</span>
           </button>
 
 
@@ -107,35 +106,28 @@
                 data-date-filter="all"
                 class="active"
               >
-                Todos
+                Todos los pedidos
               </button>
 
               <button
                 type="button"
-                data-date-filter="today"
+                data-date-filter="day"
               >
-                Hoy
+                Por día
               </button>
 
               <button
                 type="button"
-                data-date-filter="yesterday"
+                data-date-filter="week"
               >
-                Ayer
+                Por semana
               </button>
 
               <button
                 type="button"
-                data-date-filter="currentWeek"
+                data-date-filter="month"
               >
-                Esta semana
-              </button>
-
-              <button
-                type="button"
-                data-date-filter="previousWeek"
-              >
-                Semana anterior
+                Por mes
               </button>
 
             </div>
@@ -174,6 +166,7 @@
 
             <div class="calendar-weekdays">
 
+              <span class="calendar-week-corner"></span>
               <span>L</span>
               <span>M</span>
               <span>X</span>
@@ -746,7 +739,7 @@
        JAVASCRIPT
        ========================================== -->
 
-  <script src="admin.js?v=2"></script>
+  <script src="admin.js?v=3"></script>
 
 </body>
 </html>
