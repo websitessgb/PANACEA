@@ -20,7 +20,7 @@
     rel="stylesheet"
   >
 
-  <!-- Reutilizamos los estilos base de PANACEA -->
+  <!-- Estilos base de PANACEA -->
   <link rel="stylesheet" href="../styles.css">
 
   <!-- Estilos exclusivos del administrador -->
@@ -38,285 +38,205 @@
     <div class="admin-container admin-nav">
 
       <a href="../index.html" class="admin-brand">
-        <span class="admin-brand-mark">P</span>
+
+        <span class="admin-brand-mark">
+          P
+        </span>
 
         <span>
           PANACEA
           <small>ADMINISTRACIÓN</small>
         </span>
+
       </a>
+
 
       <div class="admin-nav-actions">
 
-  
-<!-- CALENDARIO / FILTROS -->
 
-<div class="calendar-wrap">
+        <!-- ==========================================
+             CALENDARIO / FILTROS
+             ========================================== -->
 
-  <button
-    type="button"
-    class="calendar-toggle"
-    id="calendarToggle"
-    aria-label="Abrir calendario"
-    aria-expanded="false"
-  >
-    📅
-    <span>Semanas</span>
-  </button>
+        <div class="calendar-wrap">
 
-
-  <div
-    class="calendar-panel"
-    id="calendarPopover"
-    hidden
-  >
-
-    <div class="calendar-panel-header">
-
-      <strong>📅 Filtrar pedidos</strong>
-
-      <button
-        type="button"
-        class="calendar-close"
-        id="calendarClose"
-        aria-label="Cerrar calendario"
-      >
-        ×
-      </button>
-
-    </div>
+          <button
+            type="button"
+            class="calendar-toggle"
+            id="calendarToggle"
+            aria-label="Abrir calendario"
+            aria-expanded="false"
+          >
+            📅
+            <span>Semanas</span>
+          </button>
 
 
-    <!-- FILTROS RÁPIDOS -->
+          <div
+            class="calendar-panel"
+            id="calendarPopover"
+            hidden
+          >
 
-    <div class="calendar-quick-filters">
+            <!-- CABECERA -->
 
-      <button
-        type="button"
-        data-date-filter="all"
-        class="active"
-      >
-        Todos
-      </button>
+            <div class="calendar-panel-header">
 
-      <button
-        type="button"
-        data-date-filter="today"
-      >
-        Hoy
-      </button>
+              <strong>
+                📅 Filtrar pedidos
+              </strong>
 
-      <button
-        type="button"
-        data-date-filter="yesterday"
-      >
-        Ayer
-      </button>
+              <button
+                type="button"
+                class="calendar-close"
+                id="calendarClose"
+                aria-label="Cerrar calendario"
+              >
+                ×
+              </button>
 
-      <button
-        type="button"
-        data-date-filter="currentWeek"
-      >
-        Esta semana
-      </button>
-
-      <button
-        type="button"
-        data-date-filter="previousWeek"
-      >
-        Semana anterior
-      </button>
-
-    </div>
+            </div>
 
 
-    <!-- CABECERA DEL MES -->
+            <!-- FILTROS RÁPIDOS -->
 
-    <div class="calendar-month-header">
+            <div class="calendar-quick-filters">
 
-      <button
-        type="button"
-        id="calendarPrev"
-        aria-label="Mes anterior"
-      >
-        ‹
-      </button>
+              <button
+                type="button"
+                data-date-filter="all"
+                class="active"
+              >
+                Todos
+              </button>
 
+              <button
+                type="button"
+                data-date-filter="today"
+              >
+                Hoy
+              </button>
 
-      <strong id="calendarMonthTitle">
-        Septiembre 2026
-      </strong>
+              <button
+                type="button"
+                data-date-filter="yesterday"
+              >
+                Ayer
+              </button>
 
+              <button
+                type="button"
+                data-date-filter="currentWeek"
+              >
+                Esta semana
+              </button>
 
-      <button
-        type="button"
-        id="calendarNext"
-        aria-label="Mes siguiente"
-      >
-        ›
-      </button>
+              <button
+                type="button"
+                data-date-filter="previousWeek"
+              >
+                Semana anterior
+              </button>
 
-    </div>
-
-
-    <!-- DÍAS DE LA SEMANA -->
-
-    <div class="calendar-weekdays">
-
-      <span>L</span>
-      <span>M</span>
-      <span>X</span>
-      <span>J</span>
-      <span>V</span>
-      <span>S</span>
-      <span>D</span>
-
-    </div>
-
-
-    <!-- CALENDARIO -->
-
-    <div
-      id="calendarGrid"
-      class="calendar-grid"
-    ></div>
+            </div>
 
 
-    <!-- FILTRO ACTIVO -->
+            <!-- CABECERA DEL MES -->
 
-    <div
-      id="calendarActiveText"
-      class="calendar-active-filter"
-    >
-      Todos los pedidos
-    </div>
+            <div class="calendar-month-header">
 
-
-    <!-- RESUMEN DE RESULTADOS -->
-
-    <div
-      id="dateFilterSummary"
-      class="date-filter-summary"
-      hidden
-    ></div>
+              <button
+                type="button"
+                id="calendarPrev"
+                aria-label="Mes anterior"
+              >
+                ‹
+              </button>
 
 
-    <!-- QUITAR FILTRO -->
-
-    <button
-      type="button"
-      class="calendar-clear"
-      id="calendarClear"
-    >
-      ✕ Quitar filtro
-    </button>
-
-  </div>
-
-</div>
-
-      <!-- FILTROS RÁPIDOS -->
-
-      <div class="calendar-quick-filters">
-
-        <button type="button" data-calendar-quick="today">
-          Hoy
-        </button>
-
-        <button type="button" data-calendar-quick="yesterday">
-          Ayer
-        </button>
-
-        <button type="button" data-calendar-quick="currentWeek">
-          Esta semana
-        </button>
-
-        <button type="button" data-calendar-quick="previousWeek">
-          Semana anterior
-        </button>
-
-      </div>
+              <strong id="calendarMonthTitle">
+                Septiembre 2026
+              </strong>
 
 
-      <!-- CABECERA DEL MES -->
+              <button
+                type="button"
+                id="calendarNext"
+                aria-label="Mes siguiente"
+              >
+                ›
+              </button>
 
-      <div class="calendar-month-header">
+            </div>
 
-        <button
-          type="button"
-          id="calendarPrev"
-          aria-label="Mes anterior"
+
+            <!-- DÍAS DE LA SEMANA -->
+
+            <div class="calendar-weekdays">
+
+              <span>L</span>
+              <span>M</span>
+              <span>X</span>
+              <span>J</span>
+              <span>V</span>
+              <span>S</span>
+              <span>D</span>
+
+            </div>
+
+
+            <!-- CUADRÍCULA DEL CALENDARIO -->
+
+            <div
+              id="calendarGrid"
+              class="calendar-grid"
+            ></div>
+
+
+            <!-- FILTRO ACTIVO -->
+
+            <div
+              id="calendarActiveText"
+              class="calendar-active-filter"
+            >
+              Todos los pedidos
+            </div>
+
+
+            <!-- RESUMEN DE RESULTADOS -->
+
+            <div
+              id="dateFilterSummary"
+              class="date-filter-summary"
+              hidden
+            ></div>
+
+
+            <!-- QUITAR FILTRO -->
+
+            <button
+              type="button"
+              class="calendar-clear"
+              id="calendarClear"
+            >
+              ✕ Quitar filtro
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <!-- ==========================================
+             ENLACE A PÁGINA PÚBLICA
+             ========================================== -->
+
+        <a
+          href="../index.html"
+          class="admin-public-link"
         >
-          ‹
-        </button>
-
-        <strong id="calendarMonth">
-          Septiembre 2026
-        </strong>
-
-        <button
-          type="button"
-          id="calendarNext"
-          aria-label="Mes siguiente"
-        >
-          ›
-        </button>
-
-      </div>
-
-
-      <!-- DÍAS DE LA SEMANA -->
-
-      <div class="calendar-weekdays">
-
-        <span>S</span>
-        <span>L</span>
-        <span>M</span>
-        <span>X</span>
-        <span>J</span>
-        <span>V</span>
-        <span>S</span>
-
-      </div>
-
-
-      <!-- CALENDARIO -->
-
-      <div
-        id="calendarGrid"
-        class="calendar-grid"
-      ></div>
-
-
-      <!-- FILTRO ACTIVO -->
-
-      <div
-        id="calendarActiveFilter"
-        class="calendar-active-filter"
-      >
-        Sin filtro de fecha
-      </div>
-
-
-      <button
-        type="button"
-        class="calendar-clear"
-        id="calendarClear"
-      >
-        ✕ Quitar filtro
-      </button>
-
-    </div>
-
-  </div>
-
-
-  <a
-    href="../index.html"
-    class="admin-public-link"
-  >
-    ← Ver página pública
-  </a>
+          ← Ver página pública
+        </a>
 
       </div>
 
@@ -325,7 +245,12 @@
   </header>
 
 
+  <!-- ==========================================
+       CONTENIDO PRINCIPAL
+       ========================================== -->
+
   <main>
+
 
     <!-- ==========================================
          CABECERA
@@ -339,17 +264,23 @@
           GESTIÓN DE VENTAS
         </p>
 
+
         <div class="admin-title-row">
 
           <div>
-            <h1>Pedidos</h1>
+
+            <h1>
+              Pedidos
+            </h1>
 
             <p>
               Importa los pedidos recibidos por WhatsApp,
               asígnales un número consecutivo y controla
               su estado.
             </p>
+
           </div>
+
 
           <button
             type="button"
@@ -372,37 +303,90 @@
 
     <section class="admin-container admin-stats">
 
-  <article class="stat-card">
-    <span class="stat-icon">📦</span>
-    <div>
-      <small>Pedidos</small>
-      <strong id="statTotal">0</strong>
-    </div>
-  </article>
 
-  <article class="stat-card">
-    <span class="stat-icon">⏳</span>
-    <div>
-      <small>Pendientes</small>
-      <strong id="statPending">0</strong>
-    </div>
-  </article>
+      <article class="stat-card">
 
-  <article class="stat-card">
-    <span class="stat-icon">🧾</span>
-    <div>
-      <small>Facturados</small>
-      <strong id="statInvoiced">0</strong>
-    </div>
-  </article>
+        <span class="stat-icon">
+          📦
+        </span>
 
-  <article class="stat-card">
-    <span class="stat-icon">❌</span>
-    <div>
-      <small>Cancelados</small>
-      <strong id="statCancelled">0</strong>
-    </div>
-  </article>
+        <div>
+
+          <small>
+            Pedidos
+          </small>
+
+          <strong id="statTotal">
+            0
+          </strong>
+
+        </div>
+
+      </article>
+
+
+      <article class="stat-card">
+
+        <span class="stat-icon">
+          ⏳
+        </span>
+
+        <div>
+
+          <small>
+            Pendientes
+          </small>
+
+          <strong id="statPending">
+            0
+          </strong>
+
+        </div>
+
+      </article>
+
+
+      <article class="stat-card">
+
+        <span class="stat-icon">
+          🧾
+        </span>
+
+        <div>
+
+          <small>
+            Facturados
+          </small>
+
+          <strong id="statInvoiced">
+            0
+          </strong>
+
+        </div>
+
+      </article>
+
+
+      <article class="stat-card">
+
+        <span class="stat-icon">
+          ❌
+        </span>
+
+        <div>
+
+          <small>
+            Cancelados
+          </small>
+
+          <strong id="statCancelled">
+            0
+          </strong>
+
+        </div>
+
+      </article>
+
 
     </section>
 
@@ -413,9 +397,14 @@
 
     <section class="admin-container admin-toolbar">
 
+
+      <!-- BUSCADOR -->
+
       <div class="admin-search">
 
-        <span>⌕</span>
+        <span>
+          ⌕
+        </span>
 
         <input
           type="search"
@@ -427,23 +416,44 @@
       </div>
 
 
+      <!-- FILTROS DE ESTADO -->
+
       <div class="admin-filters">
 
-  <button type="button" class="order-filter active" data-status="all">
-    Todos
-  </button>
+        <button
+          type="button"
+          class="order-filter active"
+          data-status="all"
+        >
+          Todos
+        </button>
 
-  <button type="button" class="order-filter" data-status="pending">
-    Pendientes
-  </button>
 
-  <button type="button" class="order-filter" data-status="invoiced">
-    Facturados
-  </button>
+        <button
+          type="button"
+          class="order-filter"
+          data-status="pending"
+        >
+          Pendientes
+        </button>
 
-  <button type="button" class="order-filter" data-status="cancelled">
-    Cancelados
-  </button>
+
+        <button
+          type="button"
+          class="order-filter"
+          data-status="invoiced"
+        >
+          Facturados
+        </button>
+
+
+        <button
+          type="button"
+          class="order-filter"
+          data-status="cancelled"
+        >
+          Cancelados
+        </button>
 
       </div>
 
@@ -451,23 +461,30 @@
 
 
     <!-- ==========================================
-         LISTADO
+         LISTADO DE PEDIDOS
          ========================================== -->
 
     <section class="admin-container admin-orders-section">
 
+
       <div class="orders-heading">
 
         <div>
-          <h2>Listado de pedidos</h2>
+
+          <h2>
+            Listado de pedidos
+          </h2>
 
           <p id="ordersCount">
             0 pedidos
           </p>
+
         </div>
 
       </div>
 
+
+      <!-- LISTA -->
 
       <div
         id="ordersList"
@@ -475,21 +492,28 @@
       ></div>
 
 
+      <!-- ESTADO VACÍO -->
+
       <div
         id="emptyOrders"
         class="admin-empty"
         hidden
       >
 
-        <div>📦</div>
+        <div>
+          📦
+        </div>
 
-        <h3>No hay pedidos todavía</h3>
+        <h3>
+          No hay pedidos todavía
+        </h3>
 
         <p>
           Cuando recibas un pedido por WhatsApp,
           pulsa <strong>Nuevo pedido</strong> y pega
           el mensaje aquí.
         </p>
+
 
         <button
           type="button"
@@ -520,6 +544,7 @@
       id="importForm"
     >
 
+
       <button
         type="button"
         class="dialog-x"
@@ -534,7 +559,11 @@
         IMPORTAR DESDE WHATSAPP
       </p>
 
-      <h2>Nuevo pedido</h2>
+
+      <h2>
+        Nuevo pedido
+      </h2>
+
 
       <p class="dialog-description">
         Copia el mensaje completo que recibiste del cliente
@@ -547,6 +576,7 @@
         Mensaje de WhatsApp
       </label>
 
+
       <textarea
         id="whatsappMessage"
         rows="12"
@@ -556,6 +586,8 @@
       ></textarea>
 
 
+      <!-- ERROR -->
+
       <div
         id="parseError"
         class="parse-error"
@@ -563,45 +595,90 @@
       ></div>
 
 
+      <!-- VISTA PREVIA -->
+
       <div
         id="importPreview"
         class="import-preview"
         hidden
       >
 
+
         <div class="preview-header">
-          <strong>Vista previa</strong>
+
+          <strong>
+            Vista previa
+          </strong>
+
           <span id="previewOrderNumber"></span>
+
         </div>
+
 
         <div class="preview-grid">
 
-          <div>
-            <small>Cliente</small>
-            <strong id="previewCustomer">—</strong>
-          </div>
 
           <div>
-            <small>Teléfono</small>
-            <strong id="previewPhone">—</strong>
+
+            <small>
+              Cliente
+            </small>
+
+            <strong id="previewCustomer">
+              —
+            </strong>
+
           </div>
 
-          <div>
-            <small>Productos</small>
-            <strong id="previewProducts">—</strong>
-          </div>
 
           <div>
-            <small>Total</small>
-            <strong id="previewTotal">—</strong>
+
+            <small>
+              Teléfono
+            </small>
+
+            <strong id="previewPhone">
+              —
+            </strong>
+
           </div>
+
+
+          <div>
+
+            <small>
+              Productos
+            </small>
+
+            <strong id="previewProducts">
+              —
+            </strong>
+
+          </div>
+
+
+          <div>
+
+            <small>
+              Total
+            </small>
+
+            <strong id="previewTotal">
+              —
+            </strong>
+
+          </div>
+
 
         </div>
 
       </div>
 
 
+      <!-- ACCIONES -->
+
       <div class="dialog-actions">
+
 
         <button
           type="button"
@@ -611,6 +688,7 @@
           Cancelar
         </button>
 
+
         <button
           type="button"
           class="admin-primary-btn"
@@ -618,6 +696,7 @@
         >
           Revisar pedido
         </button>
+
 
         <button
           type="submit"
@@ -628,7 +707,9 @@
           ✓ Crear pedido
         </button>
 
+
       </div>
+
 
     </form>
 
@@ -660,6 +741,10 @@
     aria-live="polite"
   ></div>
 
+
+  <!-- ==========================================
+       JAVASCRIPT
+       ========================================== -->
 
   <script src="admin.js?v=2"></script>
 
