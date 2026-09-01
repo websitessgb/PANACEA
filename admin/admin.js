@@ -671,7 +671,7 @@ function changeStatus(orderNumber){
             color:#fff;
             font-weight:700">
 
-          ✓ Guardar estado
+          ✓ Guardar
 
         </button>
 
