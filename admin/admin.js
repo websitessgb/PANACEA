@@ -1265,6 +1265,23 @@ if(calendarToggle){
   );
 }
 
+/* ==========================================
+   CERRAR CALENDARIO CON LA ✕
+========================================== */
+
+if(calendarClose){
+
+  calendarClose.addEventListener(
+    'click',
+    e=>{
+
+      e.stopPropagation();
+
+      closeCalendar();
+
+    }
+  );
+}
 
 /* ==========================================
    MES ANTERIOR
