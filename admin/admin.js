@@ -1,5 +1,4 @@
 const ADMIN_STORAGE_KEY='panacea-admin-orders';
-const PANACEA_WHATSAPP='5358051138';
 
 let orders=loadOrders(),activeStatus='all',searchTerm='',pendingParsedOrder=null;
 
@@ -404,19 +403,12 @@ function renderOrders(){
 
 function renderStats(){
   document.getElementById('statTotal').textContent=orders.length;
-
   document.getElementById('statPending').textContent=
     orders.filter(o=>o.status==='pending').length;
-
   document.getElementById('statInvoiced').textContent=
     orders.filter(o=>o.status==='invoiced').length;
-
-  const cup=orders.reduce(
-    (s,o)=>s+Number(o.totals?.CUP||0),0
-  );
-
-  document.getElementById('statCup').textContent=
-    money(cup,'CUP');
+  document.getElementById('statCancelled').textContent=
+    orders.filter(o=>o.status==='cancelled').length;
 }
 
 function renderAll(){
@@ -629,21 +621,9 @@ function changeStatus(orderNumber){
         </option>
 
         <option
-          value="confirmed"
-          ${order.status==='confirmed'?'selected':''}>
-          Confirmado
-        </option>
-
-        <option
           value="invoiced"
           ${order.status==='invoiced'?'selected':''}>
           Facturado
-        </option>
-
-        <option
-          value="delivered"
-          ${order.status==='delivered'?'selected':''}>
-          Entregado
         </option>
 
         <option
@@ -701,21 +681,21 @@ function changeStatus(orderNumber){
   const select=box.querySelector('[data-status-select]');
 
   box.querySelector('[data-save-status]').onclick=()=>{
+  order.status=select.value;
+  saveOrders();
+  box.remove();
+  button.hidden=false;
+  renderAll();
 
-    order.status=select.value;
+  const badge=detail.querySelector('.detail-top .status-badge');
 
-saveOrders();
+  if(badge){
+    badge.className=`status-badge ${statusClass(order.status)}`;
+    badge.textContent=statusLabel(order.status);
+  }
 
-box.remove();
-button.hidden=false;
-
-renderAll();
-openOrder(orderNumber);
-
-showToast(
-  `Estado cambiado a: ${statusLabel(order.status)}`
-);
-  };
+  showToast(`Estado cambiado a: ${statusLabel(order.status)}`);
+};
 
   box.querySelector('[data-cancel-status]').onclick=()=>{
     box.remove();
@@ -783,6 +763,35 @@ ${totals}
 📌 Estado: ${statusLabel(o.status)}`;
 }
 
+function buildClientMessage(o){
+  const lines=(o.products||[]).map(p=>
+    `• ${p.name} - ${p.quantity} - ${p.presentation}`
+  );
+
+  const state={
+    pending:'Pendiente de Facturación',
+    confirmed:'Confirmado',
+    invoiced:'Facturado',
+    delivered:'Entregado',
+    cancelled:'Cancelado'
+  }[o.status]||'Pendiente de Facturación';
+
+  return`Estimado cliente su # de preorden es: *${o.orderNumber}*
+
+👤 *Nombre:* ${o.customer}
+
+📦 *Productos:*
+${lines.join('\n')}
+
+📌 Estado: ${state}.
+
+❗️Esta preorden no reserva su producto. La compra solo está asegurada una vez obtenga la factura del producto en nuestra oficina❗️
+
+✅ Usted fue atendido por: *Alejandro* - Gestor de Ventas. Información que debe comunicar a la facturadora que lo atienda.
+
+Disfrute su producto🔖`;
+}
+
 function normalizeCubanPhone(phone){
   let v=String(phone||'').replace(/[^\d]/g,'');
 
@@ -795,21 +804,6 @@ function normalizeCubanPhone(phone){
   return v.length===8?`53${v}`:v;
 }
 
-function sendToSelf(orderNumber){
-  const o=orders.find(
-    x=>x.orderNumber===orderNumber
-  );
-
-  if(!o)return;
-
-  window.open(
-    `https://wa.me/${PANACEA_WHATSAPP}?text=${encodeURIComponent(buildOrderMessage(o))}`,
-    '_blank'
-  );
-
-  showToast('Abriendo WhatsApp.');
-}
-
 function sendToClient(orderNumber){
   const o=orders.find(
     x=>x.orderNumber===orderNumber
@@ -820,20 +814,10 @@ function sendToClient(orderNumber){
   const phone=normalizeCubanPhone(o.phone);
 
   if(!phone)
-    return showToast(
-      'El teléfono del cliente no es válido.'
-    );
-
-  const message=`Hola ${o.customer} 👋
-
-Le escribimos de PANACEA en relación con su pedido ${o.orderNumber}.
-
-${buildOrderMessage(o)}
-
-Si necesita alguna aclaración, estamos a su disposición.`;
+    return showToast('El teléfono del cliente no es válido.');
 
   window.open(
-    `https://wa.me/${phone}?text=${encodeURIComponent(message)}`,
+    `https://wa.me/${phone}?text=${encodeURIComponent(buildClientMessage(o))}`,
     '_blank'
   );
 
