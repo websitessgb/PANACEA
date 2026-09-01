@@ -503,12 +503,16 @@ function openOrder(orderNumber){
   </button>
 
   <button type="button" data-send-client="${o.orderNumber}">
-    👤 Enviar al cliente
-  </button>
+  👤 Enviar al cliente
+</button>
 
-  <button type="button" data-send-biller="${o.orderNumber}">
-    🧾 Enviar a la facturadora
-  </button>
+<button type="button" data-send-info="${o.orderNumber}">
+  ‼️ Informaciones importantes
+</button>
+
+<button type="button" data-send-biller="${o.orderNumber}">
+  🧾 Enviar a la facturadora
+</button>
 
   <button type="button" data-copy-order="${o.orderNumber}">
     📋 Copiar pedido
@@ -540,6 +544,13 @@ function openOrder(orderNumber){
       ()=>sendToClient(orderNumber)
     );
 
+  orderDetail
+  .querySelector('[data-send-info]')
+  ?.addEventListener(
+    'click',
+    ()=>sendImportantInfo(orderNumber)
+  );
+  
   orderDetail
     .querySelector('[data-copy-order]')
     ?.addEventListener(
@@ -821,6 +832,42 @@ function sendToClient(orderNumber){
   );
 
   showToast('Abriendo WhatsApp del cliente.');
+}
+
+function buildImportantInfoMessage(){
+  return`‼️Informaciones importantes:‼️
+
+🧾 *Facturación:*
+Callejón de los Prorestante esq. Colón, Nuevo Vedado.
+▪︎ https://www.google.com/maps/search/?api=1&query=23.1195366%2C-82.3967783
+
+📍 *Retiro en almacén:*
+Agro de la EJT. Ubicado cerca de la Ciudad Deportiva. Al lado de los cajeros y la TRD.
+▪︎ https://www.google.com/maps/search/?api=1&query=23.103866%2C-82.390748
+
+⏰ *Horario:* Lunes a Viernes 10:00 a.m - 4:00 p.m | Sábados 9:30 a.m - 2:00 p.m.
+
+💰 *Método de pago:* Efectivo (solo se recibe 20% en billetes de 50 CUP y 30% en billetes de 100 CUP por compra).`;
+}
+
+function sendImportantInfo(orderNumber){
+  const o=orders.find(
+    x=>x.orderNumber===orderNumber
+  );
+
+  if(!o)return;
+
+  const phone=normalizeCubanPhone(o.phone);
+
+  if(!phone)
+    return showToast('El teléfono del cliente no es válido.');
+
+  window.open(
+    `https://wa.me/${phone}?text=${encodeURIComponent(buildImportantInfoMessage())}`,
+    '_blank'
+  );
+
+  showToast('Abriendo WhatsApp con las informaciones importantes.');
 }
 
 async function copyOrder(orderNumber){
