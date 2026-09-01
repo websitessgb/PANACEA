@@ -1,6 +1,6 @@
 /* =========================================================
    PANACEA ADMIN
-   Primera versión sin base de datos
+   Versión con estados manuales
    Los pedidos se guardan en localStorage.
    ========================================================= */
 
@@ -194,9 +194,21 @@ function loadOrders(){
     const parsed =
       JSON.parse(saved);
 
-    return Array.isArray(parsed)
-      ? parsed
-      : [];
+    if(!Array.isArray(parsed)){
+      return [];
+    }
+
+    /*
+     * Compatibilidad con pedidos anteriores.
+     * Si algún pedido antiguo no tiene estado,
+     * se considera pendiente.
+     */
+
+    return parsed.map(order => ({
+      ...order,
+      status:
+        order.status || 'pending'
+    }));
 
   }catch(error){
 
@@ -228,8 +240,6 @@ function saveOrders(){
 
 /* =========================================================
    ESCAPAR HTML
-   Evita que nombres pegados desde WhatsApp
-   puedan romper la interfaz.
    ========================================================= */
 
 function escapeHTML(value){
@@ -268,6 +278,10 @@ function statusLabel(status){
 
 }
 
+
+/* =========================================================
+   CLASE DE ESTADO
+   ========================================================= */
 
 function statusClass(status){
 
@@ -391,14 +405,6 @@ function getProductsSection(text){
 
 /* =========================================================
    EXTRAER PRODUCTOS
-   Formato esperado:
-
-   • Nombre — 2 pack × 2,660 CUP = 5,320 CUP
-
-   También acepta:
-
-   • Nombre — 2 saco × 30,000 CUP = 60,000 CUP
-
    ========================================================= */
 
 function parseProducts(text){
@@ -528,11 +534,6 @@ function parseTotals(text){
 
 /* =========================================================
    CREAR NÚMERO CONSECUTIVO
-   Ejemplo:
-
-   PAN-2026-S36-001
-
-   El consecutivo se reinicia cada semana.
    ========================================================= */
 
 function nextOrderNumber(date = new Date()){
@@ -653,11 +654,6 @@ function parseWhatsAppOrder(text){
     parseTotals(cleanText);
 
 
-  /*
-   * Si por alguna razón no aparece el total,
-   * lo calculamos desde las líneas.
-   */
-
   if(
     totals.CUP === 0 &&
     totals.USD === 0
@@ -706,6 +702,10 @@ function parseWhatsAppOrder(text){
     products,
 
     totals,
+
+    /*
+     * Todo pedido nuevo comienza como pendiente.
+     */
 
     status:'pending',
 
@@ -902,9 +902,16 @@ function filteredOrders(){
 
   return orders.filter(order => {
 
+    /*
+     * IMPORTANTE:
+     * Este código SOLO FILTRA.
+     *
+     * Nunca modifica order.status.
+     */
+
     const statusOk =
       activeStatus === 'all' ||
-      order.status === activeStatus;
+      (order.status || 'pending') === activeStatus;
 
 
     if(!statusOk){
@@ -1085,7 +1092,7 @@ function renderStats(){
   ).textContent =
     orders.filter(
       order =>
-        order.status === 'pending'
+        (order.status || 'pending') === 'pending'
     ).length;
 
 
@@ -1146,6 +1153,16 @@ function openOrder(orderNumber){
 
   if(!order){
     return;
+  }
+
+
+  /*
+   * Compatibilidad con pedidos antiguos.
+   */
+
+  if(!order.status){
+    order.status = 'pending';
+    saveOrders();
   }
 
 
@@ -1390,6 +1407,15 @@ function openOrder(orderNumber){
 
 /* =========================================================
    CAMBIAR ESTADO
+   =========================================================
+   
+   AHORA EL ESTADO SE ELIGE MANUALMENTE.
+
+   Ya no existe:
+   Pendiente → Confirmado → Facturado → ...
+
+   El usuario puede elegir directamente
+   el estado que desea.
    ========================================================= */
 
 function changeStatus(orderNumber){
@@ -1407,36 +1433,84 @@ function changeStatus(orderNumber){
   }
 
 
-  const statuses = [
+  const options = [
 
-    'pending',
+    ['pending','Pendiente'],
 
-    'confirmed',
+    ['confirmed','Confirmado'],
 
-    'invoiced',
+    ['invoiced','Facturado'],
 
-    'delivered',
+    ['delivered','Entregado'],
 
-    'cancelled'
+    ['cancelled','Cancelado']
 
   ];
 
 
-  const current =
-    statuses.indexOf(
-      order.status
+  const currentStatus =
+    order.status || 'pending';
+
+
+  const optionsText =
+    options
+      .map(
+        ([value,label],index) =>
+          `${index + 1}. ${label}${
+            value === currentStatus
+              ? ' ✓'
+              : ''
+          }`
+      )
+      .join('\n');
+
+
+  const answer =
+    window.prompt(
+      `Selecciona el nuevo estado del pedido ${orderNumber}:\n\n${optionsText}\n\nEscribe 1, 2, 3, 4 o 5.`,
+      String(
+        options.findIndex(
+          ([value]) =>
+            value === currentStatus
+        ) + 1
+      )
     );
 
 
-  const next =
-    statuses[
-      (current + 1) %
-      statuses.length
-    ];
+  if(answer === null){
+    return;
+  }
 
+
+  const selectedIndex =
+    Number(answer) - 1;
+
+
+  if(
+    !Number.isInteger(selectedIndex) ||
+    !options[selectedIndex]
+  ){
+
+    showToast(
+      'Selección no válida.'
+    );
+
+    return;
+
+  }
+
+
+  const newStatus =
+    options[selectedIndex][0];
+
+
+  /*
+   * AQUÍ es el único lugar donde
+   * modificamos manualmente el estado.
+   */
 
   order.status =
-    next;
+    newStatus;
 
 
   saveOrders();
@@ -1446,7 +1520,7 @@ function changeStatus(orderNumber){
   openOrder(orderNumber);
 
   showToast(
-    `Estado: ${statusLabel(next)}`
+    `Estado cambiado a: ${statusLabel(newStatus)}`
   );
 
 }
@@ -1504,7 +1578,14 @@ function deleteOrder(orderNumber){
 
 
 /* =========================================================
-   CREAR TEXTO PARA WHATSAPP
+   CREAR TEXTO PARA WHATSAPP - ADMIN
+   =========================================================
+   
+   Este mensaje es para TI.
+   
+   Incluye:
+   🔢 Número interno del pedido
+   📌 Estado
    ========================================================= */
 
 function buildOrderMessage(order){
@@ -1553,6 +1634,62 @@ ${totals}
 
 
 /* =========================================================
+   CREAR MENSAJE PARA CLIENTE
+   =========================================================
+   
+   IMPORTANTE:
+   NO incluye el número interno PAN-...
+   
+   El cliente solo recibe la información
+   comercial de su pedido.
+   ========================================================= */
+
+function buildClientMessage(order){
+
+  const lines =
+    (order.products || [])
+      .map(product =>
+        `• ${product.name} — ${product.quantity} ${product.presentation} × ${money(product.unitPrice,product.currency)} = ${money(product.total,product.currency)}`
+      );
+
+
+  let totals = '';
+
+
+  if(Number(order.totals?.CUP) > 0){
+
+    totals +=
+      `💰 TOTAL CUP: ${money(order.totals.CUP,'CUP')}\n`;
+
+  }
+
+
+  if(Number(order.totals?.USD) > 0){
+
+    totals +=
+      `💵 TOTAL USD: ${money(order.totals.USD,'USD')}\n`;
+
+  }
+
+
+  return `🛍️ PEDIDO PANACEA
+
+👤 Cliente: ${order.customer}
+📞 Teléfono: ${order.phone}
+
+📦 PRODUCTOS
+${lines.join('\n')}
+
+━━━━━━━━━━━━━━
+${totals}
+❗️Esta solicitud generada no reserva su producto. La compra solo está asegurada una vez obtenga la factura del producto en nuestra oficina (ver en google maps en el final de la página)❗️
+
+✅ Usted será atendido por: Alejandro - Gestor de Ventas.`;
+
+}
+
+
+/* =========================================================
    NORMALIZAR TELÉFONO CUBA
    ========================================================= */
 
@@ -1572,11 +1709,6 @@ function normalizeCubanPhone(phone){
     return value;
   }
 
-
-  /*
-   * Si el cliente dio un número cubano
-   * de 8 dígitos, añadimos +53.
-   */
 
   if(value.length === 8){
     return `53${value}`;
@@ -1630,6 +1762,14 @@ function sendToSelf(orderNumber){
 
 /* =========================================================
    ENVIAR AL CLIENTE
+   =========================================================
+   
+   IMPORTANTE:
+   Utiliza buildClientMessage()
+   y NO buildOrderMessage().
+   
+   Por tanto NO envía:
+   🔢 Pedido: PAN-...
    ========================================================= */
 
 function sendToClient(orderNumber){
@@ -1665,13 +1805,7 @@ function sendToClient(orderNumber){
 
 
   const message =
-`Hola ${order.customer} 👋
-
-Le escribimos de PANACEA en relación con su pedido ${order.orderNumber}.
-
-${buildOrderMessage(order)}
-
-Si necesita alguna aclaración, estamos a su disposición.`;
+    buildClientMessage(order);
 
 
   const url =
@@ -1693,6 +1827,10 @@ Si necesita alguna aclaración, estamos a su disposición.`;
 
 /* =========================================================
    COPIAR PEDIDO
+   =========================================================
+   
+   Como esta función es para uso administrativo,
+   copia el mensaje completo con número de pedido.
    ========================================================= */
 
 async function copyOrder(orderNumber){
@@ -1839,13 +1977,31 @@ searchOrders
       searchTerm =
         event.target.value;
 
+      /*
+       * Buscar solo vuelve a filtrar.
+       * Nunca cambia estados.
+       */
+
       renderOrders();
 
     }
   );
 
 
-/* Filtros */
+/* =========================================================
+   FILTROS DE ESTADO
+   =========================================================
+   
+   IMPORTANTE:
+   Al hacer clic aquí SOLO cambia:
+   
+   activeStatus
+   
+   Nunca:
+   
+   order.status
+   
+   ========================================================= */
 
 document
   .querySelectorAll('.order-filter')
@@ -1873,6 +2029,12 @@ document
           button.dataset.status;
 
 
+        /*
+         * Solo se vuelve a dibujar la lista.
+         * Los pedidos mantienen exactamente
+         * el estado que tenían.
+         */
+
         renderOrders();
 
       }
@@ -1881,7 +2043,9 @@ document
   });
 
 
-/* Cerrar dialogs */
+/* =========================================================
+   CERRAR DIALOGS
+   ========================================================= */
 
 orderDialog.addEventListener(
   'click',
