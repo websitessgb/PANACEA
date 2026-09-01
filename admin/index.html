@@ -109,52 +109,37 @@
 
     <section class="admin-container admin-stats">
 
-      <article class="stat-card">
+  <article class="stat-card">
+    <span class="stat-icon">📦</span>
+    <div>
+      <small>Pedidos</small>
+      <strong id="statTotal">0</strong>
+    </div>
+  </article>
 
-        <span class="stat-icon">📦</span>
+  <article class="stat-card">
+    <span class="stat-icon">⏳</span>
+    <div>
+      <small>Pendientes</small>
+      <strong id="statPending">0</strong>
+    </div>
+  </article>
 
-        <div>
-          <small>Pedidos</small>
-          <strong id="statTotal">0</strong>
-        </div>
+  <article class="stat-card">
+    <span class="stat-icon">🧾</span>
+    <div>
+      <small>Facturados</small>
+      <strong id="statInvoiced">0</strong>
+    </div>
+  </article>
 
-      </article>
-
-
-      <article class="stat-card">
-
-        <span class="stat-icon">⏳</span>
-
-        <div>
-          <small>Pendientes</small>
-          <strong id="statPending">0</strong>
-        </div>
-
-      </article>
-
-
-      <article class="stat-card">
-
-        <span class="stat-icon">🧾</span>
-
-        <div>
-          <small>Facturados</small>
-          <strong id="statInvoiced">0</strong>
-        </div>
-
-      </article>
-
-
-      <article class="stat-card">
-
-        <span class="stat-icon">💰</span>
-
-        <div>
-          <small>Ventas CUP</small>
-          <strong id="statCup">0 CUP</strong>
-        </div>
-
-      </article>
+  <article class="stat-card">
+    <span class="stat-icon">❌</span>
+    <div>
+      <small>Cancelados</small>
+      <strong id="statCancelled">0</strong>
+    </div>
+  </article>
 
     </section>
 
@@ -181,45 +166,21 @@
 
       <div class="admin-filters">
 
-        <button
-          type="button"
-          class="order-filter active"
-          data-status="all"
-        >
-          Todos
-        </button>
+  <button type="button" class="order-filter active" data-status="all">
+    Todos
+  </button>
 
-        <button
-          type="button"
-          class="order-filter"
-          data-status="pending"
-        >
-          Pendientes
-        </button>
+  <button type="button" class="order-filter" data-status="pending">
+    Pendientes
+  </button>
 
-        <button
-          type="button"
-          class="order-filter"
-          data-status="confirmed"
-        >
-          Confirmados
-        </button>
+  <button type="button" class="order-filter" data-status="invoiced">
+    Facturados
+  </button>
 
-        <button
-          type="button"
-          class="order-filter"
-          data-status="invoiced"
-        >
-          Facturados
-        </button>
-
-        <button
-          type="button"
-          class="order-filter"
-          data-status="delivered"
-        >
-          Entregados
-        </button>
+  <button type="button" class="order-filter" data-status="cancelled">
+    Cancelados
+  </button>
 
       </div>
 
