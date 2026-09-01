@@ -423,71 +423,65 @@ function openOrder(orderNumber){
 ========================= */
 
 function changeStatus(orderNumber){
-  const o=orders.find(x=>x.orderNumber===orderNumber);
-  if(!o)return;
+  const order=orders.find(o=>o.orderNumber===orderNumber);
+  if(!order)return;
 
-  if(document.querySelector('[data-status-editor]'))return;
+  const box=document.createElement('div');
+  box.dataset.statusEditor='';
 
-  const options=[
-    ['pending','Pendiente'],
-    ['confirmed','Confirmado'],
-    ['invoiced','Facturado'],
-    ['delivered','Entregado'],
-    ['cancelled','Cancelado']
-  ];
+  box.innerHTML=`
+    <div style="margin-top:15px;padding:15px;background:#f6f4ef;border:1px solid #ddd;border-radius:14px">
+      <label style="display:block;font-weight:700;margin-bottom:8px">
+        Estado del pedido
+      </label>
 
-  const editor=document.createElement('div');
-  editor.dataset.statusEditor='';
-  editor.style.cssText=
-    'margin-top:15px;padding:15px;border-radius:16px;background:#f6f5f0;border:1px solid #e3e1d9';
+      <select data-status-select
+        style="width:100%;padding:12px;border:1px solid #ccc;border-radius:10px;font-size:16px;background:#fff">
 
-  editor.innerHTML=`
-    <div style="font-size:13px;font-weight:700;margin-bottom:8px;color:#68716c">
-      Estado del pedido
+        <option value="pending" ${order.status==='pending'?'selected':''}>Pendiente</option>
+        <option value="confirmed" ${order.status==='confirmed'?'selected':''}>Confirmado</option>
+        <option value="invoiced" ${order.status==='invoiced'?'selected':''}>Facturado</option>
+        <option value="delivered" ${order.status==='delivered'?'selected':''}>Entregado</option>
+        <option value="cancelled" ${order.status==='cancelled'?'selected':''}>Cancelado</option>
+
+      </select>
+
+      <div style="display:flex;gap:8px;margin-top:10px">
+
+        <button type="button" data-save-status
+          style="flex:1;padding:11px;border:0;border-radius:10px;background:#263a32;color:#fff;font-weight:700">
+          ✓ Guardar estado
+        </button>
+
+        <button type="button" data-cancel-status
+          style="flex:1;padding:11px;border:1px solid #ccc;border-radius:10px;background:#fff;font-weight:600">
+          Cancelar
+        </button>
+
+      </div>
     </div>
-
-    <select data-status-select
-      style="width:100%;padding:12px;border:1px solid #d7d5ce;border-radius:12px;background:#fff;font-size:16px">
-      ${options.map(([v,l])=>
-        `<option value="${v}" ${o.status===v?'selected':''}>${l}</option>`
-      ).join('')}
-    </select>
-
-    <div style="display:flex;gap:10px;margin-top:12px">
-
-      <button type="button" data-save-status
-        style="flex:1;padding:12px;border:0;border-radius:12px;background:#263a32;color:#fff;font-weight:700">
-        ✓ Guardar estado
-      </button>
-
-      <button type="button" data-cancel-status
-        style="flex:1;padding:12px;border:1px solid #d7d5ce;border-radius:12px;background:#fff;color:#263a32;font-weight:600">
-        Cancelar
-      </button>
-
-    </div>`;
+  `;
 
   const button=document.querySelector('[data-status]');
   if(!button)return;
 
-  button.insertAdjacentElement('afterend',editor);
+  button.insertAdjacentElement('afterend',box);
   button.hidden=true;
 
-  const select=editor.querySelector('[data-status-select]');
+  const select=box.querySelector('[data-status-select]');
 
-  editor.querySelector('[data-save-status]').addEventListener('click',()=>{
-    o.status=select.value;
+  box.querySelector('[data-save-status]').onclick=()=>{
+    order.status=select.value;
     saveOrders();
     orderDialog.close();
     renderAll();
-    showToast(`Estado cambiado a: ${statusLabel(o.status)}`);
-  });
+    showToast(`Estado cambiado a: ${statusLabel(order.status)}`);
+  };
 
-  editor.querySelector('[data-cancel-status]').addEventListener('click',()=>{
-    editor.remove();
+  box.querySelector('[data-cancel-status]').onclick=()=>{
+    box.remove();
     button.hidden=false;
-    button.focus();
-  });
+  };
 
   select.focus();
 }
