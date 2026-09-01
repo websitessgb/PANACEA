@@ -1882,16 +1882,16 @@ function filteredOrders(){
     .toLowerCase()
     .trim();
 
-
-  return orders.filter(o=>{
+  const result=orders.filter(o=>{
 
     /* FILTRO DE ESTADO */
 
     if(
       activeStatus!=='all' &&
       o.status!==activeStatus
-    )
+    ){
       return false;
+    }
 
 
     /* FILTRO DE FECHA */
@@ -1899,8 +1899,9 @@ function filteredOrders(){
     if(
       dateFilter.type!=='all' &&
       !matchesDateFilter(o)
-    )
+    ){
       return false;
+    }
 
 
     /* BÚSQUEDA */
@@ -1923,7 +1924,20 @@ function filteredOrders(){
     return s.includes(q);
 
   });
+
+
+  alert(
+    'Guardados: '+orders.length+
+    '\nResultado del filtro: '+result.length+
+    '\nEstado: '+activeStatus+
+    '\nFecha: '+dateFilter.type+
+    '\nBúsqueda: "'+searchTerm+'"'
+  );
+
+
+  return result;
 }
+
 
 
 /* ==========================================
