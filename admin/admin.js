@@ -506,38 +506,28 @@ function openOrder(orderNumber){
 
       <div class="detail-actions">
 
-        <button
-          type="button"
-          data-send-self="${escapeHTML(o.orderNumber)}">
-          📱 Enviar a mi WhatsApp
-        </button>
+  <button type="button" data-status="${o.orderNumber}">
+    🔄 Cambiar estado
+  </button>
 
-        <button
-          type="button"
-          data-send-client="${escapeHTML(o.orderNumber)}">
-          👤 Enviar al cliente
-        </button>
+  <button type="button" data-send-client="${o.orderNumber}">
+    👤 Enviar al cliente
+  </button>
 
-        <button
-          type="button"
-          data-copy-order="${escapeHTML(o.orderNumber)}">
-          📋 Copiar pedido
-        </button>
+  <button type="button" data-send-biller="${o.orderNumber}">
+    🧾 Enviar a la facturadora
+  </button>
 
-        <button
-          type="button"
-          data-status="${escapeHTML(o.orderNumber)}">
-          🔄 Cambiar estado
-        </button>
+  <button type="button" data-copy-order="${o.orderNumber}">
+    📋 Copiar pedido
+  </button>
 
-        <button
-          type="button"
-          class="danger"
-          data-delete-order="${escapeHTML(o.orderNumber)}">
-          🗑️ Eliminar
-        </button>
+  <button type="button" class="danger"
+    data-delete-order="${o.orderNumber}">
+    🗑️ Eliminar
+  </button>
 
-      </div>
+</div>
 
     </div>
   `;
@@ -549,13 +539,6 @@ function openOrder(orderNumber){
     ?.addEventListener(
       'click',
       ()=>orderDialog.close()
-    );
-
-  orderDetail
-    .querySelector('[data-send-self]')
-    ?.addEventListener(
-      'click',
-      ()=>sendToSelf(orderNumber)
     );
 
   orderDetail
