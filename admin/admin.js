@@ -704,15 +704,17 @@ function changeStatus(orderNumber){
 
     order.status=select.value;
 
-    saveOrders();
+saveOrders();
 
-    orderDialog.close();
+box.remove();
+button.hidden=false;
 
-    renderAll();
+renderAll();
+openOrder(orderNumber);
 
-    showToast(
-      `Estado cambiado a: ${statusLabel(order.status)}`
-    );
+showToast(
+  `Estado cambiado a: ${statusLabel(order.status)}`
+);
   };
 
   box.querySelector('[data-cancel-status]').onclick=()=>{
