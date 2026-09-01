@@ -585,13 +585,27 @@ function clearDateFilter(){
     month:null
   };
 
+  /* RESTABLECER FILTRO DE ESTADO */
+
+  activeStatus='all';
+
+  document
+    .querySelectorAll('[data-status]')
+    .forEach(button=>{
+
+      button.classList.toggle(
+        'active',
+        button.dataset.status==='all'
+      );
+
+    });
 
   setActiveDateFilterButton('all');
 
   renderAll();
 
   renderCalendar();
-}
+      }
 
 
 /* ==========================================
