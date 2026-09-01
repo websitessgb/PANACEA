@@ -24,19 +24,35 @@ let calendarDate=new Date();
 ========================================== */
 
 const ordersList=document.getElementById('ordersList'),
-      emptyOrders=document.getElementById('emptyOrders'),
-      ordersCount=document.getElementById('ordersCount'),
-      searchOrders=document.getElementById('searchOrders'),
-      importDialog=document.getElementById('importDialog'),
-      orderDialog=document.getElementById('orderDialog'),
-      whatsappMessage=document.getElementById('whatsappMessage'),
-      importPreview=document.getElementById('importPreview'),
-      parseError=document.getElementById('parseError'),
-      saveImportBtn=document.getElementById('saveImportBtn'),
-      previewImportBtn=document.getElementById('previewImportBtn'),
-      orderDetail=document.getElementById('orderDetail'),
-      adminToast=document.getElementById('adminToast');
+emptyOrders=document.getElementById('emptyOrders'),
+ordersCount=document.getElementById('ordersCount'),
+searchOrders=document.getElementById('searchOrders'),
+importDialog=document.getElementById('importDialog'),
+orderDialog=document.getElementById('orderDialog'),
+whatsappMessage=document.getElementById('whatsappMessage'),
+importPreview=document.getElementById('importPreview'),
+parseError=document.getElementById('parseError'),
+saveImportBtn=document.getElementById('saveImportBtn'),
+previewImportBtn=document.getElementById('previewImportBtn'),
+orderDetail=document.getElementById('orderDetail'),
+adminToast=document.getElementById('adminToast');
 
+
+/* ==========================================
+   CALENDARIO
+   ========================================== */
+
+const calendarClose=document.getElementById('calendarClose');
+
+if(calendarClose){
+  calendarClose.addEventListener(
+    'click',
+    e=>{
+      e.stopPropagation();
+      closeCalendar();
+    }
+  );
+}
 
 /* ==========================================
    ELEMENTOS DEL CALENDARIO
