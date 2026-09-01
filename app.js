@@ -504,7 +504,7 @@ ${totals}
 
 ✅ Usted será atendido por: Alejandro - Gestor de Ventas.
 
-\u2063${orderToken}\u2063
+\u2063${orderToken}\u2063`;
 
 
     /* ==============================
