@@ -885,3 +885,30 @@ body{
   }
 
                                }
+
+/* ESTADO DEL PEDIDO */
+[data-status-editor]{
+  margin-top:18px!important;
+  padding:16px!important;
+  background:#f6f4ef!important;
+  border:1px solid var(--admin-line)!important;
+  border-radius:16px!important;
+}
+
+[data-status-editor] label{
+  font-size:13px!important;
+  color:var(--admin-ink);
+}
+
+[data-status-editor] select{
+  font-size:13px!important;
+  padding:10px 12px!important;
+  color:var(--admin-ink);
+}
+
+[data-status-editor] button{
+  font-size:11px!important;
+  padding:10px 13px!important;
+  border-radius:11px!important;
+  font-weight:800;
+}
