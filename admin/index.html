@@ -48,41 +48,172 @@
 
       <div class="admin-nav-actions">
 
-  <!-- CALENDARIO / FILTROS -->
-  <div class="calendar-wrap">
+  
+<!-- CALENDARIO / FILTROS -->
+
+<div class="calendar-wrap">
+
+  <button
+    type="button"
+    class="calendar-toggle"
+    id="calendarToggle"
+    aria-label="Abrir calendario"
+    aria-expanded="false"
+  >
+    📅
+    <span>Semanas</span>
+  </button>
+
+
+  <div
+    class="calendar-panel"
+    id="calendarPopover"
+    hidden
+  >
+
+    <div class="calendar-panel-header">
+
+      <strong>📅 Filtrar pedidos</strong>
+
+      <button
+        type="button"
+        class="calendar-close"
+        id="calendarClose"
+        aria-label="Cerrar calendario"
+      >
+        ×
+      </button>
+
+    </div>
+
+
+    <!-- FILTROS RÁPIDOS -->
+
+    <div class="calendar-quick-filters">
+
+      <button
+        type="button"
+        data-date-filter="all"
+        class="active"
+      >
+        Todos
+      </button>
+
+      <button
+        type="button"
+        data-date-filter="today"
+      >
+        Hoy
+      </button>
+
+      <button
+        type="button"
+        data-date-filter="yesterday"
+      >
+        Ayer
+      </button>
+
+      <button
+        type="button"
+        data-date-filter="currentWeek"
+      >
+        Esta semana
+      </button>
+
+      <button
+        type="button"
+        data-date-filter="previousWeek"
+      >
+        Semana anterior
+      </button>
+
+    </div>
+
+
+    <!-- CABECERA DEL MES -->
+
+    <div class="calendar-month-header">
+
+      <button
+        type="button"
+        id="calendarPrev"
+        aria-label="Mes anterior"
+      >
+        ‹
+      </button>
+
+
+      <strong id="calendarMonthTitle">
+        Septiembre 2026
+      </strong>
+
+
+      <button
+        type="button"
+        id="calendarNext"
+        aria-label="Mes siguiente"
+      >
+        ›
+      </button>
+
+    </div>
+
+
+    <!-- DÍAS DE LA SEMANA -->
+
+    <div class="calendar-weekdays">
+
+      <span>L</span>
+      <span>M</span>
+      <span>X</span>
+      <span>J</span>
+      <span>V</span>
+      <span>S</span>
+      <span>D</span>
+
+    </div>
+
+
+    <!-- CALENDARIO -->
+
+    <div
+      id="calendarGrid"
+      class="calendar-grid"
+    ></div>
+
+
+    <!-- FILTRO ACTIVO -->
+
+    <div
+      id="calendarActiveText"
+      class="calendar-active-filter"
+    >
+      Todos los pedidos
+    </div>
+
+
+    <!-- RESUMEN DE RESULTADOS -->
+
+    <div
+      id="dateFilterSummary"
+      class="date-filter-summary"
+      hidden
+    ></div>
+
+
+    <!-- QUITAR FILTRO -->
 
     <button
       type="button"
-      class="calendar-toggle"
-      id="calendarToggle"
-      aria-label="Abrir calendario"
-      aria-expanded="false"
+      class="calendar-clear"
+      id="calendarClear"
     >
-      📅
-      <span>Semanas</span>
+      ✕ Quitar filtro
     </button>
 
-    <div
-      class="calendar-panel"
-      id="calendarPanel"
-      hidden
-    >
+  </div>
 
-      <div class="calendar-panel-header">
-
-        <strong>📅 Filtrar pedidos</strong>
-
-        <button
-          type="button"
-          class="calendar-close"
-          id="calendarClose"
-          aria-label="Cerrar calendario"
-        >
-          ×
-        </button>
-
-      </div>
-
+</div>
 
       <!-- FILTROS RÁPIDOS -->
 
