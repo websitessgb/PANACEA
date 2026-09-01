@@ -378,23 +378,46 @@ document.getElementById('closeCheckout')
 
 /* ==========================================
    ENVÍO DEL PEDIDO A WHATSAPP
+   FORMATO COMPATIBLE CON PANACEA ADMIN
    ========================================== */
 
 document.getElementById('checkoutForm')
   .addEventListener('submit', e => {
+
     e.preventDefault();
 
+
+    /* ==============================
+       DATOS DEL CLIENTE
+       ============================== */
+
     const name =
-      document.getElementById('customerName').value.trim();
+      document.getElementById('customerName')
+        .value
+        .trim();
 
     const phone =
-      document.getElementById('customerPhone').value.trim();
+      document.getElementById('customerPhone')
+        .value
+        .trim();
+
 
     if(!name || !phone) return;
 
+
+    /* ==============================
+       PRODUCTOS DEL CARRITO
+       ============================== */
+
     const entries = cartEntries();
 
+
     if(!entries.length) return;
+
+
+    /* ==============================
+       TOTALES
+       ============================== */
 
     const totalCUP = entries.reduce(
       (sum,{p,qty}) =>
@@ -404,6 +427,7 @@ document.getElementById('checkoutForm')
       0
     );
 
+
     const totalUSD = entries.reduce(
       (sum,{p,qty}) =>
         p.currency === 'USD'
@@ -412,19 +436,58 @@ document.getElementById('checkoutForm')
       0
     );
 
+
+    /* ==============================
+       IDENTIFICADOR ÚNICO DEL PEDIDO
+       ============================== */
+
+    const orderToken =
+      `PANACEA_ORDER_V1_${Date.now()}`;
+
+
+    /* ==============================
+       LÍNEAS ESTRUCTURADAS
+       
+       IMPORTANTE:
+       Guardamos también el ID real
+       del producto.
+       
+       Esto permitirá que Admin
+       reconozca exactamente qué
+       producto pidió el cliente.
+       ============================== */
+
     const lines = entries.map(({p,qty}) =>
-      `• ${p.name} — ${qty} ${(p.priceLabel || '').replace(/^por\s+/i, '')} × ${money(p.price,p.currency)} = ${money(p.price * qty,p.currency)}`
+      `• ${p.id} | ${p.name} | ${qty} | ${p.price} | ${p.currency}`
     );
+
+
+    /* ==============================
+       TOTALES VISIBLES
+       ============================== */
 
     let totals = '';
 
+
     if(totalCUP > 0){
-      totals += `💰 TOTAL CUP: ${money(totalCUP,'CUP')}\n`;
+
+      totals +=
+        `💰 TOTAL CUP: ${money(totalCUP,'CUP')}\n`;
+
     }
 
+
     if(totalUSD > 0){
-      totals += `💵 TOTAL USD: ${money(totalUSD,'USD')}\n`;
+
+      totals +=
+        `💵 TOTAL USD: ${money(totalUSD,'USD')}\n`;
+
     }
+
+
+    /* ==============================
+       MENSAJE DE WHATSAPP
+       ============================== */
 
     const msg =
 `🛍️ PEDIDO PANACEA
@@ -439,32 +502,61 @@ ${lines.join('\n')}
 ${totals}
 ❗️Esta solicitud generada no reserva su producto. La compra solo está asegurada una vez obtenga la factura del producto en nuestra oficina (ver en google maps en el final de la página)❗️
 
-✅ Usted será atendido por: Alejandro - Gestor de Ventas.`;
+✅ Usted será atendido por: Alejandro - Gestor de Ventas.
+
+🔐 ${orderToken}`;
+
+
+    /* ==============================
+       ABRIR WHATSAPP
+       ============================== */
 
     const whatsappUrl =
       `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`;
 
-    // Abrir WhatsApp
-    const whatsappWindow = window.open(
-      whatsappUrl,
-      '_blank'
-    );
 
-    // Solo vaciar el carrito si WhatsApp se pudo abrir
+    const whatsappWindow =
+      window.open(
+        whatsappUrl,
+        '_blank'
+      );
+
+
+    /* ==============================
+       LIMPIAR CARRITO
+       ============================== */
+
     if(whatsappWindow){
+
       cart = {};
-      localStorage.removeItem('panacea-cart');
+
+      localStorage.removeItem(
+        'panacea-cart'
+      );
+
 
       renderCart();
 
-      document.getElementById('checkoutDialog').close();
+
+      document
+        .getElementById(
+          'checkoutDialog'
+        )
+        .close();
+
+
       closeCart();
+
+
     } else {
+
       alert(
         'No se pudo abrir WhatsApp. ' +
         'Por favor, permite las ventanas emergentes para este sitio.'
       );
+
     }
+
   });
 
 /* ==========================================
