@@ -1863,7 +1863,6 @@ function filteredOrders(){
 
   return orders.filter(o=>{
 
-
     /* FILTRO DE ESTADO */
 
     if(
@@ -1875,13 +1874,17 @@ function filteredOrders(){
 
     /* FILTRO DE FECHA */
 
-    if(!matchesDateFilter(o))
+    if(
+      dateFilter.type!=='all' &&
+      !matchesDateFilter(o)
+    )
       return false;
 
 
     /* BÚSQUEDA */
 
-    if(!q)return true;
+    if(!q)
+      return true;
 
 
     const s=[
@@ -1896,6 +1899,7 @@ function filteredOrders(){
 
 
     return s.includes(q);
+
   });
 }
 
