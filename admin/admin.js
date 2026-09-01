@@ -1410,15 +1410,15 @@ document
   .forEach(button=>{
 
     button.addEventListener(
-      'click',
-      ()=>{
+  'click',
+  e=>{
+    e.stopPropagation();
 
-        applyQuickDateFilter(
-          button.dataset.dateFilter
-        );
-
-      }
+    applyQuickDateFilter(
+      button.dataset.dateFilter
     );
+  }
+);
 
   });
 
