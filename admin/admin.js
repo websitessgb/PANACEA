@@ -591,6 +591,12 @@ function clearDateFilter(){
 
   alert('Pedidos guardados: '+orders.length);
 
+  searchTerm='';
+
+  if(searchOrders){
+  searchOrders.value='';
+  }
+    
   document
     .querySelectorAll('[data-status]')
     .forEach(button=>{
