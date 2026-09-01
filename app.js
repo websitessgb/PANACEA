@@ -458,7 +458,7 @@ document.getElementById('checkoutForm')
        ============================== */
 
     const lines = entries.map(({p,qty}) =>
-      `• ${p.id} | ${p.name} | ${qty} | ${p.price} | ${p.currency}`
+      `• ${p.name} — ${qty} ${(p.priceLabel || '').replace(/^por\s+/i, '')} × ${money(p.price,p.currency)} = ${money(p.price * qty,p.currency)}`
     );
 
 
@@ -504,7 +504,7 @@ ${totals}
 
 ✅ Usted será atendido por: Alejandro - Gestor de Ventas.
 
-🔐 ${orderToken}`;
+\u2063${orderToken}\u2063
 
 
     /* ==============================
