@@ -48,12 +48,144 @@
 
       <div class="admin-nav-actions">
 
-        <a
-          href="../index.html"
-          class="admin-public-link"
+  <!-- CALENDARIO / FILTROS -->
+  <div class="calendar-wrap">
+
+    <button
+      type="button"
+      class="calendar-toggle"
+      id="calendarToggle"
+      aria-label="Abrir calendario"
+      aria-expanded="false"
+    >
+      📅
+      <span>Semanas</span>
+    </button>
+
+    <div
+      class="calendar-panel"
+      id="calendarPanel"
+      hidden
+    >
+
+      <div class="calendar-panel-header">
+
+        <strong>📅 Filtrar pedidos</strong>
+
+        <button
+          type="button"
+          class="calendar-close"
+          id="calendarClose"
+          aria-label="Cerrar calendario"
         >
-          ← Ver página pública
-        </a>
+          ×
+        </button>
+
+      </div>
+
+
+      <!-- FILTROS RÁPIDOS -->
+
+      <div class="calendar-quick-filters">
+
+        <button type="button" data-calendar-quick="today">
+          Hoy
+        </button>
+
+        <button type="button" data-calendar-quick="yesterday">
+          Ayer
+        </button>
+
+        <button type="button" data-calendar-quick="currentWeek">
+          Esta semana
+        </button>
+
+        <button type="button" data-calendar-quick="previousWeek">
+          Semana anterior
+        </button>
+
+      </div>
+
+
+      <!-- CABECERA DEL MES -->
+
+      <div class="calendar-month-header">
+
+        <button
+          type="button"
+          id="calendarPrev"
+          aria-label="Mes anterior"
+        >
+          ‹
+        </button>
+
+        <strong id="calendarMonth">
+          Septiembre 2026
+        </strong>
+
+        <button
+          type="button"
+          id="calendarNext"
+          aria-label="Mes siguiente"
+        >
+          ›
+        </button>
+
+      </div>
+
+
+      <!-- DÍAS DE LA SEMANA -->
+
+      <div class="calendar-weekdays">
+
+        <span>S</span>
+        <span>L</span>
+        <span>M</span>
+        <span>X</span>
+        <span>J</span>
+        <span>V</span>
+        <span>S</span>
+
+      </div>
+
+
+      <!-- CALENDARIO -->
+
+      <div
+        id="calendarGrid"
+        class="calendar-grid"
+      ></div>
+
+
+      <!-- FILTRO ACTIVO -->
+
+      <div
+        id="calendarActiveFilter"
+        class="calendar-active-filter"
+      >
+        Sin filtro de fecha
+      </div>
+
+
+      <button
+        type="button"
+        class="calendar-clear"
+        id="calendarClear"
+      >
+        ✕ Quitar filtro
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <a
+    href="../index.html"
+    class="admin-public-link"
+  >
+    ← Ver página pública
+  </a>
 
       </div>
 
