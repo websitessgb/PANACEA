@@ -589,6 +589,8 @@ function clearDateFilter(){
 
   activeStatus='all';
 
+  alert('Pedidos guardados: '+orders.length);
+
   document
     .querySelectorAll('[data-status]')
     .forEach(button=>{
