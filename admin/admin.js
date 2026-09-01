@@ -5,6 +5,7 @@ let orders=loadOrders(),
     searchTerm='',
     pendingParsedOrder=null;
 
+
 /* ==========================================
    FILTRO DE FECHA / CALENDARIO
 ========================================== */
@@ -13,11 +14,15 @@ let dateFilter={
   type:'all',
   date:null,
   week:null,
-  year:null
+  year:null,
+  month:null
 };
 
+
 /* Mes que se está mostrando en el calendario */
+
 let calendarDate=new Date();
+
 
 /* ==========================================
    ELEMENTOS
@@ -39,25 +44,10 @@ adminToast=document.getElementById('adminToast');
 
 
 /* ==========================================
-   CALENDARIO
-   ========================================== */
-
-const calendarClose=document.getElementById('calendarClose');
-
-if(calendarClose){
-  calendarClose.addEventListener(
-    'click',
-    e=>{
-      e.stopPropagation();
-      closeCalendar();
-    }
-  );
-}
-
-/* ==========================================
    ELEMENTOS DEL CALENDARIO
 ========================================== */
 
+const calendarClose=document.getElementById('calendarClose');
 const calendarToggle=document.getElementById('calendarToggle');
 const calendarPopover=document.getElementById('calendarPopover');
 const calendarMonthTitle=document.getElementById('calendarMonthTitle');
@@ -74,10 +64,12 @@ const dateFilterSummary=document.getElementById('dateFilterSummary');
 ========================================== */
 
 function money(v,c='CUP'){
-  return`${new Intl.NumberFormat('es-CU').format(Number(v)||0)} ${c}`
+  return`${new Intl.NumberFormat('es-CU').format(Number(v)||0)} ${c}`;
 }
 
+
 function formatDate(v){
+
   const d=new Date(v);
 
   return Number.isNaN(d.getTime())
@@ -88,10 +80,12 @@ function formatDate(v){
         year:'numeric',
         hour:'2-digit',
         minute:'2-digit'
-      }).format(d)
+      }).format(d);
 }
 
+
 function getISOWeek(d=new Date()){
+
   d=new Date(
     Date.UTC(
       d.getFullYear(),
@@ -116,10 +110,12 @@ function getISOWeek(d=new Date()){
 
   return Math.ceil(
     (((d-y)/86400000)+1)/7
-  )
+  );
 }
 
+
 function getISOYear(d=new Date()){
+
   d=new Date(
     Date.UTC(
       d.getFullYear(),
@@ -134,55 +130,114 @@ function getISOYear(d=new Date()){
     d.getUTCDate()+4-day
   );
 
-  return d.getUTCFullYear()
+  return d.getUTCFullYear();
 }
 
+
 function loadOrders(){
+
   try{
+
     const x=JSON.parse(
       localStorage.getItem(ADMIN_STORAGE_KEY)||'[]'
     );
 
-    return Array.isArray(x)?x:[]
+    return Array.isArray(x)?x:[];
+
   }catch(e){
-    return[]
+
+    return[];
   }
 }
 
+
 function saveOrders(){
+
   localStorage.setItem(
     ADMIN_STORAGE_KEY,
     JSON.stringify(orders)
-  )
+  );
 }
 
+
 function escapeHTML(v){
+
   return String(v??'')
     .replace(/&/g,'&amp;')
     .replace(/</g,'&lt;')
     .replace(/>/g,'&gt;')
     .replace(/"/g,'&quot;')
-    .replace(/'/g,'&#039;')
+    .replace(/'/g,'&#039;');
 }
 
+
 function statusLabel(s){
+
   return{
     pending:'Pendiente',
     confirmed:'Confirmado',
     invoiced:'Facturado',
     delivered:'Entregado',
     cancelled:'Cancelado'
-  }[s]||'Pendiente'
+  }[s]||'Pendiente';
 }
 
+
 function statusClass(s){
-  return`status-${s||'pending'}`
+
+  return`status-${s||'pending'}`;
 }
 
 
 /* ==========================================
-   FUNCIONES DEL CALENDARIO
+   FUNCIONES DE FECHA
 ========================================== */
+
+
+/*
+  Convierte una fecha YYYY-MM-DD
+  en una fecha LOCAL.
+
+  Esto evita que el navegador la interprete
+  como UTC y cambie el día.
+*/
+
+function parseLocalDateKey(value){
+
+  if(value instanceof Date){
+
+    return new Date(
+      value.getFullYear(),
+      value.getMonth(),
+      value.getDate()
+    );
+  }
+
+
+  const text=String(value||'');
+
+  const match=text.match(
+    /^(\d{4})-(\d{2})-(\d{2})$/
+  );
+
+
+  if(match){
+
+    return new Date(
+      Number(match[1]),
+      Number(match[2])-1,
+      Number(match[3])
+    );
+  }
+
+
+  const d=new Date(value);
+
+  return Number.isNaN(d.getTime())
+    ?new Date(NaN)
+    :d;
+}
+
 
 /* Comparar dos fechas ignorando hora */
 
@@ -190,8 +245,8 @@ function sameLocalDay(a,b){
 
   if(!a||!b)return false;
 
-  const da=new Date(a);
-  const db=new Date(b);
+  const da=parseLocalDateKey(a);
+  const db=parseLocalDateKey(b);
 
   return(
     da.getFullYear()===db.getFullYear() &&
@@ -237,11 +292,20 @@ function getSunday(date){
 
 function dateKey(date){
 
-  const d=new Date(date);
+  const d=parseLocalDateKey(date);
+
+  if(Number.isNaN(d.getTime()))
+    return'';
 
   const y=d.getFullYear();
-  const m=String(d.getMonth()+1).padStart(2,'0');
-  const day=String(d.getDate()).padStart(2,'0');
+
+  const m=String(
+    d.getMonth()+1
+  ).padStart(2,'0');
+
+  const day=String(
+    d.getDate()
+  ).padStart(2,'0');
 
   return`${y}-${m}-${day}`;
 }
@@ -251,13 +315,18 @@ function dateKey(date){
 
 function shortDate(date){
 
+  const d=parseLocalDateKey(date);
+
+  if(Number.isNaN(d.getTime()))
+    return'';
+
   return new Intl.DateTimeFormat(
     'es-CU',
     {
       day:'2-digit',
       month:'2-digit'
     }
-  ).format(new Date(date));
+  ).format(d);
 }
 
 
@@ -302,6 +371,25 @@ function weekRangeText(year,week){
 
 
 /* ==========================================
+   FILTRO ACTIVO
+========================================== */
+
+function setActiveDateFilterButton(type){
+
+  document
+    .querySelectorAll('[data-date-filter]')
+    .forEach(button=>{
+
+      button.classList.toggle(
+        'active',
+        button.dataset.dateFilter===type
+      );
+
+    });
+}
+
+
+/* ==========================================
    ACTUALIZAR TEXTO DEL CALENDARIO
 ========================================== */
 
@@ -309,9 +397,16 @@ function updateCalendarActiveText(){
 
   if(!calendarActiveText)return;
 
+
+  calendarActiveText.classList.toggle(
+    'filtered',
+    dateFilter.type!=='all'
+  );
+
+
   if(dateFilter.type==='day'){
 
-    const d=new Date(
+    const d=parseLocalDateKey(
       dateFilter.date
     );
 
@@ -321,6 +416,7 @@ function updateCalendarActiveText(){
     return;
   }
 
+
   if(dateFilter.type==='week'){
 
     calendarActiveText.textContent=
@@ -328,6 +424,31 @@ function updateCalendarActiveText(){
 
     return;
   }
+
+
+  if(dateFilter.type==='month'){
+
+    const d=new Date(
+      Number(dateFilter.year),
+      Number(dateFilter.month),
+      1
+    );
+
+    const monthName=
+      new Intl.DateTimeFormat(
+        'es-ES',
+        {
+          month:'long',
+          year:'numeric'
+        }
+      ).format(d);
+
+    calendarActiveText.textContent=
+      `Mes: ${monthName.charAt(0).toUpperCase()+monthName.slice(1)}`;
+
+    return;
+  }
+
 
   calendarActiveText.textContent=
     'Todos los pedidos';
@@ -340,16 +461,37 @@ function updateCalendarActiveText(){
 
 function filterByDay(date){
 
-  const d=new Date(date);
+  const d=parseLocalDateKey(date);
+
+  if(Number.isNaN(d.getTime()))
+    return;
+
 
   dateFilter={
     type:'day',
     date:dateKey(d),
     week:null,
-    year:null
+    year:null,
+    month:null
   };
 
+
+  /*
+    Si se selecciona un día de otro mes,
+    el calendario cambia a ese mes.
+  */
+
+  calendarDate=new Date(
+    d.getFullYear(),
+    d.getMonth(),
+    1
+  );
+
+
+  setActiveDateFilterButton('day');
+
   renderAll();
+
   renderCalendar();
 }
 
@@ -360,14 +502,71 @@ function filterByDay(date){
 
 function filterByWeek(year,week){
 
+  const numericYear=Number(year);
+  const numericWeek=Number(week);
+
+
   dateFilter={
     type:'week',
     date:null,
-    week:Number(week),
-    year:Number(year)
+    week:numericWeek,
+    year:numericYear,
+    month:null
   };
 
+
+  /*
+    Colocamos el calendario en el mes
+    donde comienza la semana.
+  */
+
+  const start=getISOWeekStart(
+    numericYear,
+    numericWeek
+  );
+
+
+  calendarDate=new Date(
+    start.getFullYear(),
+    start.getMonth(),
+    1
+  );
+
+
+  setActiveDateFilterButton('week');
+
   renderAll();
+
+  renderCalendar();
+}
+
+
+/* ==========================================
+   FILTRAR POR MES
+========================================== */
+
+function filterByMonth(year,month){
+
+  dateFilter={
+    type:'month',
+    date:null,
+    week:null,
+    year:Number(year),
+    month:Number(month)
+  };
+
+
+  calendarDate=new Date(
+    Number(year),
+    Number(month),
+    1
+  );
+
+
+  setActiveDateFilterButton('month');
+
+  renderAll();
+
   renderCalendar();
 }
 
@@ -382,10 +581,15 @@ function clearDateFilter(){
     type:'all',
     date:null,
     week:null,
-    year:null
+    year:null,
+    month:null
   };
 
+
+  setActiveDateFilterButton('all');
+
   renderAll();
+
   renderCalendar();
 }
 
@@ -399,45 +603,36 @@ function applyQuickDateFilter(type){
   const today=new Date();
 
   today.setHours(
-    0,0,0,0
+    0,
+    0,
+    0,
+    0
   );
+
 
   /* TODOS */
 
   if(type==='all'){
 
     clearDateFilter();
+
     return;
   }
 
 
-  /* HOY */
+  /* POR DÍA */
 
-  if(type==='today'){
+  if(type==='day'){
 
     filterByDay(today);
+
     return;
   }
 
 
-  /* AYER */
+  /* POR SEMANA */
 
-  if(type==='yesterday'){
-
-    const yesterday=new Date(today);
-
-    yesterday.setDate(
-      yesterday.getDate()-1
-    );
-
-    filterByDay(yesterday);
-    return;
-  }
-
-
-  /* ESTA SEMANA */
-
-  if(type==='currentWeek'){
+  if(type==='week'){
 
     filterByWeek(
       getISOYear(today),
@@ -448,19 +643,13 @@ function applyQuickDateFilter(type){
   }
 
 
-  /* SEMANA ANTERIOR */
+  /* POR MES */
 
-  if(type==='previousWeek'){
+  if(type==='month'){
 
-    const previous=new Date(today);
-
-    previous.setDate(
-      previous.getDate()-7
-    );
-
-    filterByWeek(
-      getISOYear(previous),
-      getISOWeek(previous)
+    filterByMonth(
+      today.getFullYear(),
+      today.getMonth()
     );
 
     return;
@@ -476,8 +665,12 @@ function renderCalendar(){
 
   if(!calendarGrid)return;
 
+
   const year=calendarDate.getFullYear();
   const month=calendarDate.getMonth();
+
+
+  /* Título */
 
   const monthName=new Intl.DateTimeFormat(
     'es-ES',
@@ -487,6 +680,7 @@ function renderCalendar(){
     }
   ).format(calendarDate);
 
+
   if(calendarMonthTitle){
 
     calendarMonthTitle.textContent=
@@ -495,7 +689,10 @@ function renderCalendar(){
   }
 
 
-  /* Primer día del mes */
+  /*
+    Primer día y último día
+    del mes mostrado.
+  */
 
   const firstDay=new Date(
     year,
@@ -509,48 +706,27 @@ function renderCalendar(){
     0
   );
 
+
   /*
-    Convertimos domingo=0
-    a lunes=0
+    Convertimos:
+    domingo = 0
+    lunes = 1
+
+    a:
+    lunes = 0
+    martes = 1
+    ...
+    domingo = 6
   */
 
   const startOffset=
     (firstDay.getDay()+6)%7;
 
-  const daysInMonth=
-    lastDay.getDate();
-
-
-  let html='';
-
-
-  /* Cabecera de días */
-
-  const weekdays=[
-    'L',
-    'M',
-    'X',
-    'J',
-    'V',
-    'S',
-    'D'
-  ];
-
-  weekdays.forEach(day=>{
-
-    html+=`
-      <div class="calendar-weekday">
-        ${day}
-      </div>
-    `;
-  });
-
-
-  /* Semanas ISO */
 
   /*
-    Determinamos la primera fecha
-    que aparecerá en la cuadrícula.
+    La primera fecha del calendario
+    será el lunes de la semana que
+    contiene al día 1.
   */
 
   const firstCalendarDate=new Date(
@@ -561,111 +737,227 @@ function renderCalendar(){
 
 
   /*
-    42 casillas = 6 semanas
+    Último domingo necesario.
   */
 
-  for(let i=0;i<42;i++){
+  const endOffset=
+    7-((lastDay.getDay()+6)%7)-1;
 
-    const d=new Date(
-      firstCalendarDate
+
+  const lastCalendarDate=new Date(
+    year,
+    month,
+    lastDay.getDate()+endOffset
+  );
+
+
+  let html='';
+
+
+  const today=new Date();
+
+
+  /*
+    Recorremos semana por semana.
+  */
+
+  let weekStart=new Date(
+    firstCalendarDate
+  );
+
+
+  while(
+    weekStart<=lastCalendarDate
+  ){
+
+    const weekEnd=new Date(
+      weekStart
     );
 
-    d.setDate(
-      firstCalendarDate.getDate()+i
+    weekEnd.setDate(
+      weekEnd.getDate()+6
     );
 
-    const currentMonth=
-      d.getMonth()===month;
 
-    const today=
-      sameLocalDay(
-        d,
-        new Date()
-      );
+    const week=
+      getISOWeek(weekStart);
 
-    const selectedDay=
-      dateFilter.type==='day' &&
-      dateFilter.date===dateKey(d);
+    const weekYear=
+      getISOYear(weekStart);
 
-    const currentWeek=
-      getISOWeek(d)===getISOWeek(new Date()) &&
-      getISOYear(d)===getISOYear(new Date());
 
-    const selectedWeek=
+    const isCurrentWeek=
+      getISOWeek(today)===week &&
+      getISOYear(today)===weekYear;
+
+
+    const isSelectedWeek=
       dateFilter.type==='week' &&
-      dateFilter.week===getISOWeek(d) &&
-      dateFilter.year===getISOYear(d);
+      Number(dateFilter.week)===week &&
+      Number(dateFilter.year)===weekYear;
 
 
-    /*
-      Solo dibujamos el número del día.
-      La semana ISO se coloca en la
-      primera casilla de cada fila.
-    */
-
-    const dayOfWeek=d.getDay()||7;
-
-    let classes=[
-      'calendar-day'
+    let rowClasses=[
+      'calendar-row'
     ];
 
-    if(!currentMonth)
-      classes.push('outside-month');
 
-    if(today)
-      classes.push('today');
+    if(isCurrentWeek)
+      rowClasses.push(
+        'current-week'
+      );
 
-    if(selectedDay)
-      classes.push('selected');
 
-    if(selectedWeek)
-      classes.push('selected-week');
+    if(isSelectedWeek)
+      rowClasses.push(
+        'selected-week-row'
+      );
 
-    if(currentWeek)
-      classes.push('current-week');
+
+    const weekNumberClass=
+      isSelectedWeek
+        ?'calendar-week-number selected'
+        :'calendar-week-number';
+
+
+    html+=`
+
+      <div class="${rowClasses.join(' ')}">
+
+        <button
+          type="button"
+          class="${weekNumberClass}"
+          data-calendar-week="${week}"
+          data-calendar-year="${weekYear}"
+          title="Filtrar por S${String(week).padStart(2,'0')}"
+        >
+          S${String(week).padStart(2,'0')}
+        </button>
+    `;
 
 
     /*
-      Si es lunes, mostramos
-      también el número de semana.
+      Siete días:
+      lunes → domingo.
     */
 
-    let weekNumber='';
+    for(let i=0;i<7;i++){
 
-    if(dayOfWeek===1){
+      const d=new Date(
+        weekStart
+      );
 
-      weekNumber=`
-        <span
-          class="calendar-week-number"
-          data-calendar-week="${getISOWeek(d)}"
-          data-calendar-year="${getISOYear(d)}"
-          title="Filtrar por esta semana"
+      d.setDate(
+        d.getDate()+i
+      );
+
+
+      const currentMonth=
+        d.getMonth()===month;
+
+
+      const isToday=
+        sameLocalDay(
+          d,
+          today
+        );
+
+
+      const isSelectedDay=
+        dateFilter.type==='day' &&
+        dateFilter.date===dateKey(d);
+
+
+      const dayWeek=
+        getISOWeek(d);
+
+      const dayWeekYear=
+        getISOYear(d);
+
+
+      const isSelectedWeekDay=
+        dateFilter.type==='week' &&
+        Number(dateFilter.week)===dayWeek &&
+        Number(dateFilter.year)===dayWeekYear;
+
+
+      const isSelectedMonth=
+        dateFilter.type==='month' &&
+        Number(dateFilter.year)===d.getFullYear() &&
+        Number(dateFilter.month)===d.getMonth();
+
+
+      let classes=[
+        'calendar-day'
+      ];
+
+
+      if(!currentMonth)
+        classes.push(
+          'other-month'
+        );
+
+
+      if(isToday)
+        classes.push(
+          'today'
+        );
+
+
+      if(isSelectedDay)
+        classes.push(
+          'selected'
+        );
+
+
+      if(isSelectedWeekDay)
+        classes.push(
+          'selected-week'
+        );
+
+
+      if(isSelectedMonth)
+        classes.push(
+          'selected-month'
+        );
+
+
+      html+=`
+
+        <button
+          type="button"
+          class="${classes.join(' ')}"
+          data-calendar-day="${dateKey(d)}"
+          title="Filtrar pedidos del ${shortDate(d)}"
         >
-          S${String(getISOWeek(d)).padStart(2,'0')}
-        </span>
+          <span class="calendar-day-number">
+            ${d.getDate()}
+          </span>
+        </button>
+
       `;
     }
 
 
     html+=`
-      <div
-        class="${classes.join(' ')}"
-        data-calendar-day="${dateKey(d)}"
-        title="Filtrar pedidos del ${shortDate(d)}"
-      >
-        ${weekNumber}
-        <span class="calendar-day-number">
-          ${d.getDate()}
-        </span>
+
       </div>
+
     `;
+
+
+    weekStart.setDate(
+      weekStart.getDate()+7
+    );
   }
 
 
   calendarGrid.innerHTML=html;
 
 
-  /* Click en día */
+  /* ==========================================
+     CLICK EN DÍA
+  ========================================== */
 
   calendarGrid
     .querySelectorAll('[data-calendar-day]')
@@ -673,28 +965,21 @@ function renderCalendar(){
 
       day.addEventListener(
         'click',
-        e=>{
-
-          /*
-            Si tocaron el número
-            de semana no filtramos día.
-          */
-
-          if(
-            e.target.closest(
-              '[data-calendar-week]'
-            )
-          )return;
+        ()=>{
 
           filterByDay(
             day.dataset.calendarDay
           );
+
         }
       );
+
     });
 
 
-  /* Click en semana */
+  /* ==========================================
+     CLICK EN SEMANA
+  ========================================== */
 
   calendarGrid
     .querySelectorAll('[data-calendar-week]')
@@ -707,11 +992,17 @@ function renderCalendar(){
           e.stopPropagation();
 
           filterByWeek(
-            Number(week.dataset.calendarYear),
-            Number(week.dataset.calendarWeek)
+            Number(
+              week.dataset.calendarYear
+            ),
+            Number(
+              week.dataset.calendarWeek
+            )
           );
+
         }
       );
+
     });
 
 
@@ -720,12 +1011,84 @@ function renderCalendar(){
 
 
 /* ==========================================
+   COMPROBAR FILTRO DE FECHA
+========================================== */
+
+function matchesDateFilter(order){
+
+  if(dateFilter.type==='all')
+    return true;
+
+
+  const d=new Date(
+    order.createdAt
+  );
+
+
+  if(Number.isNaN(d.getTime()))
+    return false;
+
+
+  /* DÍA */
+
+  if(dateFilter.type==='day'){
+
+    return(
+      dateKey(d)===dateFilter.date
+    );
+  }
+
+
+  /* SEMANA */
+
+  if(dateFilter.type==='week'){
+
+    return(
+      getISOWeek(d)===
+        Number(dateFilter.week) &&
+      getISOYear(d)===
+        Number(dateFilter.year)
+    );
+  }
+
+
+  /* MES */
+
+  if(dateFilter.type==='month'){
+
+    return(
+      d.getFullYear()===
+        Number(dateFilter.year) &&
+      d.getMonth()===
+        Number(dateFilter.month)
+    );
+  }
+
+
+  return true;
+}
+
+
+/* ==========================================
+   PEDIDOS DEL FILTRO DE FECHA
+========================================== */
+
+function dateFilteredOrders(){
+
+  return orders.filter(
+    matchesDateFilter
+  );
+}
+
+
+/* ==========================================
    RESUMEN DEL FILTRO
 ========================================== */
 
-function renderDateFilterSummary(list){
+function renderDateFilterSummary(){
 
   if(!dateFilterSummary)return;
+
 
   if(dateFilter.type==='all'){
 
@@ -736,13 +1099,25 @@ function renderDateFilterSummary(list){
   }
 
 
+  /*
+    El resumen siempre cuenta TODOS los
+    pedidos del período seleccionado,
+    independientemente del filtro de estado
+    o del buscador.
+  */
+
+  const list=dateFilteredOrders();
+
+
   const pending=list.filter(
     o=>o.status==='pending'
   ).length;
 
+
   const invoiced=list.filter(
     o=>o.status==='invoiced'
   ).length;
+
 
   const cancelled=list.filter(
     o=>o.status==='cancelled'
@@ -750,6 +1125,7 @@ function renderDateFilterSummary(list){
 
 
   const total=list.length;
+
 
   let filterText='';
 
@@ -760,6 +1136,7 @@ function renderDateFilterSummary(list){
       `📅 ${shortDate(dateFilter.date)}`;
   }
 
+
   else if(dateFilter.type==='week'){
 
     filterText=
@@ -767,21 +1144,58 @@ function renderDateFilterSummary(list){
   }
 
 
+  else if(dateFilter.type==='month'){
+
+    const d=new Date(
+      Number(dateFilter.year),
+      Number(dateFilter.month),
+      1
+    );
+
+
+    const name=
+      new Intl.DateTimeFormat(
+        'es-ES',
+        {
+          month:'long',
+          year:'numeric'
+        }
+      ).format(d);
+
+
+    filterText=
+      `📅 ${name.charAt(0).toUpperCase()+name.slice(1)}`;
+  }
+
+
   dateFilterSummary.innerHTML=`
-    <strong>${filterText}</strong>
+
+    <strong>
+      ${escapeHTML(filterText)}
+    </strong>
+
     <span class="date-summary-count">
-      ${total} ${total===1?'pedido':'pedidos'}
+      ${total}
+      ${total===1?'pedido':'pedidos'}
     </span>
+
     <span class="date-summary-status pending">
-      🟠 ${pending} Pendiente${pending===1?'':'s'}
+      🟠 ${pending}
+      ${pending===1?'Pendiente':'Pendientes'}
     </span>
+
     <span class="date-summary-status invoiced">
-      🟢 ${invoiced} Facturado${invoiced===1?'':'s'}
+      🟢 ${invoiced}
+      ${invoiced===1?'Facturado':'Facturados'}
     </span>
+
     <span class="date-summary-status cancelled">
-      🔴 ${cancelled} Cancelado${cancelled===1?'':'s'}
+      🔴 ${cancelled}
+      ${cancelled===1?'Cancelado':'Cancelados'}
     </span>
+
   `;
+
 
   dateFilterSummary.hidden=false;
 }
@@ -795,7 +1209,15 @@ function openCalendar(){
 
   if(!calendarPopover)return;
 
+
   calendarPopover.hidden=false;
+
+
+  calendarToggle?.setAttribute(
+    'aria-expanded',
+    'true'
+  );
+
 
   renderCalendar();
 }
@@ -805,9 +1227,20 @@ function closeCalendar(){
 
   if(!calendarPopover)return;
 
+
   calendarPopover.hidden=true;
+
+
+  calendarToggle?.setAttribute(
+    'aria-expanded',
+    'false'
+  );
 }
 
+
+/* ==========================================
+   EVENTO BOTÓN CALENDARIO
+========================================== */
 
 if(calendarToggle){
 
@@ -817,15 +1250,25 @@ if(calendarToggle){
 
       e.stopPropagation();
 
+
       if(calendarPopover?.hidden){
+
         openCalendar();
+
       }else{
+
         closeCalendar();
+
       }
+
     }
   );
 }
 
+
+/* ==========================================
+   MES ANTERIOR
+========================================== */
 
 if(calendarPrev){
 
@@ -835,15 +1278,41 @@ if(calendarPrev){
 
       e.stopPropagation();
 
-      calendarDate.setMonth(
-        calendarDate.getMonth()-1
+
+      calendarDate=new Date(
+        calendarDate.getFullYear(),
+        calendarDate.getMonth()-1,
+        1
       );
 
-      renderCalendar();
+
+      /*
+        Si estamos usando "Por mes",
+        cambiar de mes también cambia
+        el filtro al nuevo mes.
+      */
+
+      if(dateFilter.type==='month'){
+
+        filterByMonth(
+          calendarDate.getFullYear(),
+          calendarDate.getMonth()
+        );
+
+      }else{
+
+        renderCalendar();
+
+      }
+
     }
   );
 }
 
+
+/* ==========================================
+   MES SIGUIENTE
+========================================== */
 
 if(calendarNext){
 
@@ -853,15 +1322,41 @@ if(calendarNext){
 
       e.stopPropagation();
 
-      calendarDate.setMonth(
-        calendarDate.getMonth()+1
+
+      calendarDate=new Date(
+        calendarDate.getFullYear(),
+        calendarDate.getMonth()+1,
+        1
       );
 
-      renderCalendar();
+
+      /*
+        Si estamos usando "Por mes",
+        cambiar de mes también cambia
+        el filtro al nuevo mes.
+      */
+
+      if(dateFilter.type==='month'){
+
+        filterByMonth(
+          calendarDate.getFullYear(),
+          calendarDate.getMonth()
+        );
+
+      }else{
+
+        renderCalendar();
+
+      }
+
     }
   );
 }
 
+
+/* ==========================================
+   QUITAR FILTRO
+========================================== */
 
 if(calendarClear){
 
@@ -872,27 +1367,36 @@ if(calendarClear){
       e.stopPropagation();
 
       clearDateFilter();
+
     }
   );
 }
 
 
-/* Cerrar al tocar fuera */
+/* ==========================================
+   CERRAR AL TOCAR FUERA
+========================================== */
 
 document.addEventListener(
   'click',
   e=>{
 
-    if(!calendarPopover||calendarPopover.hidden)
+    if(
+      !calendarPopover ||
+      calendarPopover.hidden
+    )
       return;
+
 
     if(
       !calendarPopover.contains(e.target) &&
-      e.target!==calendarToggle &&
       !calendarToggle?.contains(e.target)
     ){
+
       closeCalendar();
+
     }
+
   }
 );
 
@@ -909,19 +1413,13 @@ document
       'click',
       ()=>{
 
-        document
-          .querySelectorAll('[data-date-filter]')
-          .forEach(x=>
-            x.classList.remove('active')
-          );
-
-        button.classList.add('active');
-
         applyQuickDateFilter(
           button.dataset.dateFilter
         );
+
       }
     );
+
   });
 
 
@@ -951,11 +1449,13 @@ function openImport(){
   );
 }
 
+
 function closeImport(){
 
   if(importDialog.open)
-    importDialog.close()
+    importDialog.close();
 }
+
 
 function parseCustomer(t){
 
@@ -965,6 +1465,7 @@ function parseCustomer(t){
 
   return m?m[1].trim():'';
 }
+
 
 function parsePhone(t){
 
@@ -977,6 +1478,7 @@ function parsePhone(t){
     :'';
 }
 
+
 function getProductsSection(t){
 
   const s=t.search(
@@ -985,16 +1487,20 @@ function getProductsSection(t){
 
   if(s===-1)return'';
 
+
   const a=t.slice(s);
+
 
   const x=a.indexOf(
     '━━━━━━━━━━━━━━'
   );
 
+
   return x!==-1
     ?a.slice(0,x)
     :a;
 }
+
 
 function parseNumber(v){
 
@@ -1003,14 +1509,16 @@ function parseNumber(v){
       .replace(/\./g,'')
       .replace(/,/g,'')
       .replace(/[^\d.-]/g,'')
-  )||0
+  )||0;
 }
+
 
 function parseProducts(t){
 
   const s=getProductsSection(t);
 
   if(!s)return[];
+
 
   return s.split('\n')
     .map(x=>x.trim())
@@ -1021,11 +1529,14 @@ function parseProducts(t){
         .replace(/^•\s*/,'')
         .trim();
 
+
       const m=c.match(
         /^(.+?)\s+—\s+(\d+)\s+(.+?)\s+×\s+([\d.,]+)\s+(CUP|USD)\s+=\s+([\d.,]+)\s+(CUP|USD)$/i
       );
 
+
       if(!m)return null;
+
 
       return{
         name:m[1].trim(),
@@ -1034,10 +1545,12 @@ function parseProducts(t){
         unitPrice:parseNumber(m[4]),
         currency:m[5].toUpperCase(),
         total:parseNumber(m[6])
-      }
+      };
+
     })
-    .filter(Boolean)
+    .filter(Boolean);
 }
+
 
 function parseTotals(t){
 
@@ -1045,22 +1558,27 @@ function parseTotals(t){
     /TOTAL\s+CUP\s*:\s*([\d.,]+)\s*CUP/i
   );
 
+
   const usd=t.match(
     /TOTAL\s+USD\s*:\s*([\d.,]+)\s*USD/i
   );
 
+
   return{
     CUP:cup?parseNumber(cup[1]):0,
     USD:usd?parseNumber(usd[1]):0
-  }
+  };
 }
+
 
 function nextOrderNumber(d=new Date()){
 
   const prefix=
     `PAN-${getISOYear(d)}-S${String(getISOWeek(d)).padStart(2,'0')}-`;
 
+
   let n=0;
+
 
   orders
     .filter(o=>
@@ -1072,54 +1590,71 @@ function nextOrderNumber(d=new Date()){
       const m=String(o.orderNumber)
         .match(/-(\d+)$/);
 
-      if(m)
+
+      if(m){
+
         n=Math.max(
           n,
           Number(m[1])
         );
+
+      }
+
     });
 
+
   return prefix+
-    String(n+1).padStart(3,'0')
+    String(n+1).padStart(3,'0');
 }
+
 
 function parseWhatsAppOrder(text){
 
   const t=String(text||'')
     .replace(/\r/g,'');
 
+
   if(!t.trim())
     throw new Error(
       'Pega primero el mensaje completo de WhatsApp.'
     );
+
 
   if(!/PEDIDO\s+PANACEA/i.test(t))
     throw new Error(
       'No parece ser un pedido generado por PANACEA.'
     );
 
+
   const customer=parseCustomer(t);
+
 
   if(!customer)
     throw new Error(
       'No pude encontrar el nombre del cliente.'
     );
 
+
   const phone=parsePhone(t);
+
 
   if(!phone)
     throw new Error(
       'No pude encontrar el teléfono del cliente.'
     );
 
+
   const products=parseProducts(t);
+
 
   if(!products.length)
     throw new Error(
       'No pude interpretar los productos. Asegúrate de pegar el mensaje completo.'
     );
 
+
   const totals=parseTotals(t);
+
 
   if(!totals.CUP&&!totals.USD){
 
@@ -1131,6 +1666,7 @@ function parseWhatsAppOrder(text){
           0
         );
 
+
     totals.USD=
       products
         .filter(p=>p.currency==='USD')
@@ -1140,7 +1676,9 @@ function parseWhatsAppOrder(text){
         );
   }
 
+
   const now=new Date();
+
 
   return{
     orderNumber:nextOrderNumber(now),
@@ -1154,32 +1692,43 @@ function parseWhatsAppOrder(text){
     status:'pending',
     source:'whatsapp',
     rawMessage:t
-  }
+  };
 }
+
 
 function showParseError(m){
 
   parseError.textContent=m;
 
-  parseError.hidden=false
+  parseError.hidden=false;
 }
+
 
 function formatTotals(t){
 
   const r=[];
 
+
   if(Number(t?.CUP)>0)
-    r.push(money(t.CUP,'CUP'));
+    r.push(
+      money(t.CUP,'CUP')
+    );
+
 
   if(Number(t?.USD)>0)
-    r.push(money(t.USD,'USD'));
+    r.push(
+      money(t.USD,'USD')
+    );
 
-  return r.join(' · ')||'0'
+
+  return r.join(' · ')||'0';
 }
+
 
 function previewImport(){
 
   parseError.hidden=true;
+
 
   try{
 
@@ -1188,31 +1737,37 @@ function previewImport(){
         whatsappMessage.value
       );
 
+
     importPreview.hidden=false;
 
     saveImportBtn.hidden=false;
 
     previewImportBtn.hidden=true;
 
+
     document.getElementById(
       'previewOrderNumber'
     ).textContent=
       pendingParsedOrder.orderNumber;
+
 
     document.getElementById(
       'previewCustomer'
     ).textContent=
       pendingParsedOrder.customer;
 
+
     document.getElementById(
       'previewPhone'
     ).textContent=
       pendingParsedOrder.phone;
 
+
     document.getElementById(
       'previewProducts'
     ).textContent=
       `${pendingParsedOrder.products.length} producto(s)`;
+
 
     document.getElementById(
       'previewTotal'
@@ -1220,6 +1775,7 @@ function previewImport(){
       formatTotals(
         pendingParsedOrder.totals
       );
+
 
   }catch(e){
 
@@ -1235,6 +1791,7 @@ function previewImport(){
   }
 }
 
+
 function createOrder(){
 
   if(!pendingParsedOrder)
@@ -1242,19 +1799,23 @@ function createOrder(){
       'Primero debes revisar el pedido.'
     );
 
+
   const d=orders.find(
     o=>o.rawMessage===
       pendingParsedOrder.rawMessage
   );
+
 
   if(d)
     return showParseError(
       `Este pedido ya fue importado como ${d.orderNumber}.`
     );
 
+
   orders.unshift(
     pendingParsedOrder
   );
+
 
   saveOrders();
 
@@ -1262,11 +1823,13 @@ function createOrder(){
 
   renderAll();
 
+
   showToast(
     `Pedido ${pendingParsedOrder.orderNumber} creado correctamente.`
   );
 
-  pendingParsedOrder=null
+
+  pendingParsedOrder=null;
 }
 
 
@@ -1280,7 +1843,9 @@ function filteredOrders(){
     .toLowerCase()
     .trim();
 
+
   return orders.filter(o=>{
+
 
     /* FILTRO DE ESTADO */
 
@@ -1293,37 +1858,14 @@ function filteredOrders(){
 
     /* FILTRO DE FECHA */
 
-    if(dateFilter.type==='day'){
-
-      if(
-        dateKey(o.createdAt)!==
-        dateFilter.date
-      )
-        return false;
-    }
-
-
-    /* FILTRO DE SEMANA */
-
-    if(dateFilter.type==='week'){
-
-      const d=new Date(
-        o.createdAt
-      );
-
-      if(
-        getISOWeek(d)!==
-        Number(dateFilter.week) ||
-        getISOYear(d)!==
-        Number(dateFilter.year)
-      )
-        return false;
-    }
+    if(!matchesDateFilter(o))
+      return false;
 
 
     /* BÚSQUEDA */
 
     if(!q)return true;
+
 
     const s=[
       o.orderNumber,
@@ -1335,8 +1877,9 @@ function filteredOrders(){
       .join(' ')
       .toLowerCase();
 
-    return s.includes(q)
-  })
+
+    return s.includes(q);
+  });
 }
 
 
@@ -1347,6 +1890,7 @@ function filteredOrders(){
 function renderOrders(){
 
   const list=filteredOrders();
+
 
   ordersCount.textContent=
     `${list.length} ${list.length===1?'pedido':'pedidos'}`;
@@ -1361,7 +1905,9 @@ function renderOrders(){
         )
         .join(' · ');
 
+
       return`
+
         <article class="order-card">
 
           <div>
@@ -1425,13 +1971,16 @@ function renderOrders(){
           </div>
 
         </article>
-      `
+
+      `;
+
     })
     .join('');
 
 
   emptyOrders.hidden=
     list.length!==0;
+
 
   ordersList.hidden=
     list.length===0;
@@ -1449,10 +1998,7 @@ function renderOrders(){
     );
 
 
-  /* NUEVO:
-     resumen del filtro */
-
-  renderDateFilterSummary(list);
+  renderDateFilterSummary();
 }
 
 
@@ -1467,12 +2013,14 @@ function renderStats(){
   ).textContent=
     orders.length;
 
+
   document.getElementById(
     'statPending'
   ).textContent=
     orders.filter(
       o=>o.status==='pending'
     ).length;
+
 
   document.getElementById(
     'statInvoiced'
@@ -1481,12 +2029,13 @@ function renderStats(){
       o=>o.status==='invoiced'
     ).length;
 
+
   document.getElementById(
     'statCancelled'
   ).textContent=
     orders.filter(
       o=>o.status==='cancelled'
-    ).length
+    ).length;
 }
 
 
@@ -1513,6 +2062,7 @@ function openOrder(orderNumber){
   const o=orders.find(
     x=>x.orderNumber===orderNumber
   );
+
 
   if(!o)return;
 
@@ -1881,7 +2431,9 @@ function changeStatus(orderNumber){
     o=>o.orderNumber===orderNumber
   );
 
+
   if(!order)return;
+
 
   if(order.status==='cancelled')
     return showToast(
@@ -1893,6 +2445,7 @@ function changeStatus(orderNumber){
     document.getElementById(
       'orderDetail'
     );
+
 
   const button=
     detail.querySelector(
@@ -2019,6 +2572,7 @@ function changeStatus(orderNumber){
     box
   );
 
+
   button.hidden=true;
 
 
@@ -2089,7 +2643,9 @@ function cancelOrder(orderNumber){
     o=>o.orderNumber===orderNumber
   );
 
+
   if(!order)return;
+
 
   if(order.status==='cancelled')
     return showToast(
@@ -2115,6 +2671,7 @@ function cancelOrder(orderNumber){
     detail.querySelector(
       '[data-cancel-order]'
     );
+
 
   if(!button)return;
 
@@ -2339,6 +2896,7 @@ function cancelOrder(orderNumber){
     box
   );
 
+
   button.hidden=true;
 
 
@@ -2355,10 +2913,13 @@ function cancelOrder(orderNumber){
     radio.addEventListener(
       'change',
       ()=>{
+
         productsBox.hidden=
           radio.value!=='partial';
+
       }
     );
+
   });
 
 
@@ -2379,8 +2940,11 @@ function cancelOrder(orderNumber){
   .addEventListener(
     'click',
     ()=>{
+
       box.remove();
+
       button.hidden=false;
+
     }
   );
 
@@ -2401,12 +2965,14 @@ function saveCancellation(orderNumber){
     o=>o.orderNumber===orderNumber
   );
 
+
   if(!order)return;
 
 
   const box=document.querySelector(
     '[data-cancellation-editor]'
   );
+
 
   if(!box)return;
 
@@ -2460,8 +3026,10 @@ function saveCancellation(orderNumber){
           input.dataset.cancelQty
         );
 
+
       const product=
         order.products[index];
+
 
       if(!product)return;
 
@@ -2516,6 +3084,7 @@ function saveCancellation(orderNumber){
       new Date().toISOString(),
 
     clientNotified:false
+
   };
 
 
@@ -2548,6 +3117,7 @@ function deleteOrder(orderNumber){
   const o=orders.find(
     x=>x.orderNumber===orderNumber
   );
+
 
   if(!o)return;
 
@@ -2723,6 +3293,7 @@ function sendToClient(orderNumber){
     x=>x.orderNumber===orderNumber
   );
 
+
   if(!o)return;
 
 
@@ -2759,6 +3330,7 @@ function sendCancellationToClient(orderNumber){
   const o=orders.find(
     x=>x.orderNumber===orderNumber
   );
+
 
   if(!o)return;
 
@@ -2830,6 +3402,7 @@ function sendImportantInfo(orderNumber){
     x=>x.orderNumber===orderNumber
   );
 
+
   if(!o)return;
 
 
@@ -2867,6 +3440,7 @@ async function copyOrder(orderNumber){
     x=>x.orderNumber===orderNumber
   );
 
+
   if(!o)return;
 
 
@@ -2881,11 +3455,13 @@ async function copyOrder(orderNumber){
       'Pedido copiado al portapapeles.'
     );
 
+
   }catch(e){
 
     showToast(
       'No se pudo copiar automáticamente.'
     );
+
   }
 }
 
@@ -2962,13 +3538,18 @@ document
   .addEventListener(
     'submit',
     e=>{
+
       e.preventDefault();
+
       createOrder();
+
     }
   );
 
 
-/* BÚSQUEDA */
+/* ==========================================
+   BÚSQUEDA
+========================================== */
 
 searchOrders.addEventListener(
   'input',
@@ -2977,11 +3558,14 @@ searchOrders.addEventListener(
     searchTerm=e.target.value;
 
     renderOrders();
+
   }
 );
 
 
-/* FILTROS DE ESTADO */
+/* ==========================================
+   FILTROS DE ESTADO
+========================================== */
 
 document
   .querySelectorAll('.order-filter')
@@ -3012,13 +3596,16 @@ document
 
 
         renderOrders();
+
       }
     );
 
   });
 
 
-/* CERRAR DETALLE */
+/* ==========================================
+   CERRAR DETALLE
+========================================== */
 
 orderDialog.addEventListener(
   'click',
@@ -3026,13 +3613,29 @@ orderDialog.addEventListener(
 
     if(e.target===orderDialog)
       orderDialog.close();
+
   }
 );
 
 
 /* ==========================================
-   INICIALIZAR CALENDARIO
+   INICIALIZAR
 ========================================== */
+
+calendarDate=new Date(
+  2026,
+  8,
+  1
+);
+
+
+/*
+  Septiembre de 2026:
+  1 = martes.
+
+  Al abrir la página el calendario
+  mostrará este mes correctamente.
+*/
 
 renderCalendar();
 
