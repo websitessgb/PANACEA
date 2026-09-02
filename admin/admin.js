@@ -2034,6 +2034,14 @@ alert('RENDER ORDERS: '+list.length);
     })
     .join('');
 
+    alert(
+  'HTML GENERADO: '+
+  ordersList.innerHTML.length+
+  '\nORDERSLIST HIDDEN: '+
+  ordersList.hidden+
+  '\nORDERSLIST DISPLAY: '+
+  getComputedStyle(ordersList).display
+);
 
   emptyOrders.hidden=
     list.length!==0;
