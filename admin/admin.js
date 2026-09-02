@@ -1947,7 +1947,7 @@ function filteredOrders(){
 function renderOrders(){
 
   const list=filteredOrders();
-
+alert('RENDER ORDERS: '+list.length);
 
   ordersCount.textContent=
     `${list.length} ${list.length===1?'pedido':'pedidos'}`;
