@@ -3888,10 +3888,10 @@ function showBackupReminder(type){
     later.textContent='Recordarme más tarde';
     create.textContent='💾 Crear respaldo ahora';
   }else{
-    eyebrow.textContent='💾 SEGURIDAD';
+    eyebrow.textContent='🔔 SEGURIDAD';
     title.textContent='RESPALDO SEMANAL';
     body.innerHTML=`Hoy es <strong>domingo</strong>.<br><br>Te recomendamos crear una copia de seguridad de los pedidos de PANACEA.`;
-    later.textContent='Más tarde';
+    later.textContent='Recordarme más tarde';
     create.textContent='💾 Crear respaldo ahora';
   }
 
