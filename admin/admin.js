@@ -2067,7 +2067,14 @@ alert(
     card ? card.offsetHeight : 'N/A'
   )
 );
-    
+    const rect=card.getBoundingClientRect();
+
+alert(
+  'POSICIÓN TOP: '+rect.top+
+  '\nPOSICIÓN BOTTOM: '+rect.bottom+
+  '\nALTURA VENTANA: '+window.innerHeight+
+  '\nSCROLL Y: '+window.scrollY
+);
   document
     .querySelectorAll('[data-open-order]')
     .forEach(b=>
