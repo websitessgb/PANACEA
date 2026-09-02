@@ -964,15 +964,15 @@ function renderCalendar(){
     .forEach(day=>{
 
       day.addEventListener(
-        'click',
-        ()=>{
+  'click',
+  e=>{
+    e.stopPropagation();
 
-          filterByDay(
-            day.dataset.calendarDay
-          );
-
-        }
-      );
+    filterByDay(
+      day.dataset.calendarDay
+    );
+  }
+);
 
     });
 
