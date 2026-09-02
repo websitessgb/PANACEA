@@ -589,7 +589,7 @@ function clearDateFilter(){
 
   activeStatus='all';
 
-  alert('Pedidos guardados: '+orders.length);
+  
 
   searchTerm='';
 
