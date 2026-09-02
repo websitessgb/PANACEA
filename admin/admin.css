@@ -175,6 +175,13 @@ body{
   box-shadow:0 10px 24px rgba(64,91,75,.18);
 }
 
+.admin-primary-btn:disabled{
+  opacity:.48;
+  cursor:not-allowed;
+  transform:none;
+  box-shadow:none;
+}
+
 .admin-secondary-btn{
   border:1px solid var(--admin-line);
   background:#fff;
@@ -1204,6 +1211,356 @@ body{
 
 
 /* =========================================================
+   RESPALDOS
+   ========================================================= */
+
+/* Contenedor general del análisis */
+
+.restore-analysis{
+  margin-top:20px;
+  max-height:58vh;
+  overflow-y:auto;
+  padding-right:3px;
+  scrollbar-width:thin;
+  scrollbar-color:#c8d1c8 transparent;
+}
+
+.restore-analysis[hidden]{
+  display:none;
+}
+
+
+/* Resumen superior */
+
+.restore-summary{
+  padding:17px 18px;
+  background:#f4f6f1;
+  border:1px solid #dfe5dc;
+  border-radius:17px;
+}
+
+.restore-summary>strong{
+  display:block;
+  margin-bottom:12px;
+  color:var(--admin-sage-dark);
+  font-size:13px;
+  letter-spacing:.02em;
+}
+
+.restore-summary p{
+  display:flex;
+  justify-content:space-between;
+  gap:15px;
+  margin:7px 0;
+  color:var(--admin-muted);
+  font-size:12px;
+}
+
+.restore-summary p b{
+  color:var(--admin-ink);
+}
+
+
+/* Grupos de pedidos */
+
+.restore-groups{
+  margin-top:12px;
+  padding:14px 16px;
+  background:#faf9f6;
+  border:1px solid var(--admin-line);
+  border-radius:15px;
+}
+
+.restore-groups p{
+  margin:6px 0;
+  color:var(--admin-muted);
+  font-size:11px;
+  line-height:1.5;
+  word-break:break-word;
+}
+
+.restore-groups p b{
+  color:var(--admin-ink);
+}
+
+
+/* Nota */
+
+.restore-note{
+  margin:13px 2px;
+  color:var(--admin-muted);
+  font-size:11px;
+  line-height:1.5;
+}
+
+
+/* Sección de modificados */
+
+.restore-modified-section{
+  margin-top:20px;
+}
+
+.restore-modified-section h3{
+  margin:0;
+  color:var(--admin-ink);
+  font-size:16px;
+}
+
+.restore-modified-section>.restore-note{
+  margin-top:6px;
+}
+
+
+/* Lista */
+
+.restore-changed-list{
+  display:grid;
+  gap:14px;
+  margin-top:14px;
+}
+
+
+/* =========================================================
+   TARJETA DE PEDIDO MODIFICADO
+   ========================================================= */
+
+.restore-changed-card{
+  background:#fff;
+  border:1px solid var(--admin-line);
+  border-radius:19px;
+  overflow:hidden;
+  transition:.2s;
+}
+
+.restore-changed-card:hover{
+  border-color:#c6d0c6;
+  box-shadow:0 8px 28px rgba(42,57,48,.07);
+}
+
+
+/* Cabecera */
+
+.restore-changed-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:15px 16px;
+  background:#faf9f6;
+  border-bottom:1px solid var(--admin-line);
+}
+
+.restore-changed-header>div{
+  min-width:0;
+}
+
+.restore-changed-header strong{
+  display:block;
+  color:var(--admin-sage-dark);
+  font-size:14px;
+}
+
+.restore-changed-header small{
+  display:block;
+  margin-top:3px;
+  color:var(--admin-muted);
+  font-size:10px;
+}
+
+
+/* Badge de decisión */
+
+.restore-decision-badge{
+  flex-shrink:0;
+  padding:6px 9px;
+  border:1px solid var(--admin-line);
+  border-radius:999px;
+  background:#fff;
+  color:var(--admin-muted);
+  font-size:9px;
+  font-weight:800;
+  white-space:nowrap;
+}
+
+
+/* =========================================================
+   ACTUAL VS RESPALDO
+   ========================================================= */
+
+.restore-version-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  padding:14px;
+}
+
+.restore-version{
+  min-width:0;
+  border:1px solid var(--admin-line);
+  border-radius:14px;
+  overflow:hidden;
+  background:#fff;
+}
+
+.restore-version-title{
+  padding:9px 11px;
+  background:#f6f4ef;
+  border-bottom:1px solid var(--admin-line);
+}
+
+.restore-version-title span{
+  color:var(--admin-ink);
+  font-size:9px;
+  font-weight:900;
+  letter-spacing:.06em;
+}
+
+.restore-backup .restore-version-title{
+  background:#edf3ee;
+}
+
+.restore-backup .restore-version-title span{
+  color:var(--admin-sage-dark);
+}
+
+.restore-version-content{
+  padding:10px 11px;
+}
+
+.restore-version-content p{
+  margin:0;
+  padding:7px 0;
+  border-bottom:1px solid #efede7;
+}
+
+.restore-version-content p:last-child{
+  border-bottom:0;
+}
+
+.restore-version-content small{
+  display:block;
+  margin-bottom:2px;
+  color:var(--admin-muted);
+  font-size:9px;
+}
+
+.restore-version-content strong{
+  display:block;
+  color:var(--admin-ink);
+  font-size:11px;
+  line-height:1.4;
+  overflow-wrap:anywhere;
+}
+
+
+/* =========================================================
+   DIFERENCIAS
+   ========================================================= */
+
+.restore-differences{
+  margin:0 14px 14px;
+  padding:11px 12px;
+  background:#f8f6f1;
+  border-radius:12px;
+}
+
+.restore-differences>strong{
+  display:block;
+  margin-bottom:7px;
+  color:var(--admin-ink);
+  font-size:10px;
+}
+
+.restore-differences>div{
+  display:flex;
+  flex-wrap:wrap;
+  gap:5px;
+}
+
+.restore-differences span{
+  display:inline-flex;
+  align-items:center;
+  padding:5px 8px;
+  border-radius:999px;
+  background:#fff;
+  border:1px solid var(--admin-line);
+  color:var(--admin-muted);
+  font-size:9px;
+  font-weight:800;
+}
+
+
+/* =========================================================
+   BOTONES DE DECISIÓN
+   ========================================================= */
+
+.restore-choice-actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  padding:0 14px 14px;
+}
+
+.restore-choice-actions button{
+  width:100%;
+  min-height:42px;
+}
+
+.restore-choice-actions [data-keep-current].selected{
+  background:#e8eee9;
+  border-color:#9eb09f;
+  color:var(--admin-sage-dark);
+  box-shadow:inset 0 0 0 1px #9eb09f;
+}
+
+.restore-choice-actions [data-use-backup].selected{
+  background:var(--admin-sage-dark);
+  border-color:var(--admin-sage-dark);
+  color:#fff;
+  box-shadow:0 5px 15px rgba(64,91,75,.16);
+}
+
+
+/* Tarjeta ya decidida */
+
+.restore-changed-card.decision-current{
+  border-color:#aebfae;
+}
+
+.restore-changed-card.decision-backup{
+  border-color:var(--admin-sage);
+}
+
+.restore-changed-card.decision-current
+.restore-decision-badge{
+  background:#e8eee9;
+  border-color:#b9c8b9;
+  color:var(--admin-sage-dark);
+}
+
+.restore-changed-card.decision-backup
+.restore-decision-badge{
+  background:#e7efe8;
+  border-color:#aebfae;
+  color:var(--admin-sage-dark);
+}
+
+
+/* =========================================================
+   BARRA DE ACCIONES DEL RESPALDO
+   ========================================================= */
+
+.restore-analysis+.dialog-actions{
+  border-top:1px solid var(--admin-line);
+  padding-top:16px;
+}
+
+#applyRestoreDecisionsBtn:disabled{
+  opacity:.45;
+}
+
+
+/* =========================================================
    RESPONSIVE
    ========================================================= */
 
@@ -1336,6 +1693,42 @@ body{
     overflow-y:auto;
   }
 
+
+  /* -----------------------------------------
+     RESPALDOS EN MÓVIL
+     ----------------------------------------- */
+
+  .restore-analysis{
+    max-height:54vh;
+  }
+
+  .restore-summary{
+    padding:14px;
+  }
+
+  .restore-groups{
+    padding:12px 13px;
+  }
+
+  .restore-version-grid{
+    grid-template-columns:1fr;
+    gap:8px;
+    padding:11px;
+  }
+
+  .restore-differences{
+    margin:0 11px 11px;
+  }
+
+  .restore-choice-actions{
+    grid-template-columns:1fr;
+    padding:0 11px 11px;
+  }
+
+  .restore-changed-header{
+    padding:13px;
+  }
+
 }
 
 
@@ -1364,4 +1757,30 @@ body{
     width:30px;
   }
 
-}
+
+  /* -----------------------------------------
+     RESPALDOS PANTALLAS PEQUEÑAS
+     ----------------------------------------- */
+
+  .restore-summary p{
+    align-items:flex-start;
+  }
+
+  .restore-changed-header{
+    align-items:flex-start;
+  }
+
+  .restore-decision-badge{
+    font-size:8px;
+    padding:5px 7px;
+  }
+
+  .restore-version-content strong{
+    font-size:10px;
+  }
+
+  .restore-choice-actions button{
+    min-height:44px;
+  }
+
+   }
