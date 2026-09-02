@@ -585,35 +585,13 @@ function clearDateFilter(){
     month:null
   };
 
-  /* RESTABLECER FILTRO DE ESTADO */
-
-  activeStatus='all';
-
-  
-
-  searchTerm='';
-
-  if(searchOrders){
-  searchOrders.value='';
-  }
-    
-  document
-    .querySelectorAll('[data-status]')
-    .forEach(button=>{
-
-      button.classList.toggle(
-        'active',
-        button.dataset.status==='all'
-      );
-
-    });
 
   setActiveDateFilterButton('all');
 
   renderAll();
 
   renderCalendar();
-      }
+}
 
 
 /* ==========================================
@@ -986,15 +964,15 @@ function renderCalendar(){
     .forEach(day=>{
 
       day.addEventListener(
-  'click',
-  e=>{
-    e.stopPropagation();
+        'click',
+        ()=>{
 
-    filterByDay(
-      day.dataset.calendarDay
-    );
-  }
-);
+          filterByDay(
+            day.dataset.calendarDay
+          );
+
+        }
+      );
 
     });
 
@@ -1287,23 +1265,6 @@ if(calendarToggle){
   );
 }
 
-/* ==========================================
-   CERRAR CALENDARIO CON LA ✕
-========================================== */
-
-if(calendarClose){
-
-  calendarClose.addEventListener(
-    'click',
-    e=>{
-
-      e.stopPropagation();
-
-      closeCalendar();
-
-    }
-  );
-}
 
 /* ==========================================
    MES ANTERIOR
@@ -1449,15 +1410,15 @@ document
   .forEach(button=>{
 
     button.addEventListener(
-  'click',
-  e=>{
-    e.stopPropagation();
+      'click',
+      ()=>{
 
-    applyQuickDateFilter(
-      button.dataset.dateFilter
+        applyQuickDateFilter(
+          button.dataset.dateFilter
+        );
+
+      }
     );
-  }
-);
 
   });
 
@@ -1882,32 +1843,28 @@ function filteredOrders(){
     .toLowerCase()
     .trim();
 
-  const result=orders.filter(o=>{
+
+  return orders.filter(o=>{
+
 
     /* FILTRO DE ESTADO */
 
     if(
       activeStatus!=='all' &&
       o.status!==activeStatus
-    ){
+    )
       return false;
-    }
 
 
     /* FILTRO DE FECHA */
 
-    if(
-      dateFilter.type!=='all' &&
-      !matchesDateFilter(o)
-    ){
+    if(!matchesDateFilter(o))
       return false;
-    }
 
 
     /* BÚSQUEDA */
 
-    if(!q)
-      return true;
+    if(!q)return true;
 
 
     const s=[
@@ -1922,16 +1879,8 @@ function filteredOrders(){
 
 
     return s.includes(q);
-
   });
-
-
-  
-
-
-  return result;
 }
-
 
 
 /* ==========================================
@@ -2028,7 +1977,6 @@ function renderOrders(){
     })
     .join('');
 
-    
 
   emptyOrders.hidden=
     list.length!==0;
@@ -2036,11 +1984,6 @@ function renderOrders(){
 
   ordersList.hidden=
     list.length===0;
-
-const card=ordersList.querySelector('.order-card');
-
-
-    const rect=card.getBoundingClientRect();
 
 
   document
