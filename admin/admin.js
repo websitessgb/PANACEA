@@ -1926,13 +1926,7 @@ function filteredOrders(){
   });
 
 
-  alert(
-    'Guardados: '+orders.length+
-    '\nResultado del filtro: '+result.length+
-    '\nEstado: '+activeStatus+
-    '\nFecha: '+dateFilter.type+
-    '\nBúsqueda: "'+searchTerm+'"'
-  );
+  
 
 
   return result;
@@ -1947,7 +1941,7 @@ function filteredOrders(){
 function renderOrders(){
 
   const list=filteredOrders();
-alert('RENDER ORDERS: '+list.length);
+
 
   ordersCount.textContent=
     `${list.length} ${list.length===1?'pedido':'pedidos'}`;
@@ -2034,14 +2028,7 @@ alert('RENDER ORDERS: '+list.length);
     })
     .join('');
 
-    alert(
-  'HTML GENERADO: '+
-  ordersList.innerHTML.length+
-  '\nORDERSLIST HIDDEN: '+
-  ordersList.hidden+
-  '\nORDERSLIST DISPLAY: '+
-  getComputedStyle(ordersList).display
-);
+    
 
   emptyOrders.hidden=
     list.length!==0;
@@ -2052,29 +2039,10 @@ alert('RENDER ORDERS: '+list.length);
 
 const card=ordersList.querySelector('.order-card');
 
-alert(
-  'CARD ENCONTRADA: '+!!card+
-  '\nCARD DISPLAY: '+(
-    card ? getComputedStyle(card).display : 'N/A'
-  )+
-  '\nCARD VISIBILITY: '+(
-    card ? getComputedStyle(card).visibility : 'N/A'
-  )+
-  '\nCARD OPACITY: '+(
-    card ? getComputedStyle(card).opacity : 'N/A'
-  )+
-  '\nCARD HEIGHT: '+(
-    card ? card.offsetHeight : 'N/A'
-  )
-);
+
     const rect=card.getBoundingClientRect();
 
-alert(
-  'POSICIÓN TOP: '+rect.top+
-  '\nPOSICIÓN BOTTOM: '+rect.bottom+
-  '\nALTURA VENTANA: '+window.innerHeight+
-  '\nSCROLL Y: '+window.scrollY
-);
+
   document
     .querySelectorAll('[data-open-order]')
     .forEach(b=>
