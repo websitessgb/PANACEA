@@ -2,167 +2,43 @@ const ADMIN_STORAGE_KEY='panacea-admin-orders';
 const BACKUP_META_KEY='panacea-admin-backup-meta';
 const BACKUP_SNAPSHOT_KEY='panacea-admin-backup-snapshot';
 
-let orders=loadOrders(),
-    activeStatus='all',
-    searchTerm='',
-    pendingParsedOrder=null;
+let orders=loadOrders(),activeStatus='all',searchTerm='',pendingParsedOrder=null;
 
 
-/* ==========================================
-   FILTRO DE FECHA / CALENDARIO
-========================================== */
-
-let dateFilter={
-  type:'all',
-  date:null,
-  week:null,
-  year:null,
-  month:null
-};
-
-
-/* Mes que se está mostrando en el calendario */
-
-let calendarDate=new Date();
-
-
-/* ==========================================
-   ELEMENTOS
-========================================== */
-
-const ordersList=document.getElementById('ordersList'),
-emptyOrders=document.getElementById('emptyOrders'),
-ordersCount=document.getElementById('ordersCount'),
-searchOrders=document.getElementById('searchOrders'),
-importDialog=document.getElementById('importDialog'),
-orderDialog=document.getElementById('orderDialog'),
-whatsappMessage=document.getElementById('whatsappMessage'),
-importPreview=document.getElementById('importPreview'),
-parseError=document.getElementById('parseError'),
-saveImportBtn=document.getElementById('saveImportBtn'),
-previewImportBtn=document.getElementById('previewImportBtn'),
-orderDetail=document.getElementById('orderDetail'),
-adminToast=document.getElementById('adminToast');
-
-
-/* ==========================================
-   ELEMENTOS DEL CALENDARIO
-========================================== */
-
-const calendarClose=document.getElementById('calendarClose');
-const calendarToggle=document.getElementById('calendarToggle');
-const calendarPopover=document.getElementById('calendarPopover');
-const calendarMonthTitle=document.getElementById('calendarMonthTitle');
-const calendarGrid=document.getElementById('calendarGrid');
-const calendarPrev=document.getElementById('calendarPrev');
-const calendarNext=document.getElementById('calendarNext');
-const calendarClear=document.getElementById('calendarClear');
-const calendarActiveText=document.getElementById('calendarActiveText');
-const dateFilterSummary=document.getElementById('dateFilterSummary');
-
-
-/* ==========================================
-   FUNCIONES BÁSICAS
-========================================== */
-
-function money(v,c='CUP'){
-  return`${new Intl.NumberFormat('es-CU').format(Number(v)||0)} ${c}`;
-}
-
-
-function formatDate(v){
-
-  const d=new Date(v);
-
-  return Number.isNaN(d.getTime())
-    ?v||''
-    :new Intl.DateTimeFormat('es-CU',{
-        day:'2-digit',
-        month:'2-digit',
-        year:'numeric',
-        hour:'2-digit',
-        minute:'2-digit'
-      }).format(d);
-}
-
-
-function getISOWeek(d=new Date()){
-
-  d=new Date(
-    Date.UTC(
-      d.getFullYear(),
-      d.getMonth(),
-      d.getDate()
-    )
-  );
-
-  const day=d.getUTCDay()||7;
-
-  d.setUTCDate(
-    d.getUTCDate()+4-day
-  );
-
-  const y=new Date(
-    Date.UTC(
-      d.getUTCFullYear(),
-      0,
-      1
-    )
-  );
-
-  return Math.ceil(
-    (((d-y)/86400000)+1)/7
-  );
-}
-
-
-function getISOYear(d=new Date()){
-
-  d=new Date(
-    Date.UTC(
-      d.getFullYear(),
-      d.getMonth(),
-      d.getDate()
-    )
-  );
-
-  const day=d.getUTCDay()||7;
-
-  d.setUTCDate(
-    d.getUTCDate()+4-day
-  );
-
-  return d.getUTCFullYear();
-}
-
+/* =========================================================
+   CARGA Y GUARDADO
+   ========================================================= */
 
 function loadOrders(){
-
   try{
-
-    const x=JSON.parse(
-      localStorage.getItem(ADMIN_STORAGE_KEY)||'[]'
-    );
-
-    return Array.isArray(x)?x:[];
-
+    const raw=localStorage.getItem(ADMIN_STORAGE_KEY);
+    return raw?JSON.parse(raw):[];
   }catch(e){
-
-    return[];
+    return [];
   }
 }
 
-
 function saveOrders(){
   localStorage.setItem(ADMIN_STORAGE_KEY,JSON.stringify(orders));
-  localStorage.setItem(BACKUP_SNAPSHOT_KEY,JSON.stringify({updatedAt:new Date().toISOString(),orders}));
+
+  localStorage.setItem(
+    BACKUP_SNAPSHOT_KEY,
+    JSON.stringify({
+      updatedAt:new Date().toISOString(),
+      orders
+    })
+  );
+
   updateBackupUI();
 }
 
 
-function escapeHTML(v){
+/* =========================================================
+   UTILIDADES
+   ========================================================= */
 
-  return String(v??'')
+function escapeHTML(value){
+  return String(value??'')
     .replace(/&/g,'&amp;')
     .replace(/</g,'&lt;')
     .replace(/>/g,'&gt;')
@@ -170,2194 +46,339 @@ function escapeHTML(v){
     .replace(/'/g,'&#039;');
 }
 
+function stamp(){
+  const d=new Date();
 
-function statusLabel(s){
+  return [
+    d.getFullYear(),
+    String(d.getMonth()+1).padStart(2,'0'),
+    String(d.getDate()).padStart(2,'0'),
+    '-',
+    String(d.getHours()).padStart(2,'0'),
+    String(d.getMinutes()).padStart(2,'0')
+  ].join('');
+}
 
-  return{
+function downloadBlob(blob,name){
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+
+  a.href=url;
+  a.download=name;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+
+function showToast(message){
+  const toast=document.getElementById('adminToast');
+
+  if(!toast)return;
+
+  toast.textContent=message;
+  toast.classList.add('show');
+
+  clearTimeout(showToast.timer);
+
+  showToast.timer=setTimeout(()=>{
+    toast.classList.remove('show');
+  },3200);
+}
+
+
+/* =========================================================
+   ESTADOS
+   ========================================================= */
+
+function statusLabel(status){
+  const map={
     pending:'Pendiente',
     confirmed:'Confirmado',
     invoiced:'Facturado',
     delivered:'Entregado',
     cancelled:'Cancelado'
-  }[s]||'Pendiente';
+  };
+
+  return map[status]||status||'Pendiente';
 }
 
 
-function statusClass(s){
+/* =========================================================
+   FORMATO
+   ========================================================= */
 
-  return`status-${s||'pending'}`;
-}
-
-
-/* ==========================================
-   FUNCIONES DE FECHA
-========================================== */
-
-
-/*
-  Convierte una fecha YYYY-MM-DD
-  en una fecha LOCAL.
-
-  Esto evita que el navegador la interprete
-  como UTC y cambie el día.
-*/
-
-function parseLocalDateKey(value){
-
-  if(value instanceof Date){
-
-    return new Date(
-      value.getFullYear(),
-      value.getMonth(),
-      value.getDate()
-    );
-  }
-
-
-  const text=String(value||'');
-
-  const match=text.match(
-    /^(\d{4})-(\d{2})-(\d{2})$/
-  );
-
-
-  if(match){
-
-    return new Date(
-      Number(match[1]),
-      Number(match[2])-1,
-      Number(match[3])
-    );
-  }
-
+function formatDate(value){
+  if(!value)return 'Sin fecha';
 
   const d=new Date(value);
 
-  return Number.isNaN(d.getTime())
-    ?new Date(NaN)
-    :d;
-}
-
-
-/* Comparar dos fechas ignorando hora */
-
-function sameLocalDay(a,b){
-
-  if(!a||!b)return false;
-
-  const da=parseLocalDateKey(a);
-  const db=parseLocalDateKey(b);
-
-  return(
-    da.getFullYear()===db.getFullYear() &&
-    da.getMonth()===db.getMonth() &&
-    da.getDate()===db.getDate()
-  );
-}
-
-
-/* Obtener lunes de la semana */
-
-function getMonday(date){
-
-  const d=new Date(date);
-
-  d.setHours(0,0,0,0);
-
-  const day=d.getDay()||7;
-
-  d.setDate(
-    d.getDate()-(day-1)
-  );
-
-  return d;
-}
-
-
-/* Obtener domingo de la semana */
-
-function getSunday(date){
-
-  const d=getMonday(date);
-
-  d.setDate(
-    d.getDate()+6
-  );
-
-  return d;
-}
-
-
-/* Clave YYYY-MM-DD */
-
-function dateKey(date){
-
-  const d=parseLocalDateKey(date);
-
-  if(Number.isNaN(d.getTime()))
-    return'';
-
-  const y=d.getFullYear();
-
-  const m=String(
-    d.getMonth()+1
-  ).padStart(2,'0');
-
-  const day=String(
-    d.getDate()
-  ).padStart(2,'0');
-
-  return`${y}-${m}-${day}`;
-}
-
-
-/* Fecha corta */
-
-function shortDate(date){
-
-  const d=parseLocalDateKey(date);
-
-  if(Number.isNaN(d.getTime()))
-    return'';
-
-  return new Intl.DateTimeFormat(
-    'es-CU',
-    {
-      day:'2-digit',
-      month:'2-digit'
-    }
-  ).format(d);
-}
-
-
-/* Inicio de una semana ISO */
-
-function getISOWeekStart(year,week){
-
-  const jan4=new Date(
-    year,
-    0,
-    4
-  );
-
-  const monday=getMonday(jan4);
-
-  monday.setDate(
-    monday.getDate()+
-    (week-1)*7
-  );
-
-  return monday;
-}
-
-
-/* Texto del rango semanal */
-
-function weekRangeText(year,week){
-
-  const start=getISOWeekStart(
-    year,
-    week
-  );
-
-  const end=new Date(start);
-
-  end.setDate(
-    end.getDate()+6
-  );
-
-  return`${shortDate(start)} – ${shortDate(end)}`;
-}
-
-
-/* ==========================================
-   FILTRO ACTIVO
-========================================== */
-
-function setActiveDateFilterButton(type){
-
-  document
-    .querySelectorAll('[data-date-filter]')
-    .forEach(button=>{
-
-      button.classList.toggle(
-        'active',
-        button.dataset.dateFilter===type
-      );
-
-    });
-}
-
-
-/* ==========================================
-   ACTUALIZAR TEXTO DEL CALENDARIO
-========================================== */
-
-function updateCalendarActiveText(){
-
-  if(!calendarActiveText)return;
-
-
-  calendarActiveText.classList.toggle(
-    'filtered',
-    dateFilter.type!=='all'
-  );
-
-
-  if(dateFilter.type==='day'){
-
-    const d=parseLocalDateKey(
-      dateFilter.date
-    );
-
-    calendarActiveText.textContent=
-      `Día: ${shortDate(d)}`;
-
-    return;
-  }
-
-
-  if(dateFilter.type==='week'){
-
-    calendarActiveText.textContent=
-      `Semana S${String(dateFilter.week).padStart(2,'0')} · ${weekRangeText(dateFilter.year,dateFilter.week)}`;
-
-    return;
-  }
-
-
-  if(dateFilter.type==='month'){
-
-    const d=new Date(
-      Number(dateFilter.year),
-      Number(dateFilter.month),
-      1
-    );
-
-    const monthName=
-      new Intl.DateTimeFormat(
-        'es-ES',
-        {
-          month:'long',
-          year:'numeric'
-        }
-      ).format(d);
-
-    calendarActiveText.textContent=
-      `Mes: ${monthName.charAt(0).toUpperCase()+monthName.slice(1)}`;
-
-    return;
-  }
-
-
-  calendarActiveText.textContent=
-    'Todos los pedidos';
-}
-
-
-/* ==========================================
-   FILTRAR POR DÍA
-========================================== */
-
-function filterByDay(date){
-
-  const d=parseLocalDateKey(date);
-
-  if(Number.isNaN(d.getTime()))
-    return;
-
-
-  dateFilter={
-    type:'day',
-    date:dateKey(d),
-    week:null,
-    year:null,
-    month:null
-  };
-
-
-  /*
-    Si se selecciona un día de otro mes,
-    el calendario cambia a ese mes.
-  */
-
-  calendarDate=new Date(
-    d.getFullYear(),
-    d.getMonth(),
-    1
-  );
-
-
-  setActiveDateFilterButton('day');
-
-  renderAll();
-
-  renderCalendar();
-}
-
-
-/* ==========================================
-   FILTRAR POR SEMANA
-========================================== */
-
-function filterByWeek(year,week){
-
-  const numericYear=Number(year);
-  const numericWeek=Number(week);
-
-
-  dateFilter={
-    type:'week',
-    date:null,
-    week:numericWeek,
-    year:numericYear,
-    month:null
-  };
-
-
-  /*
-    Colocamos el calendario en el mes
-    donde comienza la semana.
-  */
-
-  const start=getISOWeekStart(
-    numericYear,
-    numericWeek
-  );
-
-
-  calendarDate=new Date(
-    start.getFullYear(),
-    start.getMonth(),
-    1
-  );
-
-
-  setActiveDateFilterButton('week');
-
-  renderAll();
-
-  renderCalendar();
-}
-
-
-/* ==========================================
-   FILTRAR POR MES
-========================================== */
-
-function filterByMonth(year,month){
-
-  dateFilter={
-    type:'month',
-    date:null,
-    week:null,
-    year:Number(year),
-    month:Number(month)
-  };
-
-
-  calendarDate=new Date(
-    Number(year),
-    Number(month),
-    1
-  );
-
-
-  setActiveDateFilterButton('month');
-
-  renderAll();
-
-  renderCalendar();
-}
-
-
-/* ==========================================
-   QUITAR FILTRO DE FECHA
-========================================== */
-
-function clearDateFilter(){
-
-  dateFilter={
-    type:'all',
-    date:null,
-    week:null,
-    year:null,
-    month:null
-  };
-
-
-  setActiveDateFilterButton('all');
-
-  renderAll();
-
-  renderCalendar();
-}
-
-
-/* ==========================================
-   FILTROS RÁPIDOS
-========================================== */
-
-function applyQuickDateFilter(type){
-
-  const today=new Date();
-
-  today.setHours(
-    0,
-    0,
-    0,
-    0
-  );
-
-
-  /* TODOS */
-
-  if(type==='all'){
-
-    clearDateFilter();
-
-    return;
-  }
-
-
-  /* POR DÍA */
-
-  if(type==='day'){
-
-    filterByDay(today);
-
-    return;
-  }
-
-
-  /* POR SEMANA */
-
-  if(type==='week'){
-
-    filterByWeek(
-      getISOYear(today),
-      getISOWeek(today)
-    );
-
-    return;
-  }
-
-
-  /* POR MES */
-
-  if(type==='month'){
-
-    filterByMonth(
-      today.getFullYear(),
-      today.getMonth()
-    );
-
-    return;
-  }
-}
-
-
-/* ==========================================
-   RENDERIZAR CALENDARIO
-========================================== */
-
-function renderCalendar(){
-
-  if(!calendarGrid)return;
-
-
-  const year=calendarDate.getFullYear();
-  const month=calendarDate.getMonth();
-
-
-  /* Título */
-
-  const monthName=new Intl.DateTimeFormat(
-    'es-ES',
-    {
-      month:'long',
-      year:'numeric'
-    }
-  ).format(calendarDate);
-
-
-  if(calendarMonthTitle){
-
-    calendarMonthTitle.textContent=
-      monthName.charAt(0).toUpperCase()+
-      monthName.slice(1);
-  }
-
-
-  /*
-    Primer día y último día
-    del mes mostrado.
-  */
-
-  const firstDay=new Date(
-    year,
-    month,
-    1
-  );
-
-  const lastDay=new Date(
-    year,
-    month+1,
-    0
-  );
-
-
-  /*
-    Convertimos:
-    domingo = 0
-    lunes = 1
-
-    a:
-    lunes = 0
-    martes = 1
-    ...
-    domingo = 6
-  */
-
-  const startOffset=
-    (firstDay.getDay()+6)%7;
-
-
-  /*
-    La primera fecha del calendario
-    será el lunes de la semana que
-    contiene al día 1.
-  */
-
-  const firstCalendarDate=new Date(
-    year,
-    month,
-    1-startOffset
-  );
-
-
-  /*
-    Último domingo necesario.
-  */
-
-  const endOffset=
-    7-((lastDay.getDay()+6)%7)-1;
-
-
-  const lastCalendarDate=new Date(
-    year,
-    month,
-    lastDay.getDate()+endOffset
-  );
-
-
-  let html='';
-
-
-  const today=new Date();
-
-
-  /*
-    Recorremos semana por semana.
-  */
-
-  let weekStart=new Date(
-    firstCalendarDate
-  );
-
-
-  while(
-    weekStart<=lastCalendarDate
-  ){
-
-    const weekEnd=new Date(
-      weekStart
-    );
-
-    weekEnd.setDate(
-      weekEnd.getDate()+6
-    );
-
-
-    const week=
-      getISOWeek(weekStart);
-
-    const weekYear=
-      getISOYear(weekStart);
-
-
-    const isCurrentWeek=
-      getISOWeek(today)===week &&
-      getISOYear(today)===weekYear;
-
-
-    const isSelectedWeek=
-      dateFilter.type==='week' &&
-      Number(dateFilter.week)===week &&
-      Number(dateFilter.year)===weekYear;
-
-
-    let rowClasses=[
-      'calendar-row'
-    ];
-
-
-    if(isCurrentWeek)
-      rowClasses.push(
-        'current-week'
-      );
-
-
-    if(isSelectedWeek)
-      rowClasses.push(
-        'selected-week-row'
-      );
-
-
-    const weekNumberClass=
-      isSelectedWeek
-        ?'calendar-week-number selected'
-        :'calendar-week-number';
-
-
-    html+=`
-
-      <div class="${rowClasses.join(' ')}">
-
-        <button
-          type="button"
-          class="${weekNumberClass}"
-          data-calendar-week="${week}"
-          data-calendar-year="${weekYear}"
-          title="Filtrar por S${String(week).padStart(2,'0')}"
-        >
-          S${String(week).padStart(2,'0')}
-        </button>
-    `;
-
-
-    /*
-      Siete días:
-      lunes → domingo.
-    */
-
-    for(let i=0;i<7;i++){
-
-      const d=new Date(
-        weekStart
-      );
-
-      d.setDate(
-        d.getDate()+i
-      );
-
-
-      const currentMonth=
-        d.getMonth()===month;
-
-
-      const isToday=
-        sameLocalDay(
-          d,
-          today
-        );
-
-
-      const isSelectedDay=
-        dateFilter.type==='day' &&
-        dateFilter.date===dateKey(d);
-
-
-      const dayWeek=
-        getISOWeek(d);
-
-      const dayWeekYear=
-        getISOYear(d);
-
-
-      const isSelectedWeekDay=
-        dateFilter.type==='week' &&
-        Number(dateFilter.week)===dayWeek &&
-        Number(dateFilter.year)===dayWeekYear;
-
-
-      const isSelectedMonth=
-        dateFilter.type==='month' &&
-        Number(dateFilter.year)===d.getFullYear() &&
-        Number(dateFilter.month)===d.getMonth();
-
-
-      let classes=[
-        'calendar-day'
-      ];
-
-
-      if(!currentMonth)
-        classes.push(
-          'other-month'
-        );
-
-
-      if(isToday)
-        classes.push(
-          'today'
-        );
-
-
-      if(isSelectedDay)
-        classes.push(
-          'selected'
-        );
-
-
-      if(isSelectedWeekDay)
-        classes.push(
-          'selected-week'
-        );
-
-
-      if(isSelectedMonth)
-        classes.push(
-          'selected-month'
-        );
-
-
-      html+=`
-
-        <button
-          type="button"
-          class="${classes.join(' ')}"
-          data-calendar-day="${dateKey(d)}"
-          title="Filtrar pedidos del ${shortDate(d)}"
-        >
-          <span class="calendar-day-number">
-            ${d.getDate()}
-          </span>
-        </button>
-
-      `;
-    }
-
-
-    html+=`
-
-      </div>
-
-    `;
-
-
-    weekStart.setDate(
-      weekStart.getDate()+7
-    );
-  }
-
-
-  calendarGrid.innerHTML=html;
-
-
-  /* ==========================================
-     CLICK EN DÍA
-  ========================================== */
-
-  calendarGrid
-    .querySelectorAll('[data-calendar-day]')
-    .forEach(day=>{
-
-      day.addEventListener(
-  'click',
-  e=>{
-    e.stopPropagation();
-
-    filterByDay(
-      day.dataset.calendarDay
-    );
-  }
-);
-
-    });
-
-
-  /* ==========================================
-     CLICK EN SEMANA
-  ========================================== */
-
-  calendarGrid
-    .querySelectorAll('[data-calendar-week]')
-    .forEach(week=>{
-
-      week.addEventListener(
-        'click',
-        e=>{
-
-          e.stopPropagation();
-
-          filterByWeek(
-            Number(
-              week.dataset.calendarYear
-            ),
-            Number(
-              week.dataset.calendarWeek
-            )
-          );
-
-        }
-      );
-
-    });
-
-
-  updateCalendarActiveText();
-}
-
-
-/* ==========================================
-   COMPROBAR FILTRO DE FECHA
-========================================== */
-
-function matchesDateFilter(order){
-
-  if(dateFilter.type==='all')
-    return true;
-
-
-  const d=new Date(
-    order.createdAt
-  );
-
-
-  if(Number.isNaN(d.getTime()))
-    return false;
-
-
-  /* DÍA */
-
-  if(dateFilter.type==='day'){
-
-    return(
-      dateKey(d)===dateFilter.date
-    );
-  }
-
-
-  /* SEMANA */
-
-  if(dateFilter.type==='week'){
-
-    return(
-      getISOWeek(d)===
-        Number(dateFilter.week) &&
-      getISOYear(d)===
-        Number(dateFilter.year)
-    );
-  }
-
-
-  /* MES */
-
-  if(dateFilter.type==='month'){
-
-    return(
-      d.getFullYear()===
-        Number(dateFilter.year) &&
-      d.getMonth()===
-        Number(dateFilter.month)
-    );
-  }
-
-
-  return true;
-}
-
-
-/* ==========================================
-   PEDIDOS DEL FILTRO DE FECHA
-========================================== */
-
-function dateFilteredOrders(){
-
-  return orders.filter(
-    matchesDateFilter
-  );
-}
-
-
-/* ==========================================
-   RESUMEN DEL FILTRO
-========================================== */
-
-function renderDateFilterSummary(){
-
-  if(!dateFilterSummary)return;
-
-
-  if(dateFilter.type==='all'){
-
-    dateFilterSummary.innerHTML='';
-    dateFilterSummary.hidden=true;
-
-    return;
-  }
-
-
-  /*
-    El resumen siempre cuenta TODOS los
-    pedidos del período seleccionado,
-    independientemente del filtro de estado
-    o del buscador.
-  */
-
-  const list=dateFilteredOrders();
-
-
-  const pending=list.filter(
-    o=>o.status==='pending'
-  ).length;
-
-
-  const invoiced=list.filter(
-    o=>o.status==='invoiced'
-  ).length;
-
-
-  const cancelled=list.filter(
-    o=>o.status==='cancelled'
-  ).length;
-
-
-  const total=list.length;
-
-
-  let filterText='';
-
-
-  if(dateFilter.type==='day'){
-
-    filterText=
-      `📅 ${shortDate(dateFilter.date)}`;
-  }
-
-
-  else if(dateFilter.type==='week'){
-
-    filterText=
-      `📅 S${String(dateFilter.week).padStart(2,'0')} · ${weekRangeText(dateFilter.year,dateFilter.week)}`;
-  }
-
-
-  else if(dateFilter.type==='month'){
-
-    const d=new Date(
-      Number(dateFilter.year),
-      Number(dateFilter.month),
-      1
-    );
-
-
-    const name=
-      new Intl.DateTimeFormat(
-        'es-ES',
-        {
-          month:'long',
-          year:'numeric'
-        }
-      ).format(d);
-
-
-    filterText=
-      `📅 ${name.charAt(0).toUpperCase()+name.slice(1)}`;
-  }
-
-
-  dateFilterSummary.innerHTML=`
-
-    <strong>
-      ${escapeHTML(filterText)}
-    </strong>
-
-    <span class="date-summary-count">
-      ${total}
-      ${total===1?'pedido':'pedidos'}
-    </span>
-
-    <span class="date-summary-status pending">
-      🟠 ${pending}
-      ${pending===1?'Pendiente':'Pendientes'}
-    </span>
-
-    <span class="date-summary-status invoiced">
-      🟢 ${invoiced}
-      ${invoiced===1?'Facturado':'Facturados'}
-    </span>
-
-    <span class="date-summary-status cancelled">
-      🔴 ${cancelled}
-      ${cancelled===1?'Cancelado':'Cancelados'}
-    </span>
-
-  `;
-
-
-  dateFilterSummary.hidden=false;
-}
-
-
-/* ==========================================
-   CALENDARIO: ABRIR / CERRAR
-========================================== */
-
-function openCalendar(){
-
-  if(!calendarPopover)return;
-
-
-  calendarPopover.hidden=false;
-
-
-  calendarToggle?.setAttribute(
-    'aria-expanded',
-    'true'
-  );
-
-
-  renderCalendar();
-}
-
-
-function closeCalendar(){
-
-  if(!calendarPopover)return;
-
-
-  calendarPopover.hidden=true;
-
-
-  calendarToggle?.setAttribute(
-    'aria-expanded',
-    'false'
-  );
-}
-
-
-/* ==========================================
-   EVENTO BOTÓN CALENDARIO
-========================================== */
-
-if(calendarToggle){
-
-  calendarToggle.addEventListener(
-    'click',
-    e=>{
-
-      e.stopPropagation();
-
-
-      if(calendarPopover?.hidden){
-
-        openCalendar();
-
-      }else{
-
-        closeCalendar();
-
-      }
-
-    }
-  );
-}
-
-/* ==========================================
-   CERRAR CALENDARIO CON LA ✕
-========================================== */
-
-if(calendarClose){
-
-  calendarClose.addEventListener(
-    'click',
-    e=>{
-
-      e.stopPropagation();
-
-      closeCalendar();
-
-    }
-  );
-}
-/* ==========================================
-   MES ANTERIOR
-========================================== */
-
-if(calendarPrev){
-
-  calendarPrev.addEventListener(
-    'click',
-    e=>{
-
-      e.stopPropagation();
-
-
-      calendarDate=new Date(
-        calendarDate.getFullYear(),
-        calendarDate.getMonth()-1,
-        1
-      );
-
-
-      /*
-        Si estamos usando "Por mes",
-        cambiar de mes también cambia
-        el filtro al nuevo mes.
-      */
-
-      if(dateFilter.type==='month'){
-
-        filterByMonth(
-          calendarDate.getFullYear(),
-          calendarDate.getMonth()
-        );
-
-      }else{
-
-        renderCalendar();
-
-      }
-
-    }
-  );
-}
-
-
-/* ==========================================
-   MES SIGUIENTE
-========================================== */
-
-if(calendarNext){
-
-  calendarNext.addEventListener(
-    'click',
-    e=>{
-
-      e.stopPropagation();
-
-
-      calendarDate=new Date(
-        calendarDate.getFullYear(),
-        calendarDate.getMonth()+1,
-        1
-      );
-
-
-      /*
-        Si estamos usando "Por mes",
-        cambiar de mes también cambia
-        el filtro al nuevo mes.
-      */
-
-      if(dateFilter.type==='month'){
-
-        filterByMonth(
-          calendarDate.getFullYear(),
-          calendarDate.getMonth()
-        );
-
-      }else{
-
-        renderCalendar();
-
-      }
-
-    }
-  );
-}
-
-
-/* ==========================================
-   QUITAR FILTRO
-========================================== */
-
-if(calendarClear){
-
-  calendarClear.addEventListener(
-    'click',
-    e=>{
-
-      e.stopPropagation();
-
-      clearDateFilter();
-
-    }
-  );
-}
-
-
-/* ==========================================
-   CERRAR AL TOCAR FUERA
-========================================== */
-
-document.addEventListener(
-  'click',
-  e=>{
-
-    if(
-      !calendarPopover ||
-      calendarPopover.hidden
-    )
-      return;
-
-
-    if(
-      !calendarPopover.contains(e.target) &&
-      !calendarToggle?.contains(e.target)
-    ){
-
-      closeCalendar();
-
-    }
-
-  }
-);
-
-
-/* ==========================================
-   FILTROS RÁPIDOS
-========================================== */
-
-document
-  .querySelectorAll('[data-date-filter]')
-  .forEach(button=>{
-
-    button.addEventListener(
-  'click',
-  e=>{
-    e.stopPropagation();
-
-    applyQuickDateFilter(
-      button.dataset.dateFilter
-    );
-  }
-);
-
-  });
-
-
-/* ==========================================
-   IMPORTAR PEDIDO
-========================================== */
-
-function openImport(){
-
-  whatsappMessage.value='';
-
-  importPreview.hidden=true;
-
-  parseError.hidden=true;
-
-  saveImportBtn.hidden=true;
-
-  previewImportBtn.hidden=false;
-
-  pendingParsedOrder=null;
-
-  importDialog.showModal();
-
-  setTimeout(
-    ()=>whatsappMessage.focus(),
-    100
-  );
-}
-
-
-function closeImport(){
-
-  if(importDialog.open)
-    importDialog.close();
-}
-
-
-function parseCustomer(t){
-
-  const m=t.match(
-    /(?:👤\s*)?Cliente\s*:\s*(.+)/i
-  );
-
-  return m?m[1].trim():'';
-}
-
-
-function parsePhone(t){
-
-  const m=t.match(
-    /(?:📞\s*)?Teléfono\s*:\s*([0-9+\-\s()]+)/i
-  );
-
-  return m
-    ?m[1].trim().replace(/[^\d+]/g,'')
-    :'';
-}
-
-
-function getProductsSection(t){
-
-  const s=t.search(
-    /📦\s*PRODUCTOS/i
-  );
-
-  if(s===-1)return'';
-
-
-  const a=t.slice(s);
-
-
-  const x=a.indexOf(
-    '━━━━━━━━━━━━━━'
-  );
-
-
-  return x!==-1
-    ?a.slice(0,x)
-    :a;
-}
-
-
-function parseNumber(v){
-
-  return Number(
-    String(v??'')
-      .replace(/\./g,'')
-      .replace(/,/g,'')
-      .replace(/[^\d.-]/g,'')
-  )||0;
-}
-
-
-function parseProducts(t){
-
-  const s=getProductsSection(t);
-
-  if(!s)return[];
-
-
-  return s.split('\n')
-    .map(x=>x.trim())
-    .filter(x=>x.startsWith('•'))
-    .map(line=>{
-
-      const c=line
-        .replace(/^•\s*/,'')
-        .trim();
-
-
-      const m=c.match(
-        /^(.+?)\s+—\s+(\d+)\s+(.+?)\s+×\s+([\d.,]+)\s+(CUP|USD)\s+=\s+([\d.,]+)\s+(CUP|USD)$/i
-      );
-
-
-      if(!m)return null;
-
-
-      return{
-        name:m[1].trim(),
-        quantity:Number(m[2]),
-        presentation:m[3].trim(),
-        unitPrice:parseNumber(m[4]),
-        currency:m[5].toUpperCase(),
-        total:parseNumber(m[6])
-      };
-
-    })
-    .filter(Boolean);
-}
-
-
-function parseTotals(t){
-
-  const cup=t.match(
-    /TOTAL\s+CUP\s*:\s*([\d.,]+)\s*CUP/i
-  );
-
-
-  const usd=t.match(
-    /TOTAL\s+USD\s*:\s*([\d.,]+)\s*USD/i
-  );
-
-
-  return{
-    CUP:cup?parseNumber(cup[1]):0,
-    USD:usd?parseNumber(usd[1]):0
-  };
-}
-
-
-function nextOrderNumber(d=new Date()){
-
-  const prefix=
-    `PAN-${getISOYear(d)}-S${String(getISOWeek(d)).padStart(2,'0')}-`;
-
-
-  let n=0;
-
-
-  orders
-    .filter(o=>
-      String(o.orderNumber||'')
-        .startsWith(prefix)
-    )
-    .forEach(o=>{
-
-      const m=String(o.orderNumber)
-        .match(/-(\d+)$/);
-
-
-      if(m){
-
-        n=Math.max(
-          n,
-          Number(m[1])
-        );
-
-      }
-
-    });
-
-
-  return prefix+
-    String(n+1).padStart(3,'0');
-}
-
-
-function parseWhatsAppOrder(text){
-
-  const t=String(text||'')
-    .replace(/\r/g,'');
-
-
-  if(!t.trim())
-    throw new Error(
-      'Pega primero el mensaje completo de WhatsApp.'
-    );
-
-
-  if(!/PEDIDO\s+PANACEA/i.test(t))
-    throw new Error(
-      'No parece ser un pedido generado por PANACEA.'
-    );
-
-
-  const customer=parseCustomer(t);
-
-
-  if(!customer)
-    throw new Error(
-      'No pude encontrar el nombre del cliente.'
-    );
-
-
-  const phone=parsePhone(t);
-
-
-  if(!phone)
-    throw new Error(
-      'No pude encontrar el teléfono del cliente.'
-    );
-
-
-  const products=parseProducts(t);
-
-
-  if(!products.length)
-    throw new Error(
-      'No pude interpretar los productos. Asegúrate de pegar el mensaje completo.'
-    );
-
-
-  const totals=parseTotals(t);
-
-
-  if(!totals.CUP&&!totals.USD){
-
-    totals.CUP=
-      products
-        .filter(p=>p.currency==='CUP')
-        .reduce(
-          (s,p)=>s+p.total,
-          0
-        );
-
-
-    totals.USD=
-      products
-        .filter(p=>p.currency==='USD')
-        .reduce(
-          (s,p)=>s+p.total,
-          0
-        );
-  }
-
-
-  const now=new Date();
-
-
-  return{
-    orderNumber:nextOrderNumber(now),
-    createdAt:now.toISOString(),
-    week:getISOWeek(now),
-    year:getISOYear(now),
-    customer,
-    phone,
-    products,
-    totals,
-    status:'pending',
-    source:'whatsapp',
-    rawMessage:t
-  };
-}
-
-
-function showParseError(m){
-
-  parseError.textContent=m;
-
-  parseError.hidden=false;
-}
-
-
-function formatTotals(t){
-
-  const r=[];
-
-
-  if(Number(t?.CUP)>0)
-    r.push(
-      money(t.CUP,'CUP')
-    );
-
-
-  if(Number(t?.USD)>0)
-    r.push(
-      money(t.USD,'USD')
-    );
-
-
-  return r.join(' · ')||'0';
-}
-
-
-function previewImport(){
-
-  parseError.hidden=true;
-
-
-  try{
-
-    pendingParsedOrder=
-      parseWhatsAppOrder(
-        whatsappMessage.value
-      );
-
-
-    importPreview.hidden=false;
-
-    saveImportBtn.hidden=false;
-
-    previewImportBtn.hidden=true;
-
-
-    document.getElementById(
-      'previewOrderNumber'
-    ).textContent=
-      pendingParsedOrder.orderNumber;
-
-
-    document.getElementById(
-      'previewCustomer'
-    ).textContent=
-      pendingParsedOrder.customer;
-
-
-    document.getElementById(
-      'previewPhone'
-    ).textContent=
-      pendingParsedOrder.phone;
-
-
-    document.getElementById(
-      'previewProducts'
-    ).textContent=
-      `${pendingParsedOrder.products.length} producto(s)`;
-
-
-    document.getElementById(
-      'previewTotal'
-    ).textContent=
-      formatTotals(
-        pendingParsedOrder.totals
-      );
-
-
-  }catch(e){
-
-    pendingParsedOrder=null;
-
-    importPreview.hidden=true;
-
-    saveImportBtn.hidden=true;
-
-    previewImportBtn.hidden=false;
-
-    showParseError(e.message);
-  }
-}
-
-
-function createOrder(){
-
-  if(!pendingParsedOrder)
-    return showParseError(
-      'Primero debes revisar el pedido.'
-    );
-
-
-  const d=orders.find(
-    o=>o.rawMessage===
-      pendingParsedOrder.rawMessage
-  );
-
-
-  if(d)
-    return showParseError(
-      `Este pedido ya fue importado como ${d.orderNumber}.`
-    );
-
-
-  orders.unshift(
-    pendingParsedOrder
-  );
-
-
-  saveOrders();
-
-  closeImport();
-
-  renderAll();
-
-
-  showToast(
-    `Pedido ${pendingParsedOrder.orderNumber} creado correctamente.`
-  );
-
-
-  pendingParsedOrder=null;
-}
-
-
-/* ==========================================
-   LISTADO
-========================================== */
-
-function filteredOrders(){
-
-  const q=searchTerm
-    .toLowerCase()
-    .trim();
-
-
-  return orders.filter(o=>{
-
-
-    /* FILTRO DE ESTADO */
-
-    if(
-      activeStatus!=='all' &&
-      o.status!==activeStatus
-    )
-      return false;
-
-
-    /* FILTRO DE FECHA */
-
-    if(!matchesDateFilter(o))
-      return false;
-
-
-    /* BÚSQUEDA */
-
-    if(!q)return true;
-
-
-    const s=[
-      o.orderNumber,
-      o.customer,
-      o.phone,
-      ...(o.products||[])
-        .map(p=>p.name)
-    ]
-      .join(' ')
-      .toLowerCase();
-
-
-    return s.includes(q);
+  if(Number.isNaN(d.getTime()))return value;
+
+  return d.toLocaleString('es-ES',{
+    day:'2-digit',
+    month:'2-digit',
+    year:'numeric',
+    hour:'2-digit',
+    minute:'2-digit'
   });
 }
 
+function formatMoney(value){
+  if(value===undefined||value===null||value==='')return '—';
 
-/* ==========================================
-   RENDERIZAR PEDIDOS
-========================================== */
+  const n=Number(value);
 
-function renderOrders(){
+  if(Number.isNaN(n))return escapeHTML(value);
 
-  const list=filteredOrders();
+  return n.toLocaleString('es-ES',{
+    minimumFractionDigits:2,
+    maximumFractionDigits:2
+  });
+}
 
+function getTotal(order){
+  if(!order)return null;
 
-  ordersCount.textContent=
-    `${list.length} ${list.length===1?'pedido':'pedidos'}`;
+  if(order.totals){
+    if(typeof order.totals==='number')return order.totals;
 
+    if(order.totals.total!==undefined)return order.totals.total;
+    if(order.totals.grandTotal!==undefined)return order.totals.grandTotal;
+    if(order.totals.amount!==undefined)return order.totals.amount;
+  }
 
-  ordersList.innerHTML=
-    list.map(o=>{
+  if(order.total!==undefined)return order.total;
 
-      const products=(o.products||[])
-        .map(p=>
-          `${p.quantity} ${p.name}`
-        )
-        .join(' · ');
+  return null;
+}
 
+function productsText(order){
+  if(!order?.products)return 'Sin productos';
 
-      return`
+  if(Array.isArray(order.products)){
+    return order.products.map(p=>{
+      if(typeof p==='string')return p;
 
-        <article class="order-card">
+      const name=p.name||p.product||p.title||'Producto';
+      const qty=p.quantity??p.qty??p.cantidad??1;
 
-          <div>
+      return `${qty} × ${name}`;
+    }).join(', ')||'Sin productos';
+  }
 
-            <div class="order-number">
-              ${escapeHTML(o.orderNumber)}
-            </div>
-
-            <div class="order-date">
-              ${escapeHTML(
-                formatDate(o.createdAt)
-              )}
-            </div>
-
-          </div>
-
-
-          <div>
-
-            <div class="order-customer">
-              ${escapeHTML(o.customer)}
-            </div>
-
-            <div class="order-phone">
-              ${escapeHTML(o.phone)}
-            </div>
-
-            <div class="order-summary">
-              ${escapeHTML(products)}
-            </div>
-
-          </div>
-
-
-          <div class="order-right">
-
-            <div class="order-total">
-              ${escapeHTML(
-                formatTotals(o.totals)
-              )}
-            </div>
-
-            <span
-              class="status-badge ${statusClass(o.status)}"
-            >
-              ${escapeHTML(
-                statusLabel(o.status)
-              )}
-            </span>
-
-            <br>
-
-            <button
-              type="button"
-              class="order-open-btn"
-              data-open-order="${escapeHTML(o.orderNumber)}"
-            >
-              Ver pedido →
-            </button>
-
-          </div>
-
-        </article>
-
-      `;
-
-    })
-    .join('');
-
-
-  emptyOrders.hidden=
-    list.length!==0;
-
-
-  ordersList.hidden=
-    list.length===0;
-
-
-  document
-    .querySelectorAll('[data-open-order]')
-    .forEach(b=>
-      b.addEventListener(
-        'click',
-        ()=>openOrder(
-          b.dataset.openOrder
-        )
-      )
-    );
-
-
-  renderDateFilterSummary();
+  return String(order.products);
 }
 
 
-/* ==========================================
-   ESTADÍSTICAS
-========================================== */
-
-function renderStats(){
-
-  document.getElementById(
-    'statTotal'
-  ).textContent=
-    orders.length;
-
-
-  document.getElementById(
-    'statPending'
-  ).textContent=
-    orders.filter(
-      o=>o.status==='pending'
-    ).length;
-
-
-  document.getElementById(
-    'statInvoiced'
-  ).textContent=
-    orders.filter(
-      o=>o.status==='invoiced'
-    ).length;
-
-
-  document.getElementById(
-    'statCancelled'
-  ).textContent=
-    orders.filter(
-      o=>o.status==='cancelled'
-    ).length;
-}
-
-
-/* ==========================================
-   RENDER GENERAL
-========================================== */
+/* =========================================================
+   PEDIDOS
+   ========================================================= */
 
 function renderAll(){
-
   renderStats();
-
   renderOrders();
+  updateBackupUI();
+}
 
-  updateCalendarActiveText();
+function renderStats(){
+  const total=document.getElementById('ordersCount');
+  const pending=document.getElementById('pendingCount');
+  const invoiced=document.getElementById('invoicedCount');
+  const cancelled=document.getElementById('cancelledCount');
+
+  if(total)total.textContent=orders.length;
+
+  if(pending){
+    pending.textContent=orders.filter(o=>o.status==='pending').length;
+  }
+
+  if(invoiced){
+    invoiced.textContent=orders.filter(o=>o.status==='invoiced').length;
+  }
+
+  if(cancelled){
+    cancelled.textContent=orders.filter(o=>o.status==='cancelled').length;
+  }
+}
+
+function matchesSearch(order){
+  if(!searchTerm)return true;
+
+  const text=[
+    order.orderNumber,
+    order.customer,
+    order.phone,
+    productsText(order)
+  ].join(' ').toLowerCase();
+
+  return text.includes(searchTerm.toLowerCase());
+}
+
+function renderOrders(){
+  const list=document.getElementById('ordersList');
+  const empty=document.getElementById('emptyOrders');
+
+  if(!list)return;
+
+  const filtered=orders.filter(order=>{
+    const statusOk=
+      activeStatus==='all' ||
+      order.status===activeStatus;
+
+    return statusOk&&matchesSearch(order);
+  });
+
+  list.innerHTML='';
+
+  if(!filtered.length){
+    if(empty)empty.hidden=false;
+    return;
+  }
+
+  if(empty)empty.hidden=true;
+
+  filtered.forEach(order=>{
+    const box=document.createElement('article');
+
+    box.className='order-card';
+
+    const total=getTotal(order);
+
+    box.innerHTML=`
+      <div>
+        <div class="order-number">#${escapeHTML(order.orderNumber)}</div>
+        <div class="order-date">${escapeHTML(formatDate(order.createdAt))}</div>
+      </div>
+
+      <div>
+        <div class="order-customer">${escapeHTML(order.customer||'Sin nombre')}</div>
+        <div class="order-phone">${escapeHTML(order.phone||'Sin teléfono')}</div>
+        <div class="order-summary">${escapeHTML(productsText(order))}</div>
+      </div>
+
+      <div class="order-right">
+        <div class="order-total">
+          ${total===null?'—':escapeHTML(formatMoney(total))}
+        </div>
+
+        <span class="status-badge status-${escapeHTML(order.status||'pending')}">
+          ${escapeHTML(statusLabel(order.status))}
+        </span>
+
+        <br>
+
+        <button type="button" class="order-open-btn">
+          Ver pedido
+        </button>
+      </div>
+    `;
+
+    box.querySelector('.order-open-btn').onclick=()=>{
+      openOrderDialog(order);
+    };
+
+    list.appendChild(box);
+  });
 }
 
 
-/* ==========================================
-   VER PEDIDO
-========================================== */
+/* =========================================================
+   DETALLE DEL PEDIDO
+   ========================================================= */
 
-function openOrder(orderNumber){
+function openOrderDialog(order){
+  const dialog=document.getElementById('orderDialog');
 
-  const o=orders.find(
-    x=>x.orderNumber===orderNumber
-  );
+  if(!dialog)return;
 
+  const detail=dialog.querySelector('[data-order-detail]');
 
-  if(!o)return;
+  if(!detail)return;
 
+  const total=getTotal(order);
 
-  const products=(o.products||[])
-    .map(p=>`
+  const products=Array.isArray(order.products)
+    ?order.products
+    :[];
 
-      <div class="detail-product">
-
-        <div>
-
-          <strong>
-            ${escapeHTML(p.name)}
-          </strong>
-
-          <br>
-
-          <small>
-            ${escapeHTML(p.presentation)}
-          </small>
-
-        </div>
-
-        <div>
-          ${p.quantity}
-        </div>
-
-        <div>
-          ${escapeHTML(
-            money(p.total,p.currency)
-          )}
-        </div>
-
-      </div>
-
-    `)
-    .join('');
-
-
-  const cancellation=o.cancellation?`
-
-    <div
-      style="
-        margin-top:15px;
-        padding:14px;
-        background:#fff7f7;
-        border:1px solid #e5caca;
-        border-radius:14px
-      "
-    >
-
-      <strong>
-        ❌ Información de cancelación
-      </strong>
-
-      <p style="margin:8px 0">
-
-        <b>Estado:</b>
-
-        ${
-          o.cancellation.type==='partial'
-            ?'Cancelación parcial'
-            :'Cancelación total'
-        }
-
-      </p>
-
-      <p style="margin:8px 0">
-
-        <b>Motivo:</b>
-
-        ${escapeHTML(
-          o.cancellation.reason
-        )}
-
-      </p>
-
-      <p style="margin:8px 0">
-
-        <b>Productos cancelados:</b><br>
-
-        ${
-          (o.cancellation.products||[])
-            .map(p=>
-              `• ${escapeHTML(p.name)} — ${p.quantity} ${escapeHTML(p.presentation)}`
-            )
-            .join('<br>')
-        }
-
-      </p>
-
-      <small>
-        ${escapeHTML(
-          formatDate(
-            o.cancellation.cancelledAt
-          )
-        )}
-      </small>
-
-    </div>
-
-  `:'';
-
-
-  const cancellationButton=
-    o.status==='cancelled'
-
-      ?`
-
-        <button
-          type="button"
-          data-send-cancellation="${o.orderNumber}"
-        >
-          👤 Enviar cancelación al cliente
-        </button>
-
-      `
-
-      :`
-
-        <button
-          type="button"
-          class="danger"
-          data-cancel-order="${o.orderNumber}"
-        >
-          ❌ Cancelar pedido
-        </button>
-
-      `;
-
-
-  orderDetail.innerHTML=`
-
+  detail.innerHTML=`
     <div class="order-detail">
-
-      <button
-        type="button"
-        class="dialog-x"
-        data-close-order
-        aria-label="Cerrar"
-      >
-        ×
-      </button>
-
 
       <div class="detail-top">
 
         <div>
-
           <div class="detail-number">
-            ${escapeHTML(
-              o.orderNumber
-            )}
+            #${escapeHTML(order.orderNumber)}
           </div>
 
           <div class="detail-date">
-
-            ${escapeHTML(
-              formatDate(o.createdAt)
-            )}
-
-            · Semana ${o.week}
-
+            ${escapeHTML(formatDate(order.createdAt))}
           </div>
-
         </div>
 
-
-        <span
-          class="status-badge ${statusClass(o.status)}"
-        >
-          ${escapeHTML(
-            statusLabel(o.status)
-          )}
+        <span class="status-badge status-${escapeHTML(order.status||'pending')}">
+          ${escapeHTML(statusLabel(order.status))}
         </span>
 
       </div>
 
-
       <div class="detail-customer">
 
         <div class="detail-box">
-
-          <small>CLIENTE</small>
-
-          <strong>
-            ${escapeHTML(o.customer)}
-          </strong>
-
+          <small>Cliente</small>
+          <strong>${escapeHTML(order.customer||'Sin nombre')}</strong>
         </div>
 
-
         <div class="detail-box">
-
-          <small>TELÉFONO</small>
-
-          <strong>
-            ${escapeHTML(o.phone)}
-          </strong>
-
+          <small>Teléfono</small>
+          <strong>${escapeHTML(order.phone||'Sin teléfono')}</strong>
         </div>
 
       </div>
-
 
       <div class="detail-products">
 
         <h3>Productos</h3>
 
-        ${products}
+        ${
+          products.length
+          ?products.map(p=>{
+            const name=p.name||p.product||p.title||'Producto';
+            const qty=p.quantity??p.qty??p.cantidad??1;
+            const price=p.price??p.unitPrice??p.precio;
+
+            return `
+              <div class="detail-product">
+                <span>${escapeHTML(name)}</span>
+                <strong>×${escapeHTML(qty)}</strong>
+                <small>
+                  ${price===undefined?'':escapeHTML(formatMoney(price))}
+                </small>
+              </div>
+            `;
+          }).join('')
+          :'<p>Sin productos registrados.</p>'
+        }
 
       </div>
-
 
       <div class="detail-totals">
-
         <div class="detail-total">
-          ${escapeHTML(
-            formatTotals(o.totals)
-          )}
+          Total: ${total===null?'—':escapeHTML(formatMoney(total))}
         </div>
-
       </div>
 
-
-      ${cancellation}
-
+      <div data-status-editor></div>
 
       <div class="detail-actions">
 
-        <button
-          type="button"
-          data-status="${o.orderNumber}"
-          ${o.status==='cancelled'?'disabled':''}
-        >
-          🔄 Cambiar estado
-        </button>
-
-
-        <button
-          type="button"
-          data-send-client="${o.orderNumber}"
-        >
-          👤 Enviar al cliente
-        </button>
-
-
-        <button
-          type="button"
-          data-send-info="${o.orderNumber}"
-        >
-          ‼️ Informaciones importantes
-        </button>
-
-
-        <button
-          type="button"
-          data-send-biller="${o.orderNumber}"
-        >
-          🧾 Enviar a la facturadora
-        </button>
-
-
-        <button
-          type="button"
-          data-copy-order="${o.orderNumber}"
-        >
+        <button type="button" data-copy-order>
           📋 Copiar pedido
         </button>
 
-
-        ${cancellationButton}
-
-
-        <button
-          type="button"
-          class="danger"
-          data-delete-order="${o.orderNumber}"
-        >
+        <button type="button" data-delete-order class="danger">
           🗑️ Eliminar
         </button>
 
@@ -2366,1318 +387,1004 @@ function openOrder(orderNumber){
     </div>
   `;
 
+  renderStatusEditor(detail,order);
 
-  orderDialog.showModal();
+  detail.querySelector('[data-copy-order]').onclick=()=>{
+    copyOrder(order);
+  };
 
+  detail.querySelector('[data-delete-order]').onclick=()=>{
+    deleteOrder(order);
+  };
 
-  orderDetail
-    .querySelector('[data-close-order]')
-    ?.addEventListener(
-      'click',
-      ()=>orderDialog.close()
-    );
-
-
-  orderDetail
-    .querySelector('[data-send-client]')
-    ?.addEventListener(
-      'click',
-      ()=>sendToClient(orderNumber)
-    );
-
-
-  orderDetail
-    .querySelector('[data-send-info]')
-    ?.addEventListener(
-      'click',
-      ()=>sendImportantInfo(orderNumber)
-    );
-
-
-  orderDetail
-    .querySelector('[data-copy-order]')
-    ?.addEventListener(
-      'click',
-      ()=>copyOrder(orderNumber)
-    );
-
-
-  orderDetail
-    .querySelector('[data-status]')
-    ?.addEventListener(
-      'click',
-      ()=>changeStatus(orderNumber)
-    );
-
-
-  orderDetail
-    .querySelector('[data-cancel-order]')
-    ?.addEventListener(
-      'click',
-      ()=>cancelOrder(orderNumber)
-    );
-
-
-  orderDetail
-    .querySelector('[data-send-cancellation]')
-    ?.addEventListener(
-      'click',
-      ()=>sendCancellationToClient(
-        orderNumber
-      )
-    );
-
-
-  orderDetail
-    .querySelector('[data-delete-order]')
-    ?.addEventListener(
-      'click',
-      ()=>deleteOrder(orderNumber)
-    );
+  dialog.showModal();
 }
 
+function renderStatusEditor(detail,order){
+  const editor=detail.querySelector('[data-status-editor]');
 
-/* ==========================================
-   CAMBIAR ESTADO
-========================================== */
+  if(!editor)return;
 
-function changeStatus(orderNumber){
+  editor.innerHTML=`
+    <label>
+      Estado del pedido
+    </label>
 
-  const order=orders.find(
-    o=>o.orderNumber===orderNumber
-  );
+    <select data-status-select>
+      <option value="pending">Pendiente</option>
+      <option value="invoiced">Facturado</option>
+      <option value="cancelled">Cancelado</option>
+    </select>
 
-
-  if(!order)return;
-
-
-  if(order.status==='cancelled')
-    return showToast(
-      'Este pedido ya está cancelado.'
-    );
-
-
-  const detail=
-    document.getElementById(
-      'orderDetail'
-    );
-
-
-  const button=
-    detail.querySelector(
-      '[data-status]'
-    );
-
-
-  if(
-    !button||
-    detail.querySelector(
-      '[data-status-editor]'
-    )
-  )
-    return;
-
-
-  const box=document.createElement('div');
-
-  box.dataset.statusEditor='';
-
-
-  box.innerHTML=`
-
-    <div
-      style="
-        margin-top:15px;
-        padding:15px;
-        background:#f6f4ef;
-        border:1px solid #ddd;
-        border-radius:14px
-      "
-    >
-
-      <label
-        style="
-          display:block;
-          font-weight:700;
-          margin-bottom:8px
-        "
-      >
-        Cambiar estado del pedido
-      </label>
-
-
-      <select
-        data-status-select
-        style="
-          width:100%;
-          padding:12px;
-          border:1px solid #ccc;
-          border-radius:10px;
-          font-size:16px;
-          background:#fff
-        "
-      >
-
-        <option
-          value="pending"
-          ${order.status==='pending'?'selected':''}
-        >
-          Pendiente
-        </option>
-
-
-        <option
-          value="invoiced"
-          ${order.status==='invoiced'?'selected':''}
-        >
-          Facturado
-        </option>
-
-      </select>
-
-
-      <div
-        style="
-          display:flex;
-          gap:8px;
-          margin-top:10px
-        "
-      >
-
-        <button
-          type="button"
-          data-save-status
-          style="
-            flex:1;
-            padding:11px;
-            border:0;
-            border-radius:10px;
-            background:#263a32;
-            color:#fff;
-            font-weight:700
-          "
-        >
-          ✓ Guardar
-        </button>
-
-
-        <button
-          type="button"
-          data-cancel-status
-          style="
-            flex:1;
-            padding:11px;
-            border:1px solid #ccc;
-            border-radius:10px;
-            background:#fff;
-            font-weight:600
-          "
-        >
-          Cancelar
-        </button>
-
-      </div>
-
-    </div>
-
+    <button type="button" data-save-status>
+      Guardar estado
+    </button>
   `;
 
+  const select=editor.querySelector('[data-status-select]');
 
-  button.insertAdjacentElement(
-    'afterend',
-    box
-  );
+  select.value=
+    ['pending','invoiced','cancelled'].includes(order.status)
+    ?order.status
+    :'pending';
 
-
-  button.hidden=true;
-
-
-  const select=
-    box.querySelector(
-      '[data-status-select]'
-    );
-
-
-  box.querySelector(
-    '[data-save-status]'
-  ).onclick=()=>{
-
+  editor.querySelector('[data-save-status]').onclick=()=>{
     order.status=select.value;
 
     saveOrders();
-
-    box.remove();
-
-    button.hidden=false;
-
     renderAll();
 
+    const dialog=document.getElementById('orderDialog');
 
-    const badge=
-      detail.querySelector(
-        '.detail-top .status-badge'
-      );
+    if(dialog?.open)dialog.close();
 
-
-    if(badge){
-
-      badge.className=
-        `status-badge ${statusClass(order.status)}`;
-
-      badge.textContent=
-        statusLabel(order.status);
-    }
-
-
-    showToast(
-      `Estado cambiado a: ${statusLabel(order.status)}`
-    );
+    showToast('✅ Estado del pedido actualizado.');
   };
+}
 
+function copyOrder(order){
+  const text=[
+    `Pedido #${order.orderNumber}`,
+    `Cliente: ${order.customer||''}`,
+    `Teléfono: ${order.phone||''}`,
+    '',
+    productsText(order),
+    '',
+    `Total: ${getTotal(order)===null?'':formatMoney(getTotal(order))}`
+  ].join('\n');
 
-  box.querySelector(
-    '[data-cancel-status]'
-  ).onclick=()=>{
+  navigator.clipboard?.writeText(text)
+    .then(()=>{
+      showToast('📋 Pedido copiado.');
+    })
+    .catch(()=>{
+      showToast('⚠️ No se pudo copiar el pedido.');
+    });
+}
 
-    box.remove();
+function deleteOrder(order){
+  if(!confirm(`¿Eliminar el pedido #${order.orderNumber}?`))return;
 
-    button.hidden=false;
-  };
+  orders=orders.filter(o=>o!==order);
 
+  saveOrders();
+  renderAll();
 
-  select.focus();
+  const dialog=document.getElementById('orderDialog');
+
+  if(dialog?.open)dialog.close();
+
+  showToast('🗑️ Pedido eliminado.');
 }
 
 
-/* ==========================================
-   CANCELAR PEDIDO
-========================================== */
+/* =========================================================
+   EXPORTAR PEDIDOS JSON
+   ========================================================= */
 
-function cancelOrder(orderNumber){
+function exportOrdersJSON(){
+  const d=new Date().toISOString();
 
-  const order=orders.find(
-    o=>o.orderNumber===orderNumber
+  downloadBlob(
+    new Blob([
+      JSON.stringify({
+        app:'PANACEA',
+        type:'orders-backup',
+        version:1,
+        exportedAt:d,
+        totalOrders:orders.length,
+        orders
+      },null,2)
+    ],{type:'application/json'}),
+    `panacea_respaldo_${stamp()}.json`
   );
 
+  localStorage.setItem(
+    BACKUP_META_KEY,
+    JSON.stringify({
+      lastBackupDate:d,
+      lastBackupOrderCount:orders.length
+    })
+  );
 
-  if(!order)return;
+  updateBackupUI();
+
+  showToast(
+    `✅ Respaldo creado correctamente. ${orders.length} pedidos guardados.`
+  );
+}
 
 
-  if(order.status==='cancelled')
-    return showToast(
-      'Este pedido ya está cancelado.'
-    );
+/* =========================================================
+   EXPORTAR EXCEL
+   ========================================================= */
 
+function exportOrdersExcel(){
+  const rows=orders.map(o=>({
+    Pedido:o.orderNumber,
+    Fecha:o.createdAt,
+    Cliente:o.customer,
+    Telefono:o.phone,
+    Productos:productsText(o),
+    Total:getTotal(o),
+    Estado:statusLabel(o.status)
+  }));
 
-  const detail=
-    document.getElementById(
-      'orderDetail'
-    );
-
-
-  if(
-    detail.querySelector(
-      '[data-cancellation-editor]'
-    )
-  )
+  if(!rows.length){
+    showToast('No hay pedidos para exportar.');
     return;
+  }
 
+  const headers=Object.keys(rows[0]);
 
-  const button=
-    detail.querySelector(
-      '[data-cancel-order]'
-    );
+  const csv=[
+    headers.join(';'),
+    ...rows.map(row=>
+      headers.map(h=>
+        `"${String(row[h]??'').replace(/"/g,'""')}"`
+      ).join(';')
+    )
+  ].join('\n');
 
-
-  if(!button)return;
-
-
-  const box=document.createElement('div');
-
-  box.dataset.cancellationEditor='';
-
-
-  box.innerHTML=`
-
-    <div
-      style="
-        margin-top:15px;
-        padding:15px;
-        background:#fff7f7;
-        border:1px solid #e5caca;
-        border-radius:14px
-      "
-    >
-
-      <strong
-        style="
-          display:block;
-          margin-bottom:12px
-        "
-      >
-        ❌ Cancelar pedido
-      </strong>
-
-
-      <label
-        style="
-          display:block;
-          font-weight:700;
-          margin-bottom:8px
-        "
-      >
-        Tipo de cancelación
-      </label>
-
-
-      <div
-        style="
-          display:flex;
-          gap:15px;
-          flex-wrap:wrap;
-          margin-bottom:14px
-        "
-      >
-
-        <label>
-
-          <input
-            type="radio"
-            name="cancelType"
-            value="total"
-            checked
-          >
-
-          Cancelación total
-
-        </label>
-
-
-        <label>
-
-          <input
-            type="radio"
-            name="cancelType"
-            value="partial"
-          >
-
-          Cancelación parcial
-
-        </label>
-
-      </div>
-
-
-      <div
-        data-cancel-products
-        hidden
-      >
-
-        <label
-          style="
-            display:block;
-            font-weight:700;
-            margin-bottom:8px
-          "
-        >
-          Cantidades a cancelar
-        </label>
-
-
-        ${(order.products||[])
-          .map((p,i)=>`
-
-            <div
-              style="
-                display:flex;
-                align-items:center;
-                gap:8px;
-                margin-bottom:9px
-              "
-            >
-
-              <div style="flex:1">
-
-                <strong>
-                  ${escapeHTML(p.name)}
-                </strong>
-
-                <small
-                  style="display:block"
-                >
-                  Pedidas:
-                  ${p.quantity}
-                  ${escapeHTML(p.presentation)}
-                </small>
-
-              </div>
-
-
-              <input
-                type="number"
-                min="0"
-                max="${p.quantity}"
-                value="0"
-                data-cancel-qty="${i}"
-                style="
-                  width:75px;
-                  padding:9px;
-                  border:1px solid #ccc;
-                  border-radius:8px
-                "
-              >
-
-            </div>
-
-          `)
-          .join('')}
-
-      </div>
-
-
-      <label
-        style="
-          display:block;
-          font-weight:700;
-          margin:12px 0 6px
-        "
-      >
-        Motivo de la cancelación
-      </label>
-
-
-      <textarea
-        data-cancel-reason
-        rows="4"
-        placeholder="Escribe el motivo..."
-        style="
-          width:100%;
-          padding:10px;
-          border:1px solid #ccc;
-          border-radius:10px;
-          resize:vertical
-        "
-      ></textarea>
-
-
-      <div
-        style="
-          display:flex;
-          gap:8px;
-          margin-top:10px
-        "
-      >
-
-        <button
-          type="button"
-          data-save-cancellation
-          style="
-            flex:1;
-            padding:11px;
-            border:0;
-            border-radius:10px;
-            background:#9b3030;
-            color:#fff;
-            font-weight:700
-          "
-        >
-          ✓ Guardar cancelación
-        </button>
-
-
-        <button
-          type="button"
-          data-cancel-cancellation
-          style="
-            flex:1;
-            padding:11px;
-            border:1px solid #ccc;
-            border-radius:10px;
-            background:#fff;
-            font-weight:600
-          "
-        >
-          Cancelar
-        </button>
-
-      </div>
-
-    </div>
-
-  `;
-
-
-  button.insertAdjacentElement(
-    'afterend',
-    box
+  downloadBlob(
+    new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}),
+    `panacea_pedidos_${stamp()}.csv`
   );
 
-
-  button.hidden=true;
-
-
-  const productsBox=
-    box.querySelector(
-      '[data-cancel-products]'
-    );
+  showToast('📊 Archivo exportado correctamente.');
+}
 
 
-  box.querySelectorAll(
-    '[name="cancelType"]'
-  ).forEach(radio=>{
+/* =========================================================
+   INFORMACIÓN DEL RESPALDO
+   ========================================================= */
 
-    radio.addEventListener(
-      'change',
-      ()=>{
+function updateBackupUI(){
+  const dateEl=document.getElementById('lastBackupDate');
+  const countEl=document.getElementById('ordersSinceBackup');
+  const statusEl=document.getElementById('backupStatus');
 
-        productsBox.hidden=
-          radio.value!=='partial';
+  let meta=null;
 
-      }
-    );
+  try{
+    const raw=localStorage.getItem(BACKUP_META_KEY);
+    meta=raw?JSON.parse(raw):null;
+  }catch(e){}
 
+  if(dateEl){
+    dateEl.textContent=
+      meta?.lastBackupDate
+      ?formatDate(meta.lastBackupDate)
+      :'Nunca';
+  }
+
+  if(countEl){
+    if(meta?.lastBackupOrderCount!==undefined){
+      countEl.textContent=
+        Math.max(0,orders.length-Number(meta.lastBackupOrderCount));
+    }else{
+      countEl.textContent=orders.length;
+    }
+  }
+
+  if(statusEl){
+    statusEl.textContent=
+      meta?.lastBackupDate
+      ?'Respaldo disponible'
+      :'Aún no se ha creado un respaldo';
+  }
+}
+
+
+/* =========================================================
+   COMPARACIÓN DE PEDIDOS
+   ========================================================= */
+
+/*
+ * El orderNumber identifica el pedido.
+ * El resto de los datos relevantes se comparan para saber
+ * si el pedido del respaldo realmente cambió.
+ */
+
+function orderComparisonData(order){
+  if(!order)return null;
+
+  return {
+    createdAt:order.createdAt??null,
+    customer:order.customer??null,
+    phone:order.phone??null,
+    products:order.products??null,
+    totals:order.totals??null,
+    total:order.total??null,
+    status:order.status??null,
+    cancellation:order.cancellation??null,
+    week:order.week??null,
+    year:order.year??null
+  };
+}
+
+function sameOrder(a,b){
+  return JSON.stringify(orderComparisonData(a))
+    ===JSON.stringify(orderComparisonData(b));
+}
+
+
+/* =========================================================
+   DETECTAR CAMBIOS
+   ========================================================= */
+
+function getOrderChanges(current,backup){
+  const changes=[];
+
+  const fields=[
+    ['createdAt','Fecha'],
+    ['customer','Cliente'],
+    ['phone','Teléfono'],
+    ['products','Productos'],
+    ['totals','Totales'],
+    ['total','Total'],
+    ['status','Estado'],
+    ['cancellation','Cancelación'],
+    ['week','Semana'],
+    ['year','Año']
+  ];
+
+  fields.forEach(([key,label])=>{
+    const a=JSON.stringify(current?.[key]??null);
+    const b=JSON.stringify(backup?.[key]??null);
+
+    if(a!==b){
+      changes.push({
+        key,
+        label,
+        current:current?.[key],
+        backup:backup?.[key]
+      });
+    }
   });
 
+  return changes;
+}
 
-  box.querySelector(
-    '[data-save-cancellation]'
-  )
-  .addEventListener(
-    'click',
-    ()=>saveCancellation(
-      orderNumber
-    )
-  );
+function displayComparisonValue(key,value){
+  if(value===undefined||value===null||value===''){
+    return '—';
+  }
 
+  if(key==='createdAt'){
+    return escapeHTML(formatDate(value));
+  }
 
-  box.querySelector(
-    '[data-cancel-cancellation]'
-  )
-  .addEventListener(
-    'click',
-    ()=>{
+  if(key==='status'){
+    return escapeHTML(statusLabel(value));
+  }
 
-      box.remove();
+  if(key==='products'){
+    return escapeHTML(productsText({products:value}));
+  }
 
-      button.hidden=false;
-
+  if(key==='totals'){
+    if(typeof value==='object'){
+      return escapeHTML(
+        Object.entries(value)
+          .map(([k,v])=>`${k}: ${v}`)
+          .join(' · ')
+      );
     }
-  );
 
+    return escapeHTML(value);
+  }
 
-  box.querySelector(
-    '[data-cancel-reason]'
-  ).focus();
+  if(key==='cancellation'){
+    if(typeof value==='object'){
+      return escapeHTML(
+        Object.entries(value)
+          .map(([k,v])=>`${k}: ${v}`)
+          .join(' · ')
+      );
+    }
+
+    return escapeHTML(value);
+  }
+
+  if(typeof value==='object'){
+    return escapeHTML(JSON.stringify(value));
+  }
+
+  return escapeHTML(value);
 }
 
 
-/* ==========================================
-   GUARDAR CANCELACIÓN
-========================================== */
+/* =========================================================
+   ESTADO DE DECISIONES DE RESTAURACIÓN
+   ========================================================= */
 
-function saveCancellation(orderNumber){
-
-  const order=orders.find(
-    o=>o.orderNumber===orderNumber
-  );
+let pendingRestoreAnalysis=null;
 
 
-  if(!order)return;
+/* =========================================================
+   RENDERIZAR ANÁLISIS DEL RESPALDO
+   ========================================================= */
 
-
-  const box=document.querySelector(
-    '[data-cancellation-editor]'
-  );
-
+function renderRestoreAnalysis(a){
+  const box=document.getElementById('restoreAnalysis');
 
   if(!box)return;
 
-
-  const type=
-    box.querySelector(
-      '[name="cancelType"]:checked'
-    )?.value;
-
-
-  const reason=
-    box.querySelector(
-      '[data-cancel-reason]'
-    )?.value.trim();
-
-
-  if(!reason)
-    return showToast(
-      'Debes escribir el motivo de la cancelación.'
-    );
-
-
-  let cancelledProducts=[];
-
-
-  /* CANCELACIÓN TOTAL */
-
-  if(type==='total'){
-
-    cancelledProducts=
-      (order.products||[])
-        .map(p=>({
-          name:p.name,
-          quantity:p.quantity,
-          presentation:p.presentation
-        }));
-  }
-
-
-  /* CANCELACIÓN PARCIAL */
-
-  else{
-
-    box.querySelectorAll(
-      '[data-cancel-qty]'
-    )
-    .forEach(input=>{
-
-      const index=
-        Number(
-          input.dataset.cancelQty
-        );
-
-
-      const product=
-        order.products[index];
-
-
-      if(!product)return;
-
-
-      const max=
-        Number(product.quantity)||0;
-
-
-      const qty=Math.min(
-        Math.max(
-          Number(input.value)||0,
-          0
-        ),
-        max
-      );
-
-
-      if(qty>0){
-
-        cancelledProducts.push({
-          name:product.name,
-          quantity:qty,
-          presentation:product.presentation
-        });
-
-      }
-
-    });
-
-
-    if(!cancelledProducts.length)
-      return showToast(
-        'Selecciona al menos una cantidad para cancelar.'
-      );
-  }
-
-
-  /* GUARDAR */
-
-  order.status='cancelled';
-
-
-  order.cancellation={
-
-    type:type,
-
-    reason:reason,
-
-    products:cancelledProducts,
-
-    cancelledAt:
-      new Date().toISOString(),
-
-    clientNotified:false
-
+  pendingRestoreAnalysis={
+    ...a,
+    decisions:new Map()
   };
 
-
-  saveOrders();
-
-
-  /*
-    NO abre WhatsApp automáticamente.
-  */
-
-  orderDialog.close();
-
-  renderAll();
-
-  openOrder(orderNumber);
-
-
-  showToast(
-    `Pedido ${order.orderNumber} cancelado correctamente.`
-  );
-}
-
-
-/* ==========================================
-   ELIMINAR
-========================================== */
-
-function deleteOrder(orderNumber){
-
-  const o=orders.find(
-    x=>x.orderNumber===orderNumber
-  );
-
-
-  if(!o)return;
-
-
-  if(
-    !confirm(
-      `¿Eliminar el pedido ${o.orderNumber}?`
-    )
-  )
-    return;
-
-
-  orders=orders.filter(
-    x=>x.orderNumber!==orderNumber
-  );
-
-
-  saveOrders();
-
-  orderDialog.close();
-
-  renderAll();
-
-
-  showToast(
-    'Pedido eliminado.'
-  );
-}
-
-
-/* ==========================================
-   WHATSAPP
-========================================== */
-
-function buildOrderMessage(o){
-
-  const lines=(o.products||[])
-    .map(p=>
-      `• ${p.name} — ${p.quantity} ${p.presentation} × ${money(p.unitPrice,p.currency)} = ${money(p.total,p.currency)}`
-    );
-
-
-  let totals='';
-
-
-  if(Number(o.totals?.CUP)>0)
-    totals+=
-      `💰 TOTAL CUP: ${money(o.totals.CUP,'CUP')}\n`;
-
-
-  if(Number(o.totals?.USD)>0)
-    totals+=
-      `💵 TOTAL USD: ${money(o.totals.USD,'USD')}\n`;
-
-
-  return`🛍️ PEDIDO PANACEA
-
-🔢 Pedido: ${o.orderNumber}
-
-👤 Cliente: ${o.customer}
-📞 Teléfono: ${o.phone}
-
-📦 PRODUCTOS
-${lines.join('\n')}
-
-━━━━━━━━━━━━━━
-${totals}
-📌 Estado: ${statusLabel(o.status)}`;
-}
-
-
-function buildClientMessage(o){
-
-  const lines=(o.products||[])
-    .map(p=>
-      `• ${p.name} - ${p.quantity} - ${p.presentation}`
-    );
-
-
-  const state={
-
-    pending:
-      'Pendiente de Facturación',
-
-    confirmed:
-      'Confirmado',
-
-    invoiced:
-      'Facturado',
-
-    delivered:
-      'Entregado',
-
-    cancelled:
-      'Cancelado'
-
-  }[o.status]||
-    'Pendiente de Facturación';
-
-
-  return`Estimado cliente su # de preorden es: *${o.orderNumber}*
-
-👤 *Nombre:* ${o.customer}
-
-📦 *Productos:*
-${lines.join('\n')}
-
-📌 Estado: ${state}.
-
-❗️Esta preorden no reserva su producto. La compra solo está asegurada una vez obtenga la factura del producto en nuestra oficina❗️
-✅ Usted fue atendido por: *Alejandro* - Gestor de Ventas. Información que debe comunicar a la facturadora que lo atienda.
-
-Disfrute su producto🔖`;
-}
-
-
-function buildCancellationMessage(o){
-
-  const c=o.cancellation||{};
-
-
-  const type=
-    c.type==='partial'
-      ?'Cancelación parcial'
-      :'Cancelación total';
-
-
-  const lines=(c.products||[])
-    .map(p=>
-      `• ${p.name} - ${p.quantity} - ${p.presentation}`
-    );
-
-
-  return`Estimado cliente su preorden *${o.orderNumber}* ha sido cancelada:
-
-👤 *Nombre:* ${o.customer}
-
-📦 *Productos:*
-${lines.join('\n')}
-
-📌 Estado: ${type}
-🖇 *Motivos:* ${c.reason||''}
-
-Disculpe las molestias ocasionadas.
-
-Gestor de Ventas - Alejandro.`;
-}
-
-
-function normalizeCubanPhone(phone){
-
-  let v=String(phone||'')
-    .replace(/[^\d]/g,'');
-
-
-  if(v.startsWith('00'))
-    v=v.slice(2);
-
-
-  if(v.startsWith('53'))
-    return v;
-
-
-  return v.length===8
-    ?`53${v}`
-    :v;
-}
-
-
-function sendToClient(orderNumber){
-
-  const o=orders.find(
-    x=>x.orderNumber===orderNumber
-  );
-
-
-  if(!o)return;
-
-
-  const phone=
-    normalizeCubanPhone(o.phone);
-
-
-  if(!phone)
-    return showToast(
-      'El teléfono del cliente no es válido.'
-    );
-
-
-  window.open(
-    `https://wa.me/${phone}?text=${encodeURIComponent(
-      buildClientMessage(o)
-    )}`,
-    '_blank'
-  );
-
-
-  showToast(
-    'Abriendo WhatsApp del cliente.'
-  );
-}
-
-
-/* ==========================================
-   ENVIAR CANCELACIÓN
-========================================== */
-
-function sendCancellationToClient(orderNumber){
-
-  const o=orders.find(
-    x=>x.orderNumber===orderNumber
-  );
-
-
-  if(!o)return;
-
-
-  if(!o.cancellation)
-    return showToast(
-      'Este pedido no tiene una cancelación guardada.'
-    );
-
-
-  const phone=
-    normalizeCubanPhone(o.phone);
-
-
-  if(!phone)
-    return showToast(
-      'El teléfono del cliente no es válido.'
-    );
-
-
-  window.open(
-    `https://wa.me/${phone}?text=${encodeURIComponent(
-      buildCancellationMessage(o)
-    )}`,
-    '_blank'
-  );
-
-
-  o.cancellation.clientNotified=true;
-
-  o.cancellation.clientNotifiedAt=
-    new Date().toISOString();
-
-
-  saveOrders();
-
-
-  showToast(
-    'WhatsApp abierto con la cancelación preparada.'
-  );
-}
-
-
-/* ==========================================
-   INFORMACIONES IMPORTANTES
-========================================== */
-
-function buildImportantInfoMessage(){
-
-  return`‼️Informaciones importantes:‼️
-
-🧾 *Facturación:*
-Callejón de los Prorestante esq. Colón, Nuevo Vedado.
-▪︎ https://www.google.com/maps/search/?api=1&query=23.1195366%2C-82.3967783
-
-📍 *Retiro en almacén:*
-Agro de la EJT. Ubicado cerca de la Ciudad Deportiva. Al lado de los cajeros y la TRD.
-▪︎ https://www.google.com/maps/search/?api=1&query=23.103866%2C-82.390748
-
-⏰ *Horario:* Lunes a Viernes 10:00 a.m - 4:00 p.m | Sábados 9:30 a.m - 2:00 p.m.
-
-💰 *Método de pago:* Efectivo (solo se recibe 20% en billetes de 50 CUP y 30% en billetes de 100 CUP por compra).`;
-}
-
-
-function sendImportantInfo(orderNumber){
-
-  const o=orders.find(
-    x=>x.orderNumber===orderNumber
-  );
-
-
-  if(!o)return;
-
-
-  const phone=
-    normalizeCubanPhone(o.phone);
-
-
-  if(!phone)
-    return showToast(
-      'El teléfono del cliente no es válido.'
-    );
-
-
-  window.open(
-    `https://wa.me/${phone}?text=${encodeURIComponent(
-      buildImportantInfoMessage()
-    )}`,
-    '_blank'
-  );
-
-
-  showToast(
-    'Abriendo WhatsApp con las informaciones importantes.'
-  );
-}
-
-
-/* ==========================================
-   COPIAR PEDIDO
-========================================== */
-
-async function copyOrder(orderNumber){
-
-  const o=orders.find(
-    x=>x.orderNumber===orderNumber
-  );
-
-
-  if(!o)return;
-
-
-  try{
-
-    await navigator.clipboard.writeText(
-      buildOrderMessage(o)
-    );
-
-
-    showToast(
-      'Pedido copiado al portapapeles.'
-    );
-
-
-  }catch(e){
-
-    showToast(
-      'No se pudo copiar automáticamente.'
-    );
-
-  }
-}
-
-
-
-/* RESPALDOS */
-function loadBackupMeta(){try{return JSON.parse(localStorage.getItem(BACKUP_META_KEY)||'{}')}catch(e){return{}}}
-function updateBackupUI(){const m=loadBackupMeta(),l=document.getElementById('lastBackupDate'),c=document.getElementById('ordersSinceBackup'),s=document.getElementById('backupStatus');if(!l)return;const n=Math.max(0,orders.length-(m.lastBackupOrderCount||0));l.textContent=m.lastBackupDate?formatDate(m.lastBackupDate):'Nunca';c.textContent=n;s.textContent=!m.lastBackupDate?'Aún no has creado una copia externa':n?'Tienes cambios sin respaldar':'Todos los cambios están respaldados'}
-function downloadBlob(b,n){const u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=n;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),1000)}
-function stamp(){const d=new Date(),p=n=>String(n).padStart(2,'0');return`${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}_${p(d.getHours())}-${p(d.getMinutes())}`}
-function exportOrdersJSON(){const d=new Date().toISOString();downloadBlob(new Blob([JSON.stringify({app:'PANACEA',type:'orders-backup',version:1,exportedAt:d,totalOrders:orders.length,orders},null,2)],{type:'application/json'}),`panacea_respaldo_${stamp()}.json`);localStorage.setItem(BACKUP_META_KEY,JSON.stringify({lastBackupDate:d,lastBackupOrderCount:orders.length}));updateBackupUI();showToast(`✅ Respaldo creado correctamente. ${orders.length} pedidos guardados.`)}
-function exportOrdersExcel(){const q=v=>`"${String(v??'').replace(/"/g,'""')}"`,prod=o=>(o.products||[]).map(p=>p.name||p.product||p.title||'Producto').join(' | '),qty=o=>(o.products||[]).map(p=>p.quantity??p.qty??1).join(' | ');const rows=[['Pedido','Fecha','Cliente','Teléfono','Productos','Cantidad','Estado'],...orders.map(o=>[`#${o.orderNumber||''}`,formatDate(o.createdAt),o.customer||'',o.phone||'',prod(o),qty(o),statusLabel(o.status)])];downloadBlob(new Blob(['\\uFEFF'+rows.map(r=>r.map(q).join(';')).join('\\r\\n')],{type:'text/csv;charset=utf-8'}),`panacea_pedidos_${stamp()}.csv`);showToast('📊 Archivo compatible con Excel creado correctamente.')}
-function sameOrder(a,b){return ['orderNumber','createdAt','customer','phone','products','status'].every(k=>JSON.stringify(a[k]??null)===JSON.stringify(b[k]??null))}
-function renderRestoreAnalysis(a){const b=document.getElementById('restoreAnalysis');b.hidden=false;const ids=x=>x.map(o=>`#${escapeHTML(o.orderNumber)}`).join(', ')||'Ninguno';b.innerHTML=`<div class="restore-summary"><strong>📥 ANALIZANDO RESPALDO...</strong><p>🟢 Pedidos nuevos: <b>${a.newOrders.length}</b></p><p>🟡 Ya existentes e iguales: <b>${a.equalOrders.length}</b></p><p>🟠 Existentes con cambios: <b>${a.changedOrders.length}</b></p></div><div class="restore-groups"><p><b>🟢 Nuevos:</b> ${ids(a.newOrders)}</p><p><b>🟡 Iguales:</b> ${ids(a.equalOrders)}</p><p><b>🟠 Con cambios:</b> ${a.changedOrders.map(x=>`#${escapeHTML(x.backup.orderNumber)}`).join(', ')||'Ninguno'}</p></div><p class="restore-note">Los iguales se ignoran. Los nuevos se pueden agregar. Los pedidos modificados no se reemplazan automáticamente.</p><div class="dialog-actions"><button type="button" class="admin-secondary-btn" id="cancelRestoreAnalysisBtn">Cancelar</button><button type="button" class="admin-primary-btn" id="addNewOrdersBtn">Agregar solo los nuevos</button></div>`;document.getElementById('cancelRestoreAnalysisBtn').onclick=closeRestoreDialog;document.getElementById('addNewOrdersBtn').onclick=()=>{if(!a.newOrders.length)return showToast('No hay pedidos nuevos para agregar.');orders.push(...a.newOrders);saveOrders();renderAll();closeRestoreDialog();showToast(`✅ Se agregaron ${a.newOrders.length} pedidos nuevos sin duplicar.`)}}
-function openRestoreDialog(){const d=document.getElementById('restoreDialog');document.getElementById('restoreAnalysis').hidden=true;document.getElementById('restoreFileInput').value='';d.showModal()}
-function closeRestoreDialog(){document.getElementById('restoreDialog').close()}
-function handleRestoreFile(f){if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result),x=Array.isArray(d)?d:d.orders;if(!Array.isArray(x))throw Error();const map=new Map(orders.map(o=>[String(o.orderNumber),o])),a={newOrders:[],equalOrders:[],changedOrders:[]};x.forEach(b=>{const c=map.get(String(b.orderNumber));if(!c)a.newOrders.push(b);else if(sameOrder(c,b))a.equalOrders.push(b);else a.changedOrders.push({current:c,backup:b})});renderRestoreAnalysis(a)}catch(e){showToast('⚠️ No se pudo analizar el archivo de respaldo.')}};r.readAsText(f)}
-function checkBackupReminder(){const m=loadBackupMeta();if(m.lastBackupDate&&Date.now()-new Date(m.lastBackupDate).getTime()>=604800000)setTimeout(()=>showToast('🔔 Han pasado 7 días desde tu último respaldo.'),1200)}
-
-/* ==========================================
-   MENSAJES
-========================================== */
-
-let toastTimer=null;
-
-
-function showToast(m){
-
-  adminToast.textContent=m;
-
-  adminToast.classList.add('show');
-
-
-  clearTimeout(toastTimer);
-
-
-  toastTimer=setTimeout(
-    ()=>adminToast.classList.remove('show'),
-    2800
-  );
-}
-
-
-/* ==========================================
-   EVENTOS
-========================================== */
-
-document
-  .getElementById('openImportBtn')
-  .addEventListener(
-    'click',
-    openImport
-  );
-
-
-document
-  .getElementById('emptyImportBtn')
-  .addEventListener(
-    'click',
-    openImport
-  );
-
-
-document
-  .getElementById('closeImportBtn')
-  .addEventListener(
-    'click',
-    closeImport
-  );
-
-
-document
-  .getElementById('cancelImportBtn')
-  .addEventListener(
-    'click',
-    closeImport
-  );
-
-
-previewImportBtn
-  .addEventListener(
-    'click',
-    previewImport
-  );
-
-
-document
-  .getElementById('importForm')
-  .addEventListener(
-    'submit',
-    e=>{
-
-      e.preventDefault();
-
-      createOrder();
-
+  box.hidden=false;
+
+  const ids=x=>
+    x.map(o=>`#${escapeHTML(o.orderNumber)}`).join(', ')
+    ||'Ninguno';
+
+  box.innerHTML=`
+    <div class="restore-summary">
+
+      <strong>📥 RESPALDO ANALIZADO</strong>
+
+      <p>
+        🟢 Pedidos nuevos:
+        <b>${a.newOrders.length}</b>
+      </p>
+
+      <p>
+        🟡 Ya existentes e iguales:
+        <b>${a.equalOrders.length}</b>
+      </p>
+
+      <p>
+        🟠 Existentes con cambios:
+        <b>${a.changedOrders.length}</b>
+      </p>
+
+    </div>
+
+    <div class="restore-groups">
+
+      <p>
+        <b>🟢 Nuevos:</b>
+        ${ids(a.newOrders)}
+      </p>
+
+      <p>
+        <b>🟡 Iguales:</b>
+        ${ids(a.equalOrders)}
+      </p>
+
+      <p>
+        <b>🟠 Con cambios:</b>
+        ${
+          a.changedOrders
+            .map(x=>`#${escapeHTML(x.backup.orderNumber)}`)
+            .join(', ')
+          ||'Ninguno'
+        }
+      </p>
+
+    </div>
+
+    ${
+      a.changedOrders.length
+      ?`
+        <div class="restore-modified-section">
+
+          <h3>
+            🟠 Pedidos modificados
+          </h3>
+
+          <p class="restore-note">
+            Estos pedidos ya existen en la página, pero el respaldo
+            contiene información diferente. Decide individualmente
+            cuál versión quieres conservar.
+          </p>
+
+          <div class="restore-changed-list">
+            ${a.changedOrders.map((item,index)=>
+              renderChangedOrderCard(item,index)
+            ).join('')}
+          </div>
+
+        </div>
+      `
+      :''
     }
+
+    <p class="restore-note">
+      Los pedidos iguales se ignoran.
+      Los nuevos se pueden agregar.
+      Los pedidos modificados no se reemplazarán automáticamente.
+    </p>
+
+    <div class="dialog-actions">
+
+      <button
+        type="button"
+        class="admin-secondary-btn"
+        id="cancelRestoreAnalysisBtn">
+        Cancelar
+      </button>
+
+      ${
+        a.newOrders.length
+        ?`
+          <button
+            type="button"
+            class="admin-secondary-btn"
+            id="addNewOrdersBtn">
+            Agregar solo los nuevos
+          </button>
+        `
+        :''
+      }
+
+      ${
+        a.changedOrders.length
+        ?`
+          <button
+            type="button"
+            class="admin-primary-btn"
+            id="applyRestoreDecisionsBtn"
+            disabled>
+            Aplicar decisiones
+          </button>
+        `
+        :''
+      }
+
+    </div>
+  `;
+
+  document.getElementById('cancelRestoreAnalysisBtn').onclick=
+    closeRestoreDialog;
+
+  const addNew=document.getElementById('addNewOrdersBtn');
+
+  if(addNew){
+    addNew.onclick=()=>{
+      if(!a.newOrders.length){
+        return showToast('No hay pedidos nuevos para agregar.');
+      }
+
+      orders.push(...a.newOrders);
+
+      saveOrders();
+      renderAll();
+      closeRestoreDialog();
+
+      showToast(
+        `✅ Se agregaron ${a.newOrders.length} pedidos nuevos sin duplicar.`
+      );
+    };
+  }
+
+  const apply=document.getElementById('applyRestoreDecisionsBtn');
+
+  if(apply){
+    apply.onclick=applyRestoreDecisions;
+  }
+
+  updateRestoreDecisionUI();
+}
+
+
+/* =========================================================
+   TARJETA DE PEDIDO MODIFICADO
+   ========================================================= */
+
+function renderChangedOrderCard(item,index){
+  const current=item.current;
+  const backup=item.backup;
+  const changes=getOrderChanges(current,backup);
+
+  return `
+    <article
+      class="restore-changed-card"
+      data-restore-index="${index}">
+
+      <div class="restore-changed-header">
+
+        <div>
+          <strong>
+            Pedido #${escapeHTML(backup.orderNumber)}
+          </strong>
+
+          <small>
+            ${changes.length} cambio${changes.length===1?'':'s'}
+          </small>
+        </div>
+
+        <span
+          class="restore-decision-badge"
+          data-decision-badge>
+          Sin decidir
+        </span>
+
+      </div>
+
+      <div class="restore-version-grid">
+
+        <div class="restore-version restore-current">
+
+          <div class="restore-version-title">
+            <span>📌 ACTUAL</span>
+          </div>
+
+          <div class="restore-version-content">
+
+            <p>
+              <small>Cliente</small>
+              <strong>
+                ${escapeHTML(current.customer||'—')}
+              </strong>
+            </p>
+
+            <p>
+              <small>Teléfono</small>
+              <strong>
+                ${escapeHTML(current.phone||'—')}
+              </strong>
+            </p>
+
+            <p>
+              <small>Productos</small>
+              <strong>
+                ${escapeHTML(productsText(current))}
+              </strong>
+            </p>
+
+            <p>
+              <small>Total</small>
+              <strong>
+                ${
+                  getTotal(current)===null
+                  ?'—'
+                  :escapeHTML(formatMoney(getTotal(current)))
+                }
+              </strong>
+            </p>
+
+            <p>
+              <small>Estado</small>
+              <strong>
+                ${escapeHTML(statusLabel(current.status))}
+              </strong>
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div class="restore-version restore-backup">
+
+          <div class="restore-version-title">
+            <span>💾 RESPALDO</span>
+          </div>
+
+          <div class="restore-version-content">
+
+            <p>
+              <small>Cliente</small>
+              <strong>
+                ${escapeHTML(backup.customer||'—')}
+              </strong>
+            </p>
+
+            <p>
+              <small>Teléfono</small>
+              <strong>
+                ${escapeHTML(backup.phone||'—')}
+              </strong>
+            </p>
+
+            <p>
+              <small>Productos</small>
+              <strong>
+                ${escapeHTML(productsText(backup))}
+              </strong>
+            </p>
+
+            <p>
+              <small>Total</small>
+              <strong>
+                ${
+                  getTotal(backup)===null
+                  ?'—'
+                  :escapeHTML(formatMoney(getTotal(backup)))
+                }
+              </strong>
+            </p>
+
+            <p>
+              <small>Estado</small>
+              <strong>
+                ${escapeHTML(statusLabel(backup.status))}
+              </strong>
+            </p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="restore-differences">
+
+        <strong>🔎 Datos diferentes</strong>
+
+        <div>
+          ${
+            changes.map(change=>`
+              <span>
+                ${escapeHTML(change.label)}
+              </span>
+            `).join('')
+          }
+        </div>
+
+      </div>
+
+
+      <div class="restore-choice-actions">
+
+        <button
+          type="button"
+          class="admin-secondary-btn"
+          data-keep-current>
+          Mantener actual
+        </button>
+
+        <button
+          type="button"
+          class="admin-primary-btn"
+          data-use-backup>
+          Usar respaldo
+        </button>
+
+      </div>
+
+    </article>
+  `;
+}
+
+
+/* =========================================================
+   DECISIÓN INDIVIDUAL
+   ========================================================= */
+
+function setRestoreDecision(index,decision){
+  if(!pendingRestoreAnalysis)return;
+
+  pendingRestoreAnalysis.decisions.set(index,decision);
+
+  const card=document.querySelector(
+    `[data-restore-index="${index}"]`
   );
 
+  if(!card)return;
 
-/* ==========================================
-   BÚSQUEDA
-========================================== */
+  const badge=card.querySelector('[data-decision-badge]');
+  const currentBtn=card.querySelector('[data-keep-current]');
+  const backupBtn=card.querySelector('[data-use-backup]');
 
-searchOrders.addEventListener(
-  'input',
-  e=>{
+  card.classList.remove(
+    'decision-current',
+    'decision-backup'
+  );
 
-    searchTerm=e.target.value;
+  currentBtn.classList.remove('selected');
+  backupBtn.classList.remove('selected');
 
-    renderOrders();
+  if(decision==='current'){
+    card.classList.add('decision-current');
+    currentBtn.classList.add('selected');
 
+    badge.textContent='Mantener actual';
   }
-);
+
+  if(decision==='backup'){
+    card.classList.add('decision-backup');
+    backupBtn.classList.add('selected');
+
+    badge.textContent='Usar respaldo';
+  }
+
+  updateRestoreDecisionUI();
+}
+
+function updateRestoreDecisionUI(){
+  if(!pendingRestoreAnalysis)return;
+
+  const total=pendingRestoreAnalysis.changedOrders.length;
+  const decided=pendingRestoreAnalysis.decisions.size;
+
+  const button=document.getElementById(
+    'applyRestoreDecisionsBtn'
+  );
+
+  if(button){
+    button.disabled=decided!==total;
+
+    button.textContent=
+      decided===total
+      ?'Aplicar decisiones'
+      :`Decidir ${total-decided} pedido${total-decided===1?'':'s'}`;
+  }
+
+  pendingRestoreAnalysis.changedOrders.forEach((_,index)=>{
+    const card=document.querySelector(
+      `[data-restore-index="${index}"]`
+    );
+
+    if(!card)return;
+
+    const currentBtn=card.querySelector('[data-keep-current]');
+    const backupBtn=card.querySelector('[data-use-backup]');
+
+    if(currentBtn){
+      currentBtn.onclick=()=>{
+        setRestoreDecision(index,'current');
+      };
+    }
+
+    if(backupBtn){
+      backupBtn.onclick=()=>{
+        setRestoreDecision(index,'backup');
+      };
+    }
+  });
+}
 
 
-/* ==========================================
-   FILTROS DE ESTADO
-========================================== */
+/* =========================================================
+   APLICAR DECISIONES
+   ========================================================= */
 
-document
-  .querySelectorAll('.order-filter')
-  .forEach(button=>{
+function applyRestoreDecisions(){
+  if(!pendingRestoreAnalysis)return;
 
-    button.addEventListener(
-      'click',
-      ()=>{
+  const {
+    changedOrders,
+    decisions
+  }=pendingRestoreAnalysis;
 
-        document
-          .querySelectorAll(
-            '.order-filter'
-          )
-          .forEach(x=>
-            x.classList.remove(
-              'active'
-            )
-          );
+  if(decisions.size!==changedOrders.length){
+    return showToast(
+      '⚠️ Debes decidir qué hacer con cada pedido modificado.'
+    );
+  }
+
+  let restored=0;
+  let kept=0;
+
+  changedOrders.forEach((item,index)=>{
+    const decision=decisions.get(index);
+
+    if(decision==='backup'){
+      const position=orders.findIndex(
+        o=>String(o.orderNumber)
+          ===String(item.backup.orderNumber)
+      );
+
+      if(position!==-1){
+        orders[position]=item.backup;
+        restored++;
+      }
+    }
+
+    if(decision==='current'){
+      kept++;
+    }
+  });
+
+  saveOrders();
+  renderAll();
+
+  closeRestoreDialog();
+
+  showToast(
+    `✅ Restauración completada. ${restored} restaurado${restored===1?'':'s'} y ${kept} mantenido${kept===1?'':'s'}.`
+  );
+}
 
 
-        button.classList.add(
-          'active'
+/* =========================================================
+   RESTAURAR RESPALDO
+   ========================================================= */
+
+function openRestoreDialog(){
+  const d=document.getElementById('restoreDialog');
+
+  if(!d)return;
+
+  pendingRestoreAnalysis=null;
+
+  document.getElementById('restoreAnalysis').hidden=true;
+  document.getElementById('restoreAnalysis').innerHTML='';
+
+  document.getElementById('restoreFileInput').value='';
+
+  d.showModal();
+}
+
+function closeRestoreDialog(){
+  const d=document.getElementById('restoreDialog');
+
+  if(d?.open)d.close();
+
+  pendingRestoreAnalysis=null;
+}
+
+function handleRestoreFile(f){
+  if(!f)return;
+
+  const reader=new FileReader();
+
+  reader.onload=()=>{
+    try{
+      const data=JSON.parse(reader.result);
+
+      const backupOrders=
+        Array.isArray(data)
+        ?data
+        :data.orders;
+
+      if(!Array.isArray(backupOrders)){
+        throw Error('Formato inválido');
+      }
+
+      const map=new Map(
+        orders.map(o=>[
+          String(o.orderNumber),
+          o
+        ])
+      );
+
+      const analysis={
+        newOrders:[],
+        equalOrders:[],
+        changedOrders:[]
+      };
+
+      backupOrders.forEach(backupOrder=>{
+        const number=String(
+          backupOrder.orderNumber??''
         );
 
+        const current=map.get(number);
 
-        activeStatus=
-          button.dataset.status;
+        if(!current){
+          analysis.newOrders.push(backupOrder);
+
+        }else if(sameOrder(current,backupOrder)){
+          analysis.equalOrders.push(backupOrder);
+
+        }else{
+          analysis.changedOrders.push({
+            current,
+            backup:backupOrder
+          });
+        }
+      });
+
+      renderRestoreAnalysis(analysis);
+
+    }catch(error){
+      console.error(error);
+
+      showToast(
+        '⚠️ No se pudo analizar el archivo de respaldo.'
+      );
+    }
+  };
+
+  reader.readAsText(f);
+}
 
 
-        renderOrders();
+/* =========================================================
+   EVENTOS
+   ========================================================= */
 
-      }
-    );
+const searchInput=document.getElementById('searchOrders');
 
+if(searchInput){
+  searchInput.addEventListener('input',e=>{
+    searchTerm=e.target.value.trim();
+    renderOrders();
+  });
+}
+
+document.querySelectorAll('.order-filter').forEach(button=>{
+  button.addEventListener('click',()=>{
+    document.querySelectorAll('.order-filter')
+      .forEach(b=>b.classList.remove('active'));
+
+    button.classList.add('active');
+
+    activeStatus=button.dataset.status||'all';
+
+    renderOrders();
+  });
+});
+
+
+/* =========================================================
+   CERRAR DIALOG PEDIDO
+   ========================================================= */
+
+const orderDialog=document.getElementById('orderDialog');
+
+if(orderDialog){
+  const closeOrderBtn=
+    orderDialog.querySelector('[data-close-order]');
+
+  if(closeOrderBtn){
+    closeOrderBtn.onclick=()=>{
+      orderDialog.close();
+    };
+  }
+}
+
+
+/* =========================================================
+   BOTONES DE RESPALDO
+   ========================================================= */
+
+document.getElementById('exportOrdersBtn')
+  ?.addEventListener('click',exportOrdersJSON);
+
+document.getElementById('exportExcelBtn')
+  ?.addEventListener('click',exportOrdersExcel);
+
+document.getElementById('restoreOrdersBtn')
+  ?.addEventListener('click',openRestoreDialog);
+
+document.getElementById('closeRestoreBtn')
+  ?.addEventListener('click',closeRestoreDialog);
+
+document.getElementById('cancelRestoreBtn')
+  ?.addEventListener('click',closeRestoreDialog);
+
+document.getElementById('selectRestoreFileBtn')
+  ?.addEventListener('click',()=>{
+    document.getElementById('restoreFileInput').click();
+  });
+
+document.getElementById('restoreFileInput')
+  ?.addEventListener('change',e=>{
+    handleRestoreFile(e.target.files?.[0]);
   });
 
 
-/* ==========================================
-   CERRAR DETALLE
-========================================== */
-
-orderDialog.addEventListener(
-  'click',
-  e=>{
-
-    if(e.target===orderDialog)
-      orderDialog.close();
-
-  }
-);
-
-
-/* EVENTOS DE RESPALDOS */
-document.getElementById('exportOrdersBtn').addEventListener('click',exportOrdersJSON);
-document.getElementById('exportExcelBtn').addEventListener('click',exportOrdersExcel);
-document.getElementById('restoreOrdersBtn').addEventListener('click',openRestoreDialog);
-document.getElementById('closeRestoreBtn').addEventListener('click',closeRestoreDialog);
-document.getElementById('cancelRestoreBtn').addEventListener('click',closeRestoreDialog);
-document.getElementById('selectRestoreFileBtn').addEventListener('click',()=>document.getElementById('restoreFileInput').click());
-document.getElementById('restoreFileInput').addEventListener('change',e=>handleRestoreFile(e.target.files?.[0]));
-/* ==========================================
-   INICIALIZAR
-========================================== */
-
-calendarDate=new Date(
-  2026,
-  8,
-  1
-);
-
-
-/*
-  Septiembre de 2026:
-  1 = martes.
-
-  Al abrir la página el calendario
-  mostrará este mes correctamente.
-*/
-
-renderCalendar();
+/* =========================================================
+   INICIALIZACIÓN
+   ========================================================= */
 
 renderAll();
-updateBackupUI();
-checkBackupReminder();
