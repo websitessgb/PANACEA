@@ -2050,7 +2050,24 @@ alert('RENDER ORDERS: '+list.length);
   ordersList.hidden=
     list.length===0;
 
+const card=ordersList.querySelector('.order-card');
 
+alert(
+  'CARD ENCONTRADA: '+!!card+
+  '\nCARD DISPLAY: '+(
+    card ? getComputedStyle(card).display : 'N/A'
+  )+
+  '\nCARD VISIBILITY: '+(
+    card ? getComputedStyle(card).visibility : 'N/A'
+  )+
+  '\nCARD OPACITY: '+(
+    card ? getComputedStyle(card).opacity : 'N/A'
+  )+
+  '\nCARD HEIGHT: '+(
+    card ? card.offsetHeight : 'N/A'
+  )
+);
+    
   document
     .querySelectorAll('[data-open-order]')
     .forEach(b=>
