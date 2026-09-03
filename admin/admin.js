@@ -3433,7 +3433,7 @@ function buildCancellationMessage(o){
 
 👤 *Nombre:* ${o.customer}
 
-📦 *Productos:*
+📦 *Productos y Cantidades Canceladas:*
 ${lines.join('\n')}
 
 📌 Estado: ${type}
