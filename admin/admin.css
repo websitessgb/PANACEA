@@ -18,6 +18,24 @@
 
 
 /* =========================================================
+   CONTROL GENERAL DE ANCHOS
+   ========================================================= */
+
+*,
+*::before,
+*::after{
+  box-sizing:border-box;
+}
+
+html,
+body{
+  width:100%;
+  max-width:100%;
+  overflow-x:hidden;
+}
+
+
+/* =========================================================
    BASE
    ========================================================= */
 
@@ -208,6 +226,7 @@ body{
   align-items:center;
   gap:15px;
   box-shadow:0 6px 20px rgba(42,57,48,.03);
+  min-width:0;
 }
 
 .stat-icon{
@@ -218,6 +237,7 @@ body{
   border-radius:14px;
   background:#eef3ee;
   font-size:21px;
+  flex-shrink:0;
 }
 
 .stat-card small{
@@ -254,6 +274,7 @@ body{
   background:#fff;
   border:1px solid var(--admin-line);
   border-radius:999px;
+  min-width:0;
 }
 
 .admin-search span{
@@ -263,6 +284,7 @@ body{
 
 .admin-search input{
   width:100%;
+  min-width:0;
   border:0;
   outline:0;
   background:transparent;
@@ -307,6 +329,7 @@ body{
   align-items:end;
   justify-content:space-between;
   margin-bottom:15px;
+  gap:20px;
 }
 
 .orders-heading h2{
@@ -337,10 +360,11 @@ body{
   border-radius:20px;
   padding:18px 20px;
   display:grid;
-  grid-template-columns:190px 1fr auto;
+  grid-template-columns:minmax(0,190px) minmax(0,1fr) auto;
   gap:22px;
   align-items:center;
   transition:.2s;
+  max-width:100%;
 }
 
 .order-card:hover{
@@ -353,33 +377,39 @@ body{
   font-weight:800;
   font-size:15px;
   color:var(--admin-sage-dark);
+  overflow-wrap:anywhere;
 }
 
 .order-date{
   color:var(--admin-muted);
   font-size:11px;
   margin-top:3px;
+  overflow-wrap:anywhere;
 }
 
 .order-customer{
   font-weight:800;
   font-size:15px;
+  overflow-wrap:anywhere;
 }
 
 .order-phone{
   color:var(--admin-muted);
   font-size:12px;
   margin-top:3px;
+  overflow-wrap:anywhere;
 }
 
 .order-summary{
   color:var(--admin-muted);
   font-size:12px;
   margin-top:5px;
+  overflow-wrap:anywhere;
 }
 
 .order-right{
   text-align:right;
+  min-width:0;
 }
 
 .order-total{
@@ -468,11 +498,15 @@ body{
    ========================================================= */
 
 .admin-dialog{
-  width:min(620px,calc(100% - 30px));
+  width:min(620px,calc(100vw - 30px));
+  max-width:calc(100vw - 30px);
   border:0;
   border-radius:26px;
   padding:0;
+  margin:auto;
   box-shadow:0 30px 100px rgba(0,0,0,.2);
+  box-sizing:border-box;
+  overflow:hidden;
 }
 
 .admin-dialog::backdrop{
@@ -482,6 +516,8 @@ body{
 .admin-dialog form{
   padding:32px;
   position:relative;
+  width:100%;
+  max-width:100%;
 }
 
 .dialog-x{
@@ -507,47 +543,16 @@ body{
   font-size:36px;
   line-height:1.1;
   margin:0;
+  max-width:100%;
+  overflow-wrap:anywhere;
 }
 
 .dialog-description{
   color:var(--admin-muted);
   font-size:13px;
   margin:10px 0 22px;
-}
-
-.admin-dialog label{
-  display:block;
-  font-weight:800;
-  font-size:12px;
-  margin-bottom:7px;
-}
-
-.admin-dialog textarea{
-  display:block;
-  width:100%;
-  resize:vertical;
-  min-height:210px;
-  border:1px solid var(--admin-line);
-  border-radius:14px;
-  padding:14px;
-  outline:0;
-  font:13px/1.5 'DM Sans',sans-serif;
-  color:var(--admin-ink);
-}
-
-.admin-dialog textarea:focus{
-  border-color:#9fb2a2;
-  box-shadow:0 0 0 3px rgba(159,178,162,.14);
-}
-
-.parse-error{
-  margin-top:12px;
-  padding:11px 13px;
-  border-radius:11px;
-  background:#f8e9e8;
-  color:var(--admin-danger);
-  font-size:12px;
-  font-weight:700;
+  max-width:100%;
+  overflow-wrap:anywhere;
 }
 
 
@@ -561,6 +566,7 @@ body{
   border:1px solid var(--admin-line);
   border-radius:16px;
   padding:16px;
+  max-width:100%;
 }
 
 .preview-header{
@@ -568,17 +574,19 @@ body{
   justify-content:space-between;
   gap:15px;
   margin-bottom:13px;
+  min-width:0;
 }
 
 .preview-header span{
   color:var(--admin-sage-dark);
   font-size:12px;
   font-weight:800;
+  overflow-wrap:anywhere;
 }
 
 .preview-grid{
   display:grid;
-  grid-template-columns:1fr 1fr;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
   gap:13px;
 }
 
@@ -592,6 +600,8 @@ body{
 .preview-grid strong{
   display:block;
   font-size:13px;
+  overflow-wrap:anywhere;
+  word-break:break-word;
 }
 
 .dialog-actions{
@@ -599,6 +609,7 @@ body{
   justify-content:flex-end;
   gap:8px;
   margin-top:20px;
+  flex-wrap:wrap;
 }
 
 
@@ -607,11 +618,14 @@ body{
    ========================================================= */
 
 .order-dialog{
-  width:min(760px,calc(100% - 24px));
+  width:min(760px,calc(100vw - 24px));
+  max-width:calc(100vw - 24px);
 }
 
 .order-detail{
   padding:30px;
+  width:100%;
+  max-width:100%;
 }
 
 .detail-top{
@@ -621,12 +635,14 @@ body{
   gap:20px;
   padding-bottom:20px;
   border-bottom:1px solid var(--admin-line);
+  min-width:0;
 }
 
 .detail-number{
   color:var(--admin-sage-dark);
   font-size:20px;
   font-weight:800;
+  overflow-wrap:anywhere;
 }
 
 .detail-date{
@@ -638,7 +654,7 @@ body{
 .detail-customer{
   margin-top:22px;
   display:grid;
-  grid-template-columns:1fr 1fr;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr);
   gap:12px;
 }
 
@@ -646,6 +662,7 @@ body{
   background:#f6f4ef;
   border-radius:14px;
   padding:14px;
+  min-width:0;
 }
 
 .detail-box small{
@@ -657,6 +674,8 @@ body{
 .detail-box strong{
   display:block;
   margin-top:2px;
+  overflow-wrap:anywhere;
+  word-break:break-word;
 }
 
 .detail-products{
@@ -670,15 +689,17 @@ body{
 
 .detail-product{
   display:grid;
-  grid-template-columns:1fr auto auto;
+  grid-template-columns:minmax(0,1fr) auto auto;
   gap:15px;
   padding:11px 0;
   border-bottom:1px solid var(--admin-line);
   font-size:13px;
+  min-width:0;
 }
 
 .detail-product small{
   color:var(--admin-muted);
+  overflow-wrap:anywhere;
 }
 
 .detail-totals{
@@ -748,6 +769,8 @@ body{
   font-size:12px;
   font-weight:700;
   transition:.25s;
+  max-width:calc(100vw - 30px);
+  text-align:center;
 }
 
 .admin-toast.show{
@@ -766,6 +789,7 @@ body{
   background:#f6f4ef!important;
   border:1px solid var(--admin-line)!important;
   border-radius:16px!important;
+  max-width:100%;
 }
 
 [data-status-editor] label{
@@ -777,6 +801,7 @@ body{
   font-size:13px!important;
   padding:10px 12px!important;
   color:var(--admin-ink);
+  max-width:100%;
 }
 
 [data-status-editor] button{
@@ -796,6 +821,7 @@ body{
   align-items:center;
   justify-content:flex-end;
   gap:14px;
+  min-width:0;
 }
 
 
@@ -936,7 +962,7 @@ body{
 
 .calendar-month-header{
   display:grid;
-  grid-template-columns:36px 1fr 36px;
+  grid-template-columns:36px minmax(0,1fr) 36px;
   align-items:center;
   gap:6px;
   margin-bottom:10px;
@@ -946,6 +972,8 @@ body{
   text-align:center;
   font-size:13px;
   text-transform:capitalize;
+  min-width:0;
+  overflow-wrap:anywhere;
 }
 
 .calendar-month-header button{
@@ -970,7 +998,7 @@ body{
 
 .calendar-weekdays{
   display:grid;
-  grid-template-columns:32px repeat(7,1fr);
+  grid-template-columns:32px repeat(7,minmax(0,1fr));
   gap:3px;
   margin-bottom:4px;
 }
@@ -999,7 +1027,7 @@ body{
 
 .calendar-row{
   display:grid;
-  grid-template-columns:32px repeat(7,1fr);
+  grid-template-columns:32px repeat(7,minmax(0,1fr));
   gap:3px;
   align-items:center;
   border-radius:9px;
@@ -1204,6 +1232,462 @@ body{
 
 
 /* =========================================================
+   ACCESO RÁPIDO A RESPALDOS
+   ========================================================= */
+
+.backup-toggle{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  min-height:38px;
+  padding:8px 13px;
+  border:1px solid var(--admin-line);
+  border-radius:999px;
+  background:#fff;
+  color:var(--admin-ink);
+  font-family:'DM Sans',sans-serif;
+  font-size:12px;
+  font-weight:800;
+  cursor:pointer;
+  transition:.2s;
+}
+
+.backup-toggle:hover{
+  background:#f4f2ec;
+  border-color:#bdcbbd;
+  transform:translateY(-1px);
+}
+
+
+/* =========================================================
+   SEGURIDAD / RESPALDOS
+   ========================================================= */
+
+.backup-section{
+  scroll-margin-top:90px;
+  padding:18px 0 54px;
+  max-width:100%;
+}
+
+.backup-card{
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  border:1px solid var(--admin-line);
+  border-radius:28px;
+  background:#fff;
+  padding:30px;
+  box-shadow:0 18px 45px rgba(50,67,57,.06);
+}
+
+.backup-heading{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:24px;
+  margin-bottom:24px;
+  min-width:0;
+}
+
+.backup-heading > *{
+  min-width:0;
+}
+
+.backup-heading .admin-eyebrow{
+  margin-bottom:8px;
+}
+
+.backup-heading h2{
+  margin:0;
+  font-family:'Playfair Display',Georgia,serif;
+  font-size:36px;
+  line-height:1.1;
+  color:var(--admin-ink);
+  max-width:100%;
+  overflow-wrap:anywhere;
+}
+
+.backup-heading-description{
+  max-width:650px;
+  margin:10px 0 0;
+  color:var(--admin-muted);
+  font-size:14px;
+  line-height:1.65;
+  overflow-wrap:anywhere;
+}
+
+.backup-info-grid{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1.45fr);
+  gap:12px;
+  width:100%;
+  max-width:100%;
+}
+
+.backup-info{
+  min-width:0;
+  min-height:112px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  padding:18px 20px;
+  border:1px solid var(--admin-line);
+  border-radius:18px;
+  background:#f8f7f3;
+  max-width:100%;
+}
+
+.backup-info small{
+  display:block;
+  margin-bottom:7px;
+  color:var(--admin-muted);
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+  overflow-wrap:anywhere;
+}
+
+.backup-info strong{
+  color:var(--admin-ink);
+  font-size:15px;
+  line-height:1.35;
+  max-width:100%;
+  overflow-wrap:anywhere;
+  word-break:break-word;
+}
+
+.backup-status{
+  background:#f2f5f1;
+}
+
+.backup-status strong{
+  color:var(--admin-sage-dark);
+}
+
+.backup-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:18px;
+  max-width:100%;
+}
+
+.backup-actions .admin-primary-btn,
+.backup-actions .admin-secondary-btn{
+  min-height:48px;
+  padding:12px 20px;
+}
+
+
+/* =========================================================
+   RESTAURAR PEDIDOS / ANÁLISIS DEL RESPALDO
+   ========================================================= */
+
+.restore-dialog{
+  width:min(620px,calc(100vw - 28px));
+  max-width:calc(100vw - 28px);
+  margin:auto;
+  padding:0;
+  border:0;
+  background:#fff;
+  color:var(--admin-ink);
+  box-sizing:border-box;
+  overflow:hidden;
+}
+
+.restore-content{
+  position:relative;
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  padding:32px;
+  box-sizing:border-box;
+  overflow-wrap:anywhere;
+}
+
+.restore-dialog h2,
+.restore-dialog p,
+.restore-dialog span,
+.restore-dialog strong,
+.restore-dialog b,
+.restore-dialog small,
+.restore-dialog div{
+  max-width:100%;
+  overflow-wrap:anywhere;
+  word-break:break-word;
+}
+
+.restore-content .admin-eyebrow{
+  margin:0 0 10px;
+}
+
+.restore-dialog h2{
+  padding-right:46px;
+}
+
+.restore-intro[hidden],
+.restore-analysis[hidden]{
+  display:none!important;
+}
+
+.restore-intro .dialog-description{
+  max-width:520px;
+  margin:14px 0 0;
+  font-size:14px;
+  line-height:1.65;
+}
+
+.restore-intro-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:24px;
+  max-width:100%;
+}
+
+.restore-intro-actions .admin-primary-btn,
+.restore-intro-actions .admin-secondary-btn{
+  min-height:48px;
+  padding:12px 20px;
+}
+
+.restore-analysis-header{
+  padding-right:42px;
+  margin-bottom:20px;
+  max-width:100%;
+}
+
+.restore-analysis-header .admin-eyebrow{
+  margin-bottom:9px;
+}
+
+.restore-analysis-header h2{
+  margin:0;
+  font-family:'Playfair Display',Georgia,serif;
+  font-size:34px;
+  line-height:1.12;
+}
+
+.restore-analysis-header > p:not(.admin-eyebrow){
+  margin:10px 0 0;
+  color:var(--admin-muted);
+  font-size:14px;
+  line-height:1.55;
+}
+
+.restore-analysis-header-compact{
+  margin-bottom:18px;
+}
+
+.restore-summary{
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  border:1px solid var(--admin-line);
+  border-radius:18px;
+  padding:18px;
+  background:#f8f7f3;
+}
+
+.restore-summary > strong{
+  display:block;
+  margin-bottom:12px;
+  font-size:15px;
+}
+
+.restore-summary-list{
+  display:grid;
+  gap:8px;
+  width:100%;
+  max-width:100%;
+}
+
+.restore-summary-list p{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  margin:0;
+  padding:9px 0;
+  border-top:1px solid rgba(0,0,0,.06);
+  color:var(--admin-ink);
+  font-size:14px;
+  min-width:0;
+}
+
+.restore-summary-list p:first-child{
+  border-top:0;
+}
+
+.restore-summary-list span{
+  color:var(--admin-muted);
+  min-width:0;
+}
+
+.restore-summary-list b{
+  min-width:28px;
+  text-align:right;
+  color:var(--admin-ink);
+  font-size:17px;
+  flex-shrink:0;
+}
+
+.restore-conflicts-intro,
+.restore-note{
+  width:100%;
+  max-width:100%;
+  min-width:0;
+  margin-top:16px;
+  padding:16px 18px;
+  border-radius:16px;
+  border:1px solid var(--admin-line);
+  background:#fff;
+  font-size:14px;
+  line-height:1.6;
+  overflow-wrap:anywhere;
+  word-break:break-word;
+}
+
+.restore-conflicts-intro strong{
+  display:block;
+  margin-bottom:5px;
+}
+
+.restore-conflicts-intro p{
+  margin:0;
+  color:var(--admin-muted);
+}
+
+.restore-note{
+  color:var(--admin-ink);
+}
+
+.restore-selection-note{
+  margin:14px 0 0;
+  color:var(--admin-muted);
+  font-size:12px;
+  line-height:1.55;
+  max-width:100%;
+  overflow-wrap:anywhere;
+}
+
+.restore-analysis-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:22px;
+  max-width:100%;
+}
+
+.restore-analysis-actions .admin-primary-btn,
+.restore-analysis-actions .admin-secondary-btn{
+  min-height:48px;
+  padding:12px 20px;
+}
+
+.restore-analysis-actions .admin-primary-btn{
+  margin-left:auto;
+}
+
+/* La pantalla de conflictos reutiliza la misma jerarquía visual */
+
+.restore-conflict-progress{
+  margin-top:4px;
+}
+
+
+/* =========================================================
+   RECORDATORIOS DE RESPALDO
+   ========================================================= */
+
+#backupReminderDialog{
+  width:min(520px,calc(100vw - 28px));
+  max-width:calc(100vw - 28px);
+  border:0;
+  border-radius:26px;
+  padding:0;
+  margin:auto;
+  background:#fff;
+  color:var(--admin-ink);
+  box-shadow:0 30px 100px rgba(0,0,0,.24);
+  overflow:hidden;
+}
+
+#backupReminderDialog::backdrop{
+  background:rgba(24,32,28,.48);
+  backdrop-filter:blur(2px);
+}
+
+#backupReminderDialog .backup-reminder-content{
+  padding:32px;
+  position:relative;
+  width:100%;
+  max-width:100%;
+}
+
+#backupReminderDialog #closeBackupReminderBtn{
+  position:absolute;
+  right:18px;
+  top:15px;
+  width:36px;
+  height:36px;
+  border:0;
+  border-radius:50%;
+  background:transparent;
+  color:var(--admin-muted);
+  font-size:28px;
+  cursor:pointer;
+}
+
+#backupReminderDialog #closeBackupReminderBtn:hover{
+  background:#f4f2ec;
+}
+
+#backupReminderDialog #backupReminderEyebrow{
+  margin:0 0 10px;
+  color:var(--admin-sage);
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+}
+
+#backupReminderDialog #backupReminderTitle{
+  font-family:'Playfair Display',Georgia,serif;
+  font-size:36px;
+  line-height:1.1;
+  margin:0;
+  padding-right:34px;
+  max-width:100%;
+  overflow-wrap:anywhere;
+}
+
+#backupReminderDialog #backupReminderBody{
+  margin-top:14px;
+  color:var(--admin-muted);
+  font-size:14px;
+  line-height:1.6;
+  max-width:100%;
+  overflow-wrap:anywhere;
+  word-break:break-word;
+}
+
+#backupReminderDialog #backupReminderBody strong{
+  color:var(--admin-ink);
+}
+
+#backupReminderDialog .backup-reminder-actions{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+  gap:8px;
+  margin-top:24px;
+}
+
+
+/* =========================================================
    RESPONSIVE
    ========================================================= */
 
@@ -1229,7 +1713,7 @@ body{
   }
 
   .order-card{
-    grid-template-columns:1fr auto;
+    grid-template-columns:minmax(0,1fr) auto;
   }
 
   .order-right{
@@ -1237,14 +1721,8 @@ body{
     grid-row:1 / span 2;
   }
 
-}
-
-
-
-@media(max-width:900px){
-
   .backup-info-grid{
-    grid-template-columns:1fr 1fr;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
   }
 
   .backup-status{
@@ -1253,7 +1731,115 @@ body{
 
 }
 
+
 @media(max-width:650px){
+
+  .admin-container{
+    width:min(calc(100% - 24px),1160px);
+  }
+
+  .admin-nav{
+    min-height:66px;
+    gap:10px;
+  }
+
+  .admin-public-link{
+    font-size:11px;
+  }
+
+  .admin-hero{
+    padding:42px 0 24px;
+  }
+
+  .admin-title-row{
+    display:block;
+  }
+
+  .admin-title-row .admin-primary-btn{
+    width:100%;
+    margin-top:20px;
+  }
+
+  .admin-stats{
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+  }
+
+  .stat-card{
+    padding:14px;
+  }
+
+  .stat-icon{
+    width:38px;
+    height:38px;
+    font-size:18px;
+  }
+
+  .stat-card strong{
+    font-size:17px;
+  }
+
+  .order-card{
+    display:block;
+  }
+
+  .order-right{
+    text-align:left;
+    margin-top:12px;
+  }
+
+  .preview-grid{
+    grid-template-columns:1fr;
+  }
+
+  .admin-dialog{
+    width:calc(100vw - 20px);
+    max-width:calc(100vw - 20px);
+    margin:0 auto;
+    border-radius:22px;
+  }
+
+  .admin-dialog form{
+    padding:25px 20px;
+  }
+
+  .order-detail{
+    padding:25px 20px;
+  }
+
+  .detail-customer{
+    grid-template-columns:1fr;
+  }
+
+  .detail-product{
+    grid-template-columns:minmax(0,1fr) auto;
+  }
+
+  .detail-product small{
+    grid-column:1 / -1;
+  }
+
+  .dialog-actions{
+    flex-direction:column-reverse;
+  }
+
+  .dialog-actions button{
+    width:100%;
+  }
+
+  .calendar-toggle span{
+    display:none;
+  }
+
+  .calendar-panel{
+    position:fixed;
+    top:70px;
+    right:12px;
+    width:350px;
+    max-width:calc(100vw - 24px);
+    max-height:calc(100vh - 84px);
+    overflow-y:auto;
+  }
 
   .backup-toggle span{
     display:none;
@@ -1310,12 +1896,24 @@ body{
     margin-left:0;
   }
 
+  .restore-dialog{
+    width:calc(100vw - 20px);
+    max-width:calc(100vw - 20px);
+    margin:0 auto;
+    border-radius:22px;
+  }
+
   .restore-content{
+    width:100%;
+    max-width:100%;
     padding:26px 22px 22px;
+    box-sizing:border-box;
   }
 
   .restore-dialog h2,
   .restore-analysis-header h2{
+    max-width:100%;
+    overflow-wrap:anywhere;
     font-size:29px;
     line-height:1.08;
   }
@@ -1329,519 +1927,14 @@ body{
     padding:16px;
   }
 
-
-
-  .admin-container{
-    width:min(100% - 24px,1160px);
-  }
-
-  .admin-nav{
-    min-height:66px;
-  }
-
-  .admin-public-link{
-    font-size:11px;
-  }
-
-  .admin-hero{
-    padding:42px 0 24px;
-  }
-
-  .admin-title-row{
-    display:block;
-  }
-
-  .admin-title-row .admin-primary-btn{
-    width:100%;
-    margin-top:20px;
-  }
-
-  .admin-stats{
-    grid-template-columns:1fr 1fr;
-    gap:10px;
-  }
-
-  .stat-card{
-    padding:14px;
-  }
-
-  .stat-icon{
-    width:38px;
-    height:38px;
-    font-size:18px;
-  }
-
-  .stat-card strong{
-    font-size:17px;
-  }
-
-  .order-card{
-    display:block;
-  }
-
-  .order-right{
-    text-align:left;
-    margin-top:12px;
-  }
-
-  .preview-grid{
-    grid-template-columns:1fr;
-  }
-
-  .admin-dialog form{
-    padding:25px 20px;
-  }
-
-  .detail-customer{
-    grid-template-columns:1fr;
-  }
-
-  .detail-product{
-    grid-template-columns:1fr auto;
-  }
-
-  .detail-product small{
-    grid-column:1 / -1;
-  }
-
-  .dialog-actions{
-    flex-direction:column-reverse;
-  }
-
-  .dialog-actions button{
-    width:100%;
-  }
-
-  .calendar-toggle span{
-    display:none;
-  }
-
-  .calendar-panel{
-    position:fixed;
-    top:70px;
-    right:12px;
-    width:350px;
-    max-height:calc(100vh - 84px);
-    overflow-y:auto;
-  }
-
 }
 
-
-@media(max-width:430px){
-
-  .admin-stats{
-    grid-template-columns:1fr;
-  }
-
-  .admin-brand small{
-    display:none;
-  }
-
-  .calendar-panel{
-    left:12px;
-    right:12px;
-    width:auto;
-  }
-
-  .calendar-weekdays,
-  .calendar-row{
-    grid-template-columns:30px repeat(7,1fr);
-  }
-
-  .calendar-week-number{
-    width:30px;
-  }
-
-}
-
-
-
-/* =========================================================
-   ACCESO RÁPIDO A RESPALDOS
-   ========================================================= */
-
-.backup-toggle{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:6px;
-  min-height:38px;
-  padding:8px 13px;
-  border:1px solid var(--admin-line);
-  border-radius:999px;
-  background:#fff;
-  color:var(--admin-ink);
-  font-family:'DM Sans',sans-serif;
-  font-size:12px;
-  font-weight:800;
-  cursor:pointer;
-  transition:.2s;
-}
-
-.backup-toggle:hover{
-  background:#f4f2ec;
-  border-color:#bdcbbd;
-  transform:translateY(-1px);
-}
-
-
-/* =========================================================
-   SEGURIDAD / RESPALDOS
-   ========================================================= */
-
-.backup-section{
-  scroll-margin-top:90px;
-  padding:18px 0 54px;
-}
-
-.backup-card{
-  border:1px solid var(--admin-line);
-  border-radius:28px;
-  background:#fff;
-  padding:30px;
-  box-shadow:0 18px 45px rgba(50,67,57,.06);
-}
-
-.backup-heading{
-  display:flex;
-  align-items:flex-start;
-  justify-content:space-between;
-  gap:24px;
-  margin-bottom:24px;
-}
-
-.backup-heading .admin-eyebrow{
-  margin-bottom:8px;
-}
-
-.backup-heading h2{
-  margin:0;
-  font-family:'Playfair Display',Georgia,serif;
-  font-size:36px;
-  line-height:1.1;
-  color:var(--admin-ink);
-}
-
-.backup-heading-description{
-  max-width:650px;
-  margin:10px 0 0;
-  color:var(--admin-muted);
-  font-size:14px;
-  line-height:1.65;
-}
-
-.backup-info-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr 1.45fr;
-  gap:12px;
-}
-
-.backup-info{
-  min-height:112px;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  padding:18px 20px;
-  border:1px solid var(--admin-line);
-  border-radius:18px;
-  background:#f8f7f3;
-}
-
-.backup-info small{
-  display:block;
-  margin-bottom:7px;
-  color:var(--admin-muted);
-  font-size:11px;
-  font-weight:800;
-  letter-spacing:.04em;
-  text-transform:uppercase;
-}
-
-.backup-info strong{
-  color:var(--admin-ink);
-  font-size:15px;
-  line-height:1.35;
-}
-
-.backup-status{
-  background:#f2f5f1;
-}
-
-.backup-status strong{
-  color:var(--admin-sage-dark);
-}
-
-.backup-actions{
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-  margin-top:18px;
-}
-
-.backup-actions .admin-primary-btn,
-.backup-actions .admin-secondary-btn{
-  min-height:48px;
-  padding:12px 20px;
-}
-
-
-/* =========================================================
-   RESTAURAR PEDIDOS / ANÁLISIS DEL RESPALDO
-   ========================================================= */
-
-.restore-dialog{
-  width:min(620px,calc(100% - 28px));
-  background:#fff;
-  color:var(--admin-ink);
-}
-
-.restore-content{
-  position:relative;
-  padding:32px;
-}
-
-.restore-content .admin-eyebrow{
-  margin:0 0 10px;
-}
-
-.restore-dialog h2{
-  padding-right:46px;
-}
-
-.restore-intro[hidden],
-.restore-analysis[hidden]{
-  display:none!important;
-}
-
-.restore-intro .dialog-description{
-  max-width:520px;
-  margin:14px 0 0;
-  font-size:14px;
-  line-height:1.65;
-}
-
-.restore-intro-actions{
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-  margin-top:24px;
-}
-
-.restore-intro-actions .admin-primary-btn,
-.restore-intro-actions .admin-secondary-btn{
-  min-height:48px;
-  padding:12px 20px;
-}
-
-.restore-analysis-header{
-  padding-right:42px;
-  margin-bottom:20px;
-}
-
-.restore-analysis-header .admin-eyebrow{
-  margin-bottom:9px;
-}
-
-.restore-analysis-header h2{
-  margin:0;
-  font-family:'Playfair Display',Georgia,serif;
-  font-size:34px;
-  line-height:1.12;
-}
-
-.restore-analysis-header > p:not(.admin-eyebrow){
-  margin:10px 0 0;
-  color:var(--admin-muted);
-  font-size:14px;
-  line-height:1.55;
-}
-
-.restore-analysis-header-compact{
-  margin-bottom:18px;
-}
-
-.restore-summary{
-  border:1px solid var(--admin-line);
-  border-radius:18px;
-  padding:18px;
-  background:#f8f7f3;
-}
-
-.restore-summary > strong{
-  display:block;
-  margin-bottom:12px;
-  font-size:15px;
-}
-
-.restore-summary-list{
-  display:grid;
-  gap:8px;
-}
-
-.restore-summary-list p{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:16px;
-  margin:0;
-  padding:9px 0;
-  border-top:1px solid rgba(0,0,0,.06);
-  color:var(--admin-ink);
-  font-size:14px;
-}
-
-.restore-summary-list p:first-child{
-  border-top:0;
-}
-
-.restore-summary-list span{
-  color:var(--admin-muted);
-}
-
-.restore-summary-list b{
-  min-width:28px;
-  text-align:right;
-  color:var(--admin-ink);
-  font-size:17px;
-}
-
-.restore-conflicts-intro,
-.restore-note{
-  margin-top:16px;
-  padding:16px 18px;
-  border-radius:16px;
-  border:1px solid var(--admin-line);
-  background:#fff;
-  font-size:14px;
-  line-height:1.6;
-}
-
-.restore-conflicts-intro strong{
-  display:block;
-  margin-bottom:5px;
-}
-
-.restore-conflicts-intro p{
-  margin:0;
-  color:var(--admin-muted);
-}
-
-.restore-note{
-  color:var(--admin-ink);
-}
-
-.restore-selection-note{
-  margin:14px 0 0;
-  color:var(--admin-muted);
-  font-size:12px;
-  line-height:1.55;
-}
-
-.restore-analysis-actions{
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-  margin-top:22px;
-}
-
-.restore-analysis-actions .admin-primary-btn,
-.restore-analysis-actions .admin-secondary-btn{
-  min-height:48px;
-  padding:12px 20px;
-}
-
-.restore-analysis-actions .admin-primary-btn{
-  margin-left:auto;
-}
-
-/* La pantalla de conflictos reutiliza la misma jerarquía visual */
-.restore-conflict-progress{
-  margin-top:4px;
-}
-
-
-/* =========================================================
-   RECORDATORIOS DE RESPALDO
-   ========================================================= */
-
-#backupReminderDialog{
-  width:min(520px,calc(100% - 28px));
-  border:0;
-  border-radius:26px;
-  padding:0;
-  background:#fff;
-  color:var(--admin-ink);
-  box-shadow:0 30px 100px rgba(0,0,0,.24);
-}
-
-#backupReminderDialog::backdrop{
-  background:rgba(24,32,28,.48);
-  backdrop-filter:blur(2px);
-}
-
-#backupReminderDialog .backup-reminder-content{
-  padding:32px;
-  position:relative;
-}
-
-#backupReminderDialog #closeBackupReminderBtn{
-  position:absolute;
-  right:18px;
-  top:15px;
-  width:36px;
-  height:36px;
-  border:0;
-  border-radius:50%;
-  background:transparent;
-  color:var(--admin-muted);
-  font-size:28px;
-  cursor:pointer;
-}
-
-#backupReminderDialog #closeBackupReminderBtn:hover{
-  background:#f4f2ec;
-}
-
-#backupReminderDialog #backupReminderEyebrow{
-  margin:0 0 10px;
-  color:var(--admin-sage);
-  font-size:11px;
-  font-weight:800;
-  letter-spacing:.18em;
-  text-transform:uppercase;
-}
-
-#backupReminderDialog #backupReminderTitle{
-  font-family:'Playfair Display',Georgia,serif;
-  font-size:36px;
-  line-height:1.1;
-  margin:0;
-  padding-right:34px;
-}
-
-#backupReminderDialog #backupReminderBody{
-  margin-top:14px;
-  color:var(--admin-muted);
-  font-size:14px;
-  line-height:1.6;
-}
-
-#backupReminderDialog #backupReminderBody strong{
-  color:var(--admin-ink);
-}
-
-#backupReminderDialog .backup-reminder-actions{
-  display:flex;
-  flex-wrap:wrap;
-  justify-content:flex-end;
-  gap:8px;
-  margin-top:24px;
-}
 
 @media(max-width:600px){
+
   #backupReminderDialog{
-    width:min(100% - 20px,520px);
+    width:calc(100vw - 20px);
+    max-width:calc(100vw - 20px);
     border-radius:22px;
   }
 
@@ -1865,4 +1958,42 @@ body{
   #backupReminderDialog .backup-reminder-actions .admin-secondary-btn{
     width:100%;
   }
+
 }
+
+
+@media(max-width:430px){
+
+  .admin-stats{
+    grid-template-columns:1fr;
+  }
+
+  .admin-brand small{
+    display:none;
+  }
+
+  .calendar-panel{
+    left:12px;
+    right:12px;
+    width:auto;
+  }
+
+  .calendar-weekdays,
+  .calendar-row{
+    grid-template-columns:30px repeat(7,minmax(0,1fr));
+  }
+
+  .calendar-week-number{
+    width:30px;
+  }
+
+  .restore-content{
+    padding-left:18px;
+    padding-right:18px;
+  }
+
+  .restore-summary-list p{
+    gap:10px;
+  }
+
+   }
