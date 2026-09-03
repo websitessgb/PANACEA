@@ -3553,7 +3553,302 @@ function updateBackupUI(){const m=loadBackupMeta(),l=document.getElementById('la
 function downloadBlob(b,n){const u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=n;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),1000)}
 function stamp(){const d=new Date(),p=n=>String(n).padStart(2,'0');return`${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}_${p(d.getHours())}-${p(d.getMinutes())}`}
 function exportOrdersJSON(){const d=new Date().toISOString();downloadBlob(new Blob([JSON.stringify({app:'PANACEA',type:'orders-backup',version:1,exportedAt:d,totalOrders:orders.length,orders},null,2)],{type:'application/json'}),`panacea_respaldo_${stamp()}.json`);localStorage.setItem(BACKUP_META_KEY,JSON.stringify({lastBackupDate:d,lastBackupOrderCount:orders.length}));updateBackupUI();showToast(`✅ Respaldo creado correctamente. ${orders.length} pedidos guardados.`)}
-function exportOrdersExcel(){const q=v=>`"${String(v??'').replace(/"/g,'""')}"`,prod=o=>(o.products||[]).map(p=>p.name||p.product||p.title||'Producto').join(' | '),qty=o=>(o.products||[]).map(p=>p.quantity??p.qty??1).join(' | ');const rows=[['Pedido','Fecha','Cliente','Teléfono','Productos','Cantidad','Estado'],...orders.map(o=>[`#${o.orderNumber||''}`,formatDate(o.createdAt),o.customer||'',o.phone||'',prod(o),qty(o),statusLabel(o.status)])];downloadBlob(new Blob(['\\uFEFF'+rows.map(r=>r.map(q).join(';')).join('\\r\\n')],{type:'text/csv;charset=utf-8'}),`panacea_pedidos_${stamp()}.csv`);showToast('📊 Archivo compatible con Excel creado correctamente.')}
+/* CARGAR LIBRERÍA EXCEL */
+function loadXLSX(){
+  return new Promise((resolve,reject)=>{
+    if(window.XLSX){
+      resolve(window.XLSX);
+      return;
+    }
+
+    const script=document.createElement('script');
+    script.src='https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js';
+
+    script.onload=()=>{
+      if(window.XLSX){
+        resolve(window.XLSX);
+      }else{
+        reject(new Error('No se pudo cargar la librería de Excel.'));
+      }
+    };
+
+    script.onerror=()=>{
+      reject(new Error('No se pudo cargar la librería de Excel.'));
+    };
+
+    document.head.appendChild(script);
+  });
+}
+async function exportOrdersExcel(){
+  try{
+    const XLSX=await loadXLSX();
+
+    const rows=[
+      [
+        'Pedido',
+        'Fecha',
+        'Cliente',
+        'Teléfono',
+        'Productos',
+        'Cantidad',
+        'Estado'
+      ]
+    ];
+
+    /* Guardamos dónde comienza y termina cada pedido */
+    const orderRanges=[];
+
+    orders.forEach(o=>{
+      const products=o.products||[];
+
+      /* Pedido sin productos */
+      if(products.length===0){
+        const startRow=rows.length;
+
+        rows.push([
+          `#${o.orderNumber||''}`,
+          formatDate(o.createdAt),
+          o.customer||'',
+          o.phone||'',
+          '',
+          '',
+          statusLabel(o.status)
+        ]);
+
+        orderRanges.push({
+          start:startRow,
+          end:startRow
+        });
+
+        return;
+      }
+
+      const startRow=rows.length;
+
+      products.forEach((p,index)=>{
+        const name=
+          p.name||
+          p.product||
+          p.title||
+          'Producto';
+
+        const qty=
+          p.quantity??
+          p.qty??
+          1;
+
+        rows.push([
+          index===0 ? `#${o.orderNumber||''}` : '',
+          index===0 ? formatDate(o.createdAt) : '',
+          index===0 ? (o.customer||'') : '',
+          index===0 ? (o.phone||'') : '',
+          name,
+          qty,
+          index===0 ? statusLabel(o.status) : ''
+        ]);
+      });
+
+      orderRanges.push({
+        start:startRow,
+        end:rows.length-1
+      });
+    });
+
+    /* Crear hoja */
+    const ws=XLSX.utils.aoa_to_sheet(rows);
+
+    /* Ancho de columnas */
+    ws['!cols']=[
+      {wch:12}, // Pedido
+      {wch:20}, // Fecha
+      {wch:28}, // Cliente
+      {wch:18}, // Teléfono
+      {wch:35}, // Productos
+      {wch:12}, // Cantidad
+      {wch:18}  // Estado
+    ];
+
+    /* Altura de filas */
+    ws['!rows']=rows.map((row,index)=>{
+      return index===0
+        ?{hpt:26}
+        :{hpt:23};
+    });
+
+    /* Congelar encabezado */
+    ws['!freeze']={
+      xSplit:0,
+      ySplit:1
+    };
+
+    /*
+      ESTILOS VISUALES
+      Se aplican mediante el sistema de estilos
+      disponible en la librería XLSX cargada.
+    */
+
+    /* Encabezado */
+    for(let col=0;col<7;col++){
+      const cell=ws[
+        XLSX.utils.encode_cell({
+          r:0,
+          c:col
+        })
+      ];
+
+      if(cell){
+        cell.s={
+          font:{
+            bold:true
+          },
+          alignment:{
+            horizontal:'center',
+            vertical:'center',
+            wrapText:true
+          },
+          border:{
+            top:{
+              style:'thin'
+            },
+            bottom:{
+              style:'thin'
+            },
+            left:{
+              style:'thin'
+            },
+            right:{
+              style:'thin'
+            }
+          }
+        };
+      }
+    }
+
+    /*
+      BORDES POR CADA PEDIDO
+      Cada pedido queda visualmente
+      separado de los demás.
+    */
+
+    orderRanges.forEach(range=>{
+      for(let r=range.start;r<=range.end;r++){
+
+        for(let c=0;c<7;c++){
+
+          const cell=ws[
+            XLSX.utils.encode_cell({
+              r:r,
+              c:c
+            })
+          ];
+
+          if(!cell)continue;
+
+          const border={};
+
+          /* Borde superior del pedido */
+          if(r===range.start){
+            border.top={
+              style:'thin'
+            };
+          }
+
+          /* Borde inferior del pedido */
+          if(r===range.end){
+            border.bottom={
+              style:'thin'
+            };
+          }
+
+          /* Borde izquierdo */
+          if(c===0){
+            border.left={
+              style:'thin'
+            };
+          }
+
+          /* Borde derecho */
+          if(c===6){
+            border.right={
+              style:'thin'
+            };
+          }
+
+          cell.s={
+            ...(cell.s||{}),
+            alignment:{
+              vertical:'center',
+              wrapText:true
+            },
+            border:{
+              ...(cell.s?.border||{}),
+              ...border
+            }
+          };
+        }
+      }
+    });
+
+    /* Alinear cantidades al centro */
+    orderRanges.forEach(range=>{
+      for(let r=range.start;r<=range.end;r++){
+
+        const cell=ws[
+          XLSX.utils.encode_cell({
+            r:r,
+            c:5
+          })
+        ];
+
+        if(cell){
+          cell.s={
+            ...(cell.s||{}),
+            alignment:{
+              horizontal:'center',
+              vertical:'center'
+            }
+          };
+        }
+      }
+    });
+
+    /* Filtro automático */
+    ws['!autofilter']={
+      ref:ws['!ref']
+    };
+
+    /* Crear libro */
+    const wb=XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(
+      wb,
+      ws,
+      'Pedidos'
+    );
+
+    /* Generar Excel REAL */
+    XLSX.writeFile(
+      wb,
+      `panacea_pedidos_${stamp()}.xlsx`
+    );
+
+    showToast(
+      `📊 Excel creado correctamente. ${orders.length} pedidos exportados.`
+    );
+
+  }catch(error){
+
+    console.error(
+      'Error al generar Excel:',
+      error
+    );
+
+    showToast(
+      '❌ No se pudo generar el archivo Excel.'
+    );
+  }
+          }
+
 function sameOrder(a,b){
   return ['orderNumber','createdAt','customer','phone','products','status']
     .every(k=>JSON.stringify(a[k]??null)===JSON.stringify(b[k]??null));
