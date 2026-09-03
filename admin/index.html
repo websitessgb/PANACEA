@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>PANACEA · Administración</title>
+
+  <meta
+    name="description"
+    content="Panel administrativo de pedidos PANACEA"
+  >
+
+  <!-- Mismo lenguaje tipográfico de PANACEA -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap"
+    rel="stylesheet"
+  >
+
+  <!-- Estilos base de PANACEA -->
+  <link rel="stylesheet" href="../styles.css">
+
+  <!-- Estilos exclusivos del administrador -->
+  <link rel="stylesheet" href="admin.css">
+</head>
+
+<body>
+
+  <!-- ==========================================
+       HEADER
+       ========================================== -->
+
+  <header class="admin-header">
+
+    <div class="admin-container admin-nav">
+
+      <a href="../index.html" class="admin-brand">
+
+        <span class="admin-brand-mark">
+          P
+        </span>
+
+        <span>
+          PANACEA
+          <small>ADMINISTRACIÓN</small>
+        </span>
+
+      </a>
+
+
+      <div class="admin-nav-actions">
+
+        <!-- ==========================================
+             CALENDARIO / FILTROS
+             ========================================== -->
+
+        <div class="calendar-wrap">
+
+          <button
+            type="button"
+            class="calendar-toggle"
+            id="calendarToggle"
+            aria-label="Abrir calendario"
+            aria-expanded="false"
+          >
+            📅
+            <span>Calendario</span>
+          </button>
+
+
+          <div
+            class="calendar-panel"
+            id="calendarPopover"
+            hidden
+          >
+
+            <!-- CABECERA -->
+
+            <div class="calendar-panel-header">
+
+              <strong>
+                📅 Filtrar pedidos
+              </strong>
+
+              <button
+                type="button"
+                class="calendar-close"
+                id="calendarClose"
+                aria-label="Cerrar calendario"
+              >
+                ×
+              </button>
+
+            </div>
+
+
+            <!-- FILTROS RÁPIDOS -->
+
+            <div class="calendar-quick-filters">
+
+              <button
+                type="button"
+                data-date-filter="all"
+                class="active"
+              >
+                Todos los pedidos
+              </button>
+
+              <button
+                type="button"
+                data-date-filter="day"
+              >
+                Por día
+              </button>
+
+              <button
+                type="button"
+                data-date-filter="week"
+              >
+                Por semana
+              </button>
+
+              <button
+                type="button"
+                data-date-filter="month"
+              >
+                Por mes
+              </button>
+
+            </div>
+
+
+            <!-- CABECERA DEL MES -->
+
+            <div class="calendar-month-header">
+
+              <button
+                type="button"
+                id="calendarPrev"
+                aria-label="Mes anterior"
+              >
+                ‹
+              </button>
+
+
+              <strong id="calendarMonthTitle">
+                Septiembre 2026
+              </strong>
+
+
+              <button
+                type="button"
+                id="calendarNext"
+                aria-label="Mes siguiente"
+              >
+                ›
+              </button>
+
+            </div>
+
+
+            <!-- DÍAS DE LA SEMANA -->
+
+            <div class="calendar-weekdays">
+
+              <span class="calendar-week-corner"></span>
+              <span>L</span>
+              <span>M</span>
+              <span>X</span>
+              <span>J</span>
+              <span>V</span>
+              <span>S</span>
+              <span>D</span>
+
+            </div>
+
+
+            <!-- CUADRÍCULA DEL CALENDARIO -->
+
+            <div
+              id="calendarGrid"
+              class="calendar-grid"
+            ></div>
+
+
+            <!-- FILTRO ACTIVO -->
+
+            <div
+              id="calendarActiveText"
+              class="calendar-active-filter"
+            >
+              Todos los pedidos
+            </div>
+
+
+            <!-- RESUMEN DE RESULTADOS -->
+
+            <div
+              id="dateFilterSummary"
+              class="date-filter-summary"
+              hidden
+            ></div>
+
+
+            <!-- QUITAR FILTRO -->
+
+            <button
+              type="button"
+              class="calendar-clear"
+              id="calendarClear"
+            >
+              ✕ Quitar filtro
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <!-- ==========================================
+             ACCESO RÁPIDO A RESPALDOS
+             ========================================== -->
+
+        <button
+          type="button"
+          class="backup-toggle"
+          id="backupToggle"
+          aria-label="Ir a la sección de respaldos"
+          title="Ir a respaldos"
+        >
+          💾
+          <span>Respaldos</span>
+        </button>
+
+
+        <!-- ==========================================
+             ENLACE A PÁGINA PÚBLICA
+             ========================================== -->
+
+        <a
+          href="../index.html"
+          class="admin-public-link"
+        >
+          ← Ver página pública
+        </a>
+
+      </div>
+
+    </div>
+
+  </header>
+
+
+  <!-- ==========================================
+       CONTENIDO PRINCIPAL
+       ========================================== -->
+
+  <main>
+
+
+    <!-- ==========================================
+         CABECERA
+         ========================================== -->
+
+    <section class="admin-hero">
+
+      <div class="admin-container">
+
+        <p class="admin-eyebrow">
+          GESTIÓN DE VENTAS
+        </p>
+
+
+        <div class="admin-title-row">
+
+          <div>
+
+            <h1>
+              Pedidos
+            </h1>
+
+            <p>
+              Importa los pedidos recibidos por WhatsApp,
+              asígnales un número consecutivo y controla
+              su estado.
+            </p>
+
+          </div>
+
+
+          <button
+            type="button"
+            class="admin-primary-btn"
+            id="openImportBtn"
+          >
+            ＋ Nuevo pedido
+          </button>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ==========================================
+         ESTADÍSTICAS
+         ========================================== -->
+
+    <section class="admin-container admin-stats">
+
+
+      <article class="stat-card">
+
+        <span class="stat-icon">
+          📦
+        </span>
+
+        <div>
+
+          <small>
+            Pedidos
+          </small>
+
+          <strong id="statTotal">
+            0
+          </strong>
+
+        </div>
+
+      </article>
+
+
+      <article class="stat-card">
+
+        <span class="stat-icon">
+          ⏳
+        </span>
+
+        <div>
+
+          <small>
+            Pendientes
+          </small>
+
+          <strong id="statPending">
+            0
+          </strong>
+
+        </div>
+
+      </article>
+
+
+      <article class="stat-card">
+
+        <span class="stat-icon">
+          🧾
+        </span>
+
+        <div>
+
+          <small>
+            Facturados
+          </small>
+
+          <strong id="statInvoiced">
+            0
+          </strong>
+
+        </div>
+
+      </article>
+
+
+      <article class="stat-card">
+
+        <span class="stat-icon">
+          ❌
+        </span>
+
+        <div>
+
+          <small>
+            Cancelados
+          </small>
+
+          <strong id="statCancelled">
+            0
+          </strong>
+
+        </div>
+
+      </article>
+
+
+    </section>
+
+
+    <!-- ==========================================
+         HERRAMIENTAS
+         ========================================== -->
+
+    <section class="admin-container admin-toolbar">
+
+
+      <!-- BUSCADOR -->
+
+      <div class="admin-search">
+
+        <span>
+          ⌕
+        </span>
+
+        <input
+          type="search"
+          id="searchOrders"
+          placeholder="Buscar por número, cliente o teléfono..."
+          autocomplete="off"
+        >
+
+      </div>
+
+
+      <!-- FILTROS DE ESTADO -->
+
+      <div class="admin-filters">
+
+        <button
+          type="button"
+          class="order-filter active"
+          data-status="all"
+        >
+          Todos
+        </button>
+
+
+        <button
+          type="button"
+          class="order-filter"
+          data-status="pending"
+        >
+          Pendientes
+        </button>
+
+
+        <button
+          type="button"
+          class="order-filter"
+          data-status="invoiced"
+        >
+          Facturados
+        </button>
+
+
+        <button
+          type="button"
+          class="order-filter"
+          data-status="cancelled"
+        >
+          Cancelados
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- RESPALDOS MOVIDOS AL FINAL DE LA PÁGINA -->
+
+    <!-- ==========================================
+         LISTADO DE PEDIDOS
+         ========================================== -->
+
+    <section class="admin-container admin-orders-section">
+
+
+      <div class="orders-heading">
+
+        <div>
+
+          <h2>
+            Listado de pedidos
+          </h2>
+
+          <p id="ordersCount">
+            0 pedidos
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <!-- LISTA -->
+
+      <div
+        id="ordersList"
+        class="orders-list"
+      ></div>
+
+
+      <!-- ESTADO VACÍO -->
+
+      <div
+        id="emptyOrders"
+        class="admin-empty"
+        hidden
+      >
+
+        <div>
+          📦
+        </div>
+
+        <h3>
+          No hay pedidos todavía
+        </h3>
+
+        <p>
+          Cuando recibas un pedido por WhatsApp,
+          pulsa <strong>Nuevo pedido</strong> y pega
+          el mensaje aquí.
+        </p>
+
+
+        <button
+          type="button"
+          class="admin-primary-btn"
+          id="emptyImportBtn"
+        >
+          Importar primer pedido
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- ==========================================
+         SEGURIDAD / RESPALDOS
+         ========================================== -->
+
+    <section
+      class="admin-container backup-section"
+      id="respaldos"
+    >
+
+      <div class="backup-card">
+
+        <div class="backup-heading">
+
+          <div>
+
+            <p class="admin-eyebrow">
+              SEGURIDAD
+            </p>
+
+            <h2>
+              Respaldos
+            </h2>
+
+            <p class="backup-heading-description">
+              Guarda una copia externa de tus pedidos y restaura información de forma segura cuando lo necesites.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div class="backup-info-grid">
+
+          <div class="backup-info">
+
+            <small>
+              Último respaldo
+            </small>
+
+            <strong id="lastBackupDate">
+              Nunca
+            </strong>
+
+          </div>
+
+
+          <div class="backup-info">
+
+            <small>
+              Pedidos desde último respaldo
+            </small>
+
+            <strong id="ordersSinceBackup">
+              0
+            </strong>
+
+          </div>
+
+
+          <div class="backup-info backup-status">
+
+            <small>
+              Estado
+            </small>
+
+            <strong id="backupStatus">
+              Aún no has creado una copia externa
+            </strong>
+
+          </div>
+
+        </div>
+
+
+        <div class="backup-actions">
+
+          <button
+            type="button"
+            class="admin-primary-btn"
+            id="exportOrdersBtn"
+          >
+            💾 Crear respaldo
+          </button>
+
+
+          <button
+            type="button"
+            class="admin-secondary-btn"
+            id="exportExcelBtn"
+          >
+            📊 Exportar a Excel
+          </button>
+
+
+          <button
+            type="button"
+            class="admin-secondary-btn"
+            id="restoreOrdersBtn"
+          >
+            📥 Restaurar pedidos
+          </button>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <!-- ==========================================
+       MODAL SELECCIONAR TIPO DE IMPORTACIÓN
+       ========================================== -->
+
+  <dialog id="newOrderDialog" class="admin-dialog order-method-dialog">
+
+    <div class="order-method-content">
+
+      <button type="button" class="dialog-x" id="closeNewOrderBtn" aria-label="Cerrar">×</button>
+
+      <p class="admin-eyebrow">NUEVO PEDIDO</p>
+
+      <h2>¿Qué tipo de importación?</h2>
+
+      <p class="dialog-description">Selecciona cómo quieres cargar el pedido. La importación de WhatsApp actual se mantiene sin cambios.</p>
+
+      <div class="order-method-options">
+        <button type="button" class="order-method-card" id="chooseWhatsAppBtn">
+          <span class="order-method-icon">📲</span>
+          <span>
+            <strong>WhatsApp</strong>
+            <small>Importar usando el formato actual de PANACEA</small>
+          </span>
+          <span class="order-method-arrow">›</span>
+        </button>
+
+        <button type="button" class="order-method-card" id="chooseFlexibleBtn">
+          <span class="order-method-icon">📝</span>
+          <span>
+            <strong>Flexible</strong>
+            <small>Importar pedidos con otros formatos de mensaje</small>
+          </span>
+          <span class="order-method-arrow">›</span>
+        </button>
+      </div>
+
+      <div class="dialog-actions">
+        <button type="button" class="admin-secondary-btn" id="cancelNewOrderBtn">Cancelar</button>
+      </div>
+
+    </div>
+  </dialog>
+
+
+  <!-- ==========================================
+       MODAL IMPORTAR PEDIDO
+       ========================================== -->
+
+  <dialog
+    id="importDialog"
+    class="admin-dialog"
+  >
+
+    <form
+      method="dialog"
+      id="importForm"
+    >
+
+
+      <button
+        type="button"
+        class="dialog-x"
+        id="closeImportBtn"
+        aria-label="Cerrar"
+      >
+        ×
+      </button>
+
+
+      <p class="admin-eyebrow">
+        IMPORTAR DESDE WHATSAPP
+      </p>
+
+
+      <h2>
+        Nuevo pedido
+      </h2>
+
+
+      <p class="dialog-description">
+        Copia el mensaje completo que recibiste del cliente
+        en WhatsApp y pégalo debajo. PANACEA extraerá
+        automáticamente los datos.
+      </p>
+
+
+      <label for="whatsappMessage">
+        Mensaje de WhatsApp
+      </label>
+
+
+      <textarea
+        id="whatsappMessage"
+        rows="12"
+        placeholder="Pega aquí el mensaje completo del pedido..."
+        spellcheck="false"
+        required
+      ></textarea>
+
+
+      <!-- ERROR -->
+
+      <div
+        id="parseError"
+        class="parse-error"
+        hidden
+      ></div>
+
+
+      <!-- VISTA PREVIA -->
+
+      <div
+        id="importPreview"
+        class="import-preview"
+        hidden
+      >
+
+
+        <div class="preview-header">
+
+          <strong>
+            Vista previa
+          </strong>
+
+          <span id="previewOrderNumber"></span>
+
+        </div>
+
+
+        <div class="preview-grid">
+
+
+          <div>
+
+            <small>
+              Cliente
+            </small>
+
+            <strong id="previewCustomer">
+              —
+            </strong>
+
+          </div>
+
+
+          <div>
+
+            <small>
+              Teléfono
+            </small>
+
+            <strong id="previewPhone">
+              —
+            </strong>
+
+          </div>
+
+
+          <div>
+
+            <small>
+              Productos
+            </small>
+
+            <strong id="previewProducts">
+              —
+            </strong>
+
+          </div>
+
+
+          <div>
+
+            <small>
+              Total
+            </small>
+
+            <strong id="previewTotal">
+              —
+            </strong>
+
+          </div>
+
+
+        </div>
+
+      </div>
+
+
+      <!-- ACCIONES -->
+
+      <div class="dialog-actions">
+
+
+        <button
+          type="button"
+          class="admin-secondary-btn"
+          id="cancelImportBtn"
+        >
+          Cancelar
+        </button>
+
+
+        <button
+          type="button"
+          class="admin-primary-btn"
+          id="previewImportBtn"
+        >
+          Revisar pedido
+        </button>
+
+
+        <button
+          type="submit"
+          class="admin-primary-btn"
+          id="saveImportBtn"
+          hidden
+        >
+          ✓ Crear pedido
+        </button>
+
+
+      </div>
+
+
+    </form>
+
+  </dialog>
+
+
+  <!-- ==========================================
+       MODAL IMPORTACIÓN FLEXIBLE
+       ========================================== -->
+
+  <dialog id="flexibleDialog" class="admin-dialog flexible-dialog">
+
+    <form method="dialog" id="flexibleForm">
+
+      <button type="button" class="dialog-x" id="closeFlexibleBtn" aria-label="Cerrar">×</button>
+
+      <p class="admin-eyebrow">IMPORTACIÓN FLEXIBLE</p>
+
+      <h2>Nuevo pedido</h2>
+
+      <p class="dialog-description">Pega un mensaje sencillo. PANACEA reconocerá nombre, teléfono, cantidades, paquetes, cajas y productos sin exigir el formato habitual.</p>
+
+      <div class="flexible-guide">
+        <strong>Formato recomendado</strong>
+        <span>Nombre: Nombre del cliente</span>
+        <span>Teléfono: 55059588</span>
+        <span>Productos:</span>
+        <span>2 Nombre del producto</span>
+        <span>3 paquetes de Nombre del producto</span>
+        <span>1 caja de Nombre del producto</span>
+      </div>
+
+      <label for="flexibleMessage">Mensaje del pedido</label>
+      <textarea id="flexibleMessage" rows="10" placeholder="Nombre: Surely Gamero
+Teléfono: 55059588
+
+Productos:
+2 Aceite Castrol 20W-50
+3 paquetes de Bolsas tipo camisetas blancas
+1 caja de Limpiacristales c/Pistola" spellcheck="false" required></textarea>
+
+      <div id="flexibleError" class="parse-error" hidden></div>
+
+      <div id="flexiblePreview" class="import-preview flexible-preview" hidden></div>
+
+      <div class="dialog-actions">
+        <button type="button" class="admin-secondary-btn" id="cancelFlexibleBtn">Cancelar</button>
+        <button type="button" class="admin-primary-btn" id="previewFlexibleBtn">Revisar pedido</button>
+        <button type="submit" class="admin-primary-btn" id="saveFlexibleBtn" hidden>✓ Crear pedido</button>
+      </div>
+
+    </form>
+  </dialog>
+
+
+  <!-- ==========================================
+       MODAL DETALLE DEL PEDIDO
+       ========================================== -->
+
+  <dialog
+    id="orderDialog"
+    class="admin-dialog order-dialog"
+  >
+
+    <div id="orderDetail"></div>
+
+  </dialog>
+
+
+
+  <!-- ==========================================
+       MODAL RESTAURAR PEDIDOS
+       ========================================== -->
+
+  <dialog
+    id="restoreDialog"
+    class="admin-dialog restore-dialog"
+  >
+
+    <div class="restore-content">
+
+      <button
+        type="button"
+        class="dialog-x"
+        id="closeRestoreBtn"
+        aria-label="Cerrar"
+      >
+        ×
+      </button>
+
+
+      <!-- PRIMER PASO: SELECCIONAR ARCHIVO -->
+
+      <div
+        class="restore-intro"
+        id="restoreIntro"
+      >
+
+        <p class="admin-eyebrow">
+          SEGURIDAD
+        </p>
+
+        <h2>
+          Restaurar pedidos
+        </h2>
+
+        <p class="dialog-description">
+          Selecciona un archivo de respaldo de PANACEA. Antes de realizar cualquier cambio, revisaremos los pedidos y detectaremos posibles diferencias.
+        </p>
+
+        <input
+          type="file"
+          id="restoreFileInput"
+          accept=".json,application/json"
+          hidden
+        >
+
+        <div class="restore-intro-actions">
+
+          <button
+            type="button"
+            class="admin-primary-btn"
+            id="selectRestoreFileBtn"
+          >
+            Seleccionar respaldo
+          </button>
+
+          <button
+            type="button"
+            class="admin-secondary-btn"
+            id="cancelRestoreBtn"
+          >
+            Cancelar
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <!-- SEGUNDO PASO: ANÁLISIS DEL RESPALDO -->
+
+      <div
+        id="restoreAnalysis"
+        class="restore-analysis"
+        hidden
+      ></div>
+
+    </div>
+
+  </dialog>
+
+  <!-- ==========================================
+       TOAST
+       ========================================== -->
+
+  <div
+    id="adminToast"
+    class="admin-toast"
+    role="status"
+    aria-live="polite"
+  ></div>
+
+
+  <!-- ==========================================
+       JAVASCRIPT
+       ========================================== -->
+
+  <script src="admin.js?v=6"></script>
+
+</body>
+</html>
