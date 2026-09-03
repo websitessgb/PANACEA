@@ -1460,13 +1460,113 @@ function flexibleCustomer(t){ const m=String(t||'').match(/(?:^|\n)\s*(?:nombre\
 function flexiblePhone(t){ const m=String(t||'').match(/(?:^|\n)\s*(?:telefono|tel[eé]fono|numero|n[uú]mero)\s*:\s*([0-9+\-\s()]+)/im); return m?m[1].trim().replace(/[^\d+]/g,''):''; }
 function flexibleProductsSection(t){ const m=String(t||'').match(/(?:^|\n)\s*productos?\s*:\s*/i); return m?String(t).slice(m.index+m[0].length):''; }
 function parseFlexibleProductLine(line){
- let x=String(line||'').trim().replace(/^[•\-*·]\s*/,'').trim(); if(!x)return null;
- let q=null, name=x, m=x.match(/^(\d+)\s+(?:[x×]\s*)?(.+)$/i);
- if(m){q=Number(m[1]);name=m[2].trim();} else {m=x.match(/^(.+?)\s*[x×]\s*(\d+)$/i);if(m){name=m[1].trim();q=Number(m[2]);}}
- if(!q||q<1)return null;
- let presentation='unidad'; m=name.match(/^(paquetes?|cajas?|bultos?|bolsas?|unidades?)\s+(?:de\s+)?(.+)$/i);
- if(m){presentation=m[1].toLowerCase();name=m[2].trim();}
- if(!name)return null; return {name,quantity:q,presentation,unitPrice:0,currency:'CUP',total:0};
+
+  let x = String(line || '')
+    .trim()
+    .replace(/^[•\-*·]\s*/, '')
+    .trim();
+
+  if(!x) return null;
+
+
+  let q = null;
+  let name = x;
+  let m;
+
+
+  /* ==========================================
+     CANTIDAD AL PRINCIPIO
+
+     Ejemplos:
+
+     2 cajas de Jabón
+     3 botellas de Aceite
+     2 Aceite Castrol
+     ========================================== */
+
+  m = x.match(/^(\d+)\s+(?:[x×]\s*)?(.+)$/i);
+
+  if(m){
+
+    q = Number(m[1]);
+    name = m[2].trim();
+
+  }else{
+
+
+    /* ==========================================
+       CANTIDAD AL FINAL
+
+       Ejemplos:
+
+       Aceite Castrol x2
+       Aceite Castrol x 2
+       ========================================== */
+
+    m = x.match(/^(.+?)\s*[x×]\s*(\d+)$/i);
+
+    if(m){
+
+      name = m[1].trim();
+      q = Number(m[2]);
+
+    }
+
+  }
+
+
+  if(!q || q < 1) return null;
+
+
+  /* ==========================================
+     UNIDAD FLEXIBLE
+
+     Busca:
+
+     [UNIDAD] de [PRODUCTO]
+
+     Ejemplos:
+
+     cajas de Jabón
+     botellas de Aceite
+     rollos de Papel
+     sacos de Arroz
+     garrafones de Agua
+     ========================================== */
+
+  let presentation = 'unidad';
+
+  m = name.match(/^(.+?)\s+de\s+(.+)$/i);
+
+
+  if(m){
+
+    presentation = m[1].trim().toLowerCase();
+
+    name = m[2].trim();
+
+  }
+
+
+  if(!name) return null;
+
+
+  return {
+
+    name,
+
+    quantity: q,
+
+    presentation,
+
+    unitPrice: 0,
+
+    currency: 'CUP',
+
+    total: 0
+
+  };
+
 }
 function flexibleProductCatalog(){ const map=new Map(); orders.forEach(o=>(o.products||[]).forEach(p=>{const name=p.name||p.product||p.title||'';const key=normalizeFlexibleText(name);if(!key)return;const old=map.get(key);if(!old||Number(p.unitPrice||0)>Number(old.unitPrice||0))map.set(key,{...p,name});}));return Array.from(map.values()); }
 function flexibleCandidates(name){ const q=normalizeFlexibleText(name),qt=new Set(q.split(/\s+/).filter(Boolean)); if(!q)return[]; return flexibleProductCatalog().map(p=>{const n=normalizeFlexibleText(p.name);if(n===q)return {...p,_score:1};const nt=new Set(n.split(/\s+/).filter(Boolean));let common=0;qt.forEach(t=>{if(nt.has(t))common++;});const score=(n.includes(q)||q.includes(n))?Math.max(.82,common/Math.max(qt.size,nt.size,1)):common/Math.max(qt.size,nt.size,1);return {...p,_score:score};}).filter(p=>p._score>=.55).sort((a,b)=>b._score-a._score).slice(0,3); }
