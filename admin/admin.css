@@ -1243,8 +1243,31 @@ body{
 
 @media(max-width:900px){
 
+  .backup-card{
+    width:100%;
+    max-width:100%;
+    box-sizing:border-box;
+    overflow:hidden;
+  }
+
   .backup-info-grid{
-    grid-template-columns:1fr 1fr;
+    width:100%;
+    max-width:100%;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+  }
+
+  .backup-info{
+    min-width:0;
+    max-width:100%;
+    box-sizing:border-box;
+    overflow:hidden;
+  }
+
+  .backup-info strong,
+  .backup-info small{
+    max-width:100%;
+    overflow-wrap:anywhere;
+    word-break:break-word;
   }
 
   .backup-status{
@@ -1281,9 +1304,19 @@ body{
   }
 
   .backup-info-grid{
-    grid-template-columns:1fr;
-    gap:10px;
-  }
+  width:100%;
+  max-width:100%;
+  grid-template-columns:minmax(0,1fr);
+  gap:10px;
+}
+
+.backup-info{
+  width:100%;
+  min-width:0;
+  max-width:100%;
+  box-sizing:border-box;
+  overflow:hidden;
+}
 
   .backup-status{
     grid-column:auto;
@@ -1864,5 +1897,56 @@ body{
   #backupReminderDialog .backup-reminder-actions .admin-primary-btn,
   #backupReminderDialog .backup-reminder-actions .admin-secondary-btn{
     width:100%;
+  }
+}
+
+/* =========================================================
+   SEGURIDAD / RESPALDOS — CONTROL DE ANCHO EN MÓVILES
+   ========================================================= */
+
+@media(max-width:650px){
+
+  .backup-section,
+  .backup-card,
+  .backup-info-grid,
+  .backup-info{
+    box-sizing:border-box;
+    max-width:100%;
+  }
+
+  .backup-section{
+    width:100%;
+    overflow-x:hidden;
+  }
+
+  .backup-card{
+    width:100%;
+    overflow:hidden;
+  }
+
+  .backup-info-grid{
+    width:100%;
+    grid-template-columns:minmax(0,1fr);
+  }
+
+  .backup-info{
+    width:100%;
+    min-width:0;
+    overflow:hidden;
+  }
+
+  .backup-info strong,
+  .backup-info small{
+    max-width:100%;
+    overflow-wrap:anywhere;
+    word-break:break-word;
+  }
+
+  .admin-dialog,
+  .order-dialog,
+  .restore-dialog,
+  #backupReminderDialog{
+    box-sizing:border-box;
+    max-width:calc(100vw - 20px);
   }
 }
