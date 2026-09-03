@@ -2337,8 +2337,18 @@ function openOrder(orderNumber){
         <button
           type="button"
           data-send-biller="${o.orderNumber}"
+          data-biller="1"
         >
-          🧾 Enviar a la facturadora
+          🧾 Enviar a facturadora 1
+        </button>
+
+
+        <button
+          type="button"
+          data-send-biller="${o.orderNumber}"
+          data-biller="2"
+        >
+          🧾 Enviar a facturadora 2
         </button>
 
 
@@ -2392,6 +2402,21 @@ function openOrder(orderNumber){
       'click',
       ()=>sendImportantInfo(orderNumber)
     );
+
+
+  orderDetail
+    .querySelectorAll('[data-send-biller]')
+    .forEach(button=>{
+
+      button.addEventListener(
+        'click',
+        ()=>sendToBiller(
+          orderNumber,
+          button.dataset.biller
+        )
+      );
+
+    });
 
 
   orderDetail
@@ -3303,6 +3328,45 @@ function normalizeCubanPhone(phone){
 }
 
 
+const BILLER_PHONES={
+  1:'52990506',
+  2:'53231470'
+};
+
+
+function sendToBiller(orderNumber,billerNumber){
+
+  const o=orders.find(
+    x=>x.orderNumber===orderNumber
+  );
+
+
+  if(!o)return;
+
+
+  const phone=BILLER_PHONES[Number(billerNumber)];
+
+
+  if(!phone)
+    return showToast(
+      'No se encontró el número de la facturadora.'
+    );
+
+
+  window.open(
+    `https://wa.me/${phone}?text=${encodeURIComponent(
+      buildClientMessage(o)
+    )}`,
+    '_blank'
+  );
+
+
+  showToast(
+    `Abriendo WhatsApp de la facturadora ${billerNumber}.`
+  );
+}
+
+
 function sendToClient(orderNumber){
 
   const o=orders.find(
@@ -3888,10 +3952,10 @@ function showBackupReminder(type){
     later.textContent='Recordarme más tarde';
     create.textContent='💾 Crear respaldo ahora';
   }else{
-    eyebrow.textContent='🔔 SEGURIDAD';
+    eyebrow.textContent='💾 SEGURIDAD';
     title.textContent='RESPALDO SEMANAL';
     body.innerHTML=`Hoy es <strong>domingo</strong>.<br><br>Te recomendamos crear una copia de seguridad de los pedidos de PANACEA.`;
-    later.textContent='Recordarme más tarde';
+    later.textContent='Más tarde';
     create.textContent='💾 Crear respaldo ahora';
   }
 
