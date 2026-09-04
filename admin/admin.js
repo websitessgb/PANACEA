@@ -3374,6 +3374,14 @@ function openOrder(orderNumber){
 
       <div class="detail-actions">
 
+<button
+  type="button"
+  data-edit-order="${o.orderNumber}"
+  ${o.status==='cancelled'?'disabled':''}
+>
+  ✏️ Editar pedido
+</button>
+
         <button
           type="button"
           data-status="${o.orderNumber}"
