@@ -3499,7 +3499,15 @@ function openOrder(orderNumber){
       ()=>copyOrder(orderNumber)
     );
 
-
+orderDetail
+  .querySelector('[data-edit-order]')
+  ?.addEventListener(
+    'click',
+    ()=>openOrderEditor(
+      orderNumber
+    )
+  );
+    
   orderDetail
     .querySelector('[data-status]')
     ?.addEventListener(
