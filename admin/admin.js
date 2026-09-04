@@ -2209,6 +2209,934 @@ function renderAll(){
 /* ==========================================
    VER PEDIDO
 ========================================== */
+/* ==========================================
+   EDITAR PEDIDO
+========================================== */
+
+function recalculateOrderTotals(order){
+
+  const totals={
+    CUP:0,
+    USD:0
+  };
+
+
+  (order.products||[]).forEach(product=>{
+
+    product.quantity=
+      Math.max(
+        1,
+        Number(product.quantity)||1
+      );
+
+
+    product.unitPrice=
+      Math.max(
+        0,
+        Number(product.unitPrice)||0
+      );
+
+
+    product.currency=
+      String(
+        product.currency||'CUP'
+      ).toUpperCase()==='USD'
+        ?'USD'
+        :'CUP';
+
+
+    product.total=
+      product.quantity*
+      product.unitPrice;
+
+
+    totals[
+      product.currency
+    ]+=product.total;
+
+  });
+
+
+  order.totals=totals;
+
+  return order;
+}
+
+
+function createEmptyEditableProduct(){
+
+  return{
+
+    name:'',
+
+    presentation:'unidad',
+
+    quantity:1,
+
+    unitPrice:0,
+
+    currency:'CUP',
+
+    total:0
+
+  };
+
+}
+
+
+function openOrderEditor(orderNumber){
+
+  const order=orders.find(
+    o=>o.orderNumber===orderNumber
+  );
+
+
+  if(!order)return;
+
+
+  const originalOrder=
+    JSON.parse(
+      JSON.stringify(order)
+    );
+
+
+  function renderEditor(){
+
+    const editableOrder=orders.find(
+      o=>o.orderNumber===orderNumber
+    );
+
+
+    if(!editableOrder)return;
+
+
+    const productsHTML=
+      (editableOrder.products||[])
+        .map(
+          (product,index)=>`
+
+            <div
+              class="order-editor-product"
+              data-editor-product="${index}"
+            >
+
+              <div class="order-editor-product-head">
+
+                <strong>
+                  Producto ${index+1}
+                </strong>
+
+                <button
+                  type="button"
+                  class="order-editor-remove"
+                  data-remove-product="${index}"
+                  ${
+                    editableOrder.products.length===1
+                      ?'disabled'
+                      :''
+                  }
+                >
+                  🗑️ Eliminar
+                </button>
+
+              </div>
+
+
+              <div class="order-editor-grid">
+
+                <div class="order-editor-field order-editor-field-wide">
+
+                  <label>
+                    Producto
+                  </label>
+
+                  <input
+                    type="text"
+                    data-edit-product-name="${index}"
+                    value="${escapeHTML(product.name||'')}"
+                  >
+
+                </div>
+
+
+                <div class="order-editor-field">
+
+                  <label>
+                    Presentación
+                  </label>
+
+                  <input
+                    type="text"
+                    data-edit-product-presentation="${index}"
+                    value="${escapeHTML(product.presentation||'unidad')}"
+                  >
+
+                </div>
+
+
+                <div class="order-editor-field">
+
+                  <label>
+                    Cantidad
+                  </label>
+
+                  <input
+                    type="number"
+                    min="1"
+                    step="1"
+                    data-edit-product-quantity="${index}"
+                    value="${Number(product.quantity)||1}"
+                  >
+
+                </div>
+
+
+                <div class="order-editor-field">
+
+                  <label>
+                    Precio unitario
+                  </label>
+
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    data-edit-product-price="${index}"
+                    value="${Number(product.unitPrice)||0}"
+                  >
+
+                </div>
+
+
+                <div class="order-editor-field">
+
+                  <label>
+                    Moneda
+                  </label>
+
+                  <select
+                    data-edit-product-currency="${index}"
+                  >
+
+                    <option
+                      value="CUP"
+                      ${
+                        String(product.currency||'CUP')
+                        .toUpperCase()==='CUP'
+                          ?'selected'
+                          :''
+                      }
+                    >
+                      CUP
+                    </option>
+
+                    <option
+                      value="USD"
+                      ${
+                        String(product.currency||'CUP')
+                        .toUpperCase()==='USD'
+                          ?'selected'
+                          :''
+                      }
+                    >
+                      USD
+                    </option>
+
+                  </select>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          `
+        )
+        .join('');
+
+
+    orderDetail.innerHTML=`
+
+      <div class="order-detail order-editor">
+
+        <button
+          type="button"
+          class="dialog-x"
+          data-close-editor
+          aria-label="Cerrar"
+        >
+          ×
+        </button>
+
+
+        <div class="detail-top">
+
+          <div>
+
+            <div class="detail-number">
+              ✏️ Editar ${escapeHTML(
+                editableOrder.orderNumber
+              )}
+            </div>
+
+            <div class="detail-date">
+              Modifica la información y guarda
+              los cambios cuando termines.
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div class="order-editor-customer">
+
+          <div class="order-editor-field">
+
+            <label>
+              CLIENTE
+            </label>
+
+            <input
+              type="text"
+              data-edit-customer
+              value="${escapeHTML(
+                editableOrder.customer||''
+              )}"
+            >
+
+          </div>
+
+
+          <div class="order-editor-field">
+
+            <label>
+              TELÉFONO
+            </label>
+
+            <input
+              type="tel"
+              data-edit-phone
+              value="${escapeHTML(
+                editableOrder.phone||''
+              )}"
+            >
+
+          </div>
+
+        </div>
+
+
+        <div class="order-editor-products">
+
+          <div class="order-editor-products-title">
+
+            <h3>
+              Productos
+            </h3>
+
+            <button
+              type="button"
+              class="order-editor-add"
+              data-add-product
+            >
+              ＋ Agregar producto
+            </button>
+
+          </div>
+
+
+          <div
+            data-editor-products-list
+          >
+            ${productsHTML}
+          </div>
+
+        </div>
+
+
+        <div
+          class="order-editor-total-preview"
+        >
+
+          <small>
+            Total actualizado
+          </small>
+
+          <strong
+            data-editor-total
+          >
+            ${escapeHTML(
+              formatTotals(
+                recalculateOrderTotals(
+                  editableOrder
+                ).totals
+              )
+            )}
+          </strong>
+
+        </div>
+
+
+        <div class="detail-actions">
+
+          <button
+            type="button"
+            data-save-order-editor
+          >
+            💾 Guardar cambios
+          </button>
+
+
+          <button
+            type="button"
+            data-cancel-order-editor
+          >
+            ↩️ Cancelar edición
+          </button>
+
+        </div>
+
+      </div>
+
+    `;
+
+
+    attachEditorEvents();
+
+  }
+
+
+  function updateTotalPreview(){
+
+    const editableOrder=orders.find(
+      o=>o.orderNumber===orderNumber
+    );
+
+
+    if(!editableOrder)return;
+
+
+    recalculateOrderTotals(
+      editableOrder
+    );
+
+
+    const totalElement=
+      orderDetail.querySelector(
+        '[data-editor-total]'
+      );
+
+
+    if(totalElement){
+
+      totalElement.textContent=
+        formatTotals(
+          editableOrder.totals
+        );
+
+    }
+
+  }
+
+
+  function attachEditorEvents(){
+
+    const customerInput=
+      orderDetail.querySelector(
+        '[data-edit-customer]'
+      );
+
+
+    customerInput?.addEventListener(
+      'input',
+      ()=>{
+
+        const editableOrder=orders.find(
+          o=>o.orderNumber===orderNumber
+        );
+
+
+        if(editableOrder){
+
+          editableOrder.customer=
+            customerInput.value;
+
+        }
+
+      }
+    );
+
+
+    const phoneInput=
+      orderDetail.querySelector(
+        '[data-edit-phone]'
+      );
+
+
+    phoneInput?.addEventListener(
+      'input',
+      ()=>{
+
+        const editableOrder=orders.find(
+          o=>o.orderNumber===orderNumber
+        );
+
+
+        if(editableOrder){
+
+          editableOrder.phone=
+            phoneInput.value;
+
+        }
+
+      }
+    );
+
+
+    orderDetail
+      .querySelectorAll(
+        '[data-edit-product-name]'
+      )
+      .forEach(input=>{
+
+        input.addEventListener(
+          'input',
+          ()=>{
+
+            const index=
+              Number(
+                input.dataset
+                  .editProductName
+              );
+
+
+            const editableOrder=orders.find(
+              o=>o.orderNumber===orderNumber
+            );
+
+
+            if(
+              editableOrder?.products[index]
+            ){
+
+              editableOrder
+                .products[index]
+                .name=input.value;
+
+            }
+
+          }
+        );
+
+      });
+
+
+    orderDetail
+      .querySelectorAll(
+        '[data-edit-product-presentation]'
+      )
+      .forEach(input=>{
+
+        input.addEventListener(
+          'input',
+          ()=>{
+
+            const index=
+              Number(
+                input.dataset
+                  .editProductPresentation
+              );
+
+
+            const editableOrder=orders.find(
+              o=>o.orderNumber===orderNumber
+            );
+
+
+            if(
+              editableOrder?.products[index]
+            ){
+
+              editableOrder
+                .products[index]
+                .presentation=input.value;
+
+            }
+
+          }
+        );
+
+      });
+
+
+    orderDetail
+      .querySelectorAll(
+        '[data-edit-product-quantity]'
+      )
+      .forEach(input=>{
+
+        input.addEventListener(
+          'input',
+          ()=>{
+
+            const index=
+              Number(
+                input.dataset
+                  .editProductQuantity
+              );
+
+
+            const editableOrder=orders.find(
+              o=>o.orderNumber===orderNumber
+            );
+
+
+            if(
+              editableOrder?.products[index]
+            ){
+
+              editableOrder
+                .products[index]
+                .quantity=
+                  Math.max(
+                    1,
+                    Number(input.value)||1
+                  );
+
+
+              updateTotalPreview();
+
+            }
+
+          }
+        );
+
+      });
+
+
+    orderDetail
+      .querySelectorAll(
+        '[data-edit-product-price]'
+      )
+      .forEach(input=>{
+
+        input.addEventListener(
+          'input',
+          ()=>{
+
+            const index=
+              Number(
+                input.dataset
+                  .editProductPrice
+              );
+
+
+            const editableOrder=orders.find(
+              o=>o.orderNumber===orderNumber
+            );
+
+
+            if(
+              editableOrder?.products[index]
+            ){
+
+              editableOrder
+                .products[index]
+                .unitPrice=
+                  Math.max(
+                    0,
+                    Number(input.value)||0
+                  );
+
+
+              updateTotalPreview();
+
+            }
+
+          }
+        );
+
+      });
+
+
+    orderDetail
+      .querySelectorAll(
+        '[data-edit-product-currency]'
+      )
+      .forEach(select=>{
+
+        select.addEventListener(
+          'change',
+          ()=>{
+
+            const index=
+              Number(
+                select.dataset
+                  .editProductCurrency
+              );
+
+
+            const editableOrder=orders.find(
+              o=>o.orderNumber===orderNumber
+            );
+
+
+            if(
+              editableOrder?.products[index]
+            ){
+
+              editableOrder
+                .products[index]
+                .currency=
+                  select.value;
+
+
+              updateTotalPreview();
+
+            }
+
+          }
+        );
+
+      });
+
+
+    orderDetail
+      .querySelectorAll(
+        '[data-remove-product]'
+      )
+      .forEach(button=>{
+
+        button.addEventListener(
+          'click',
+          ()=>{
+
+            const index=
+              Number(
+                button.dataset
+                  .removeProduct
+              );
+
+
+            const editableOrder=orders.find(
+              o=>o.orderNumber===orderNumber
+            );
+
+
+            if(
+              !editableOrder||
+              editableOrder.products.length<=1
+            )
+              return;
+
+
+            editableOrder.products.splice(
+              index,
+              1
+            );
+
+
+            renderEditor();
+
+          }
+        );
+
+      });
+
+
+    orderDetail
+      .querySelector(
+        '[data-add-product]'
+      )
+      ?.addEventListener(
+        'click',
+        ()=>{
+
+          const editableOrder=orders.find(
+            o=>o.orderNumber===orderNumber
+          );
+
+
+          if(!editableOrder)return;
+
+
+          editableOrder.products.push(
+            createEmptyEditableProduct()
+          );
+
+
+          renderEditor();
+
+        }
+      );
+
+
+    orderDetail
+      .querySelector(
+        '[data-save-order-editor]'
+      )
+      ?.addEventListener(
+        'click',
+        ()=>{
+
+          const editableOrder=orders.find(
+            o=>o.orderNumber===orderNumber
+          );
+
+
+          if(!editableOrder)return;
+
+
+          editableOrder.customer=
+            String(
+              editableOrder.customer||''
+            ).trim();
+
+
+          editableOrder.phone=
+            String(
+              editableOrder.phone||''
+            ).trim();
+
+
+          if(!editableOrder.customer){
+
+            showToast(
+              'Escribe el nombre del cliente.'
+            );
+
+            return;
+
+          }
+
+
+          if(!editableOrder.phone){
+
+            showToast(
+              'Escribe el teléfono del cliente.'
+            );
+
+            return;
+
+          }
+
+
+          const invalidProduct=
+            editableOrder.products.some(
+              product=>
+                !String(
+                  product.name||''
+                ).trim()
+            );
+
+
+          if(invalidProduct){
+
+            showToast(
+              'Todos los productos deben tener nombre.'
+            );
+
+            return;
+
+          }
+
+
+          recalculateOrderTotals(
+            editableOrder
+          );
+
+
+          editableOrder.updatedAt=
+            new Date().toISOString();
+
+
+          saveOrders();
+
+          renderAll();
+
+          openOrder(
+            orderNumber
+          );
+
+
+          showToast(
+            'Pedido actualizado correctamente.'
+          );
+
+        }
+      );
+
+
+    orderDetail
+      .querySelector(
+        '[data-cancel-order-editor]'
+      )
+      ?.addEventListener(
+        'click',
+        ()=>{
+
+          const index=orders.findIndex(
+            o=>o.orderNumber===orderNumber
+          );
+
+
+          if(index!==-1){
+
+            orders[index]=
+              JSON.parse(
+                JSON.stringify(
+                  originalOrder
+                )
+              );
+
+          }
+
+
+          openOrder(
+            orderNumber
+          );
+
+        }
+      );
+
+
+    orderDetail
+      .querySelector(
+        '[data-close-editor]'
+      )
+      ?.addEventListener(
+        'click',
+        ()=>{
+
+          const index=orders.findIndex(
+            o=>o.orderNumber===orderNumber
+          );
+
+
+          if(index!==-1){
+
+            orders[index]=
+              JSON.parse(
+                JSON.stringify(
+                  originalOrder
+                )
+              );
+
+          }
+
+
+          orderDialog.close();
+
+        }
+      );
+
+  }
+
+
+  renderEditor();
+
+ }
 
 function openOrder(orderNumber){
 
