@@ -2218,3 +2218,79 @@ body{
   }
 
 }
+
+/* =========================================================
+   SELECCIÓN VISUAL DE CONFLICTOS DE RESTAURACIÓN
+   ========================================================= */
+
+.restore-choice-actions{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  margin-top:20px;
+}
+
+.restore-choice-btn{
+  width:100%;
+  min-height:52px;
+  padding:13px 18px;
+  border:2px solid var(--admin-line);
+  border-radius:14px;
+  background:#fff;
+  color:var(--admin-ink);
+  font:inherit;
+  font-size:14px;
+  font-weight:800;
+  line-height:1.35;
+  text-align:left;
+  cursor:pointer;
+  transition:
+    background .18s ease,
+    border-color .18s ease,
+    color .18s ease,
+    box-shadow .18s ease,
+    transform .12s ease;
+}
+
+.restore-choice-btn:hover{
+  border-color:var(--admin-sage);
+  background:#f7f8f5;
+}
+
+.restore-choice-btn:active{
+  transform:scale(.99);
+}
+
+/* La opción elegida queda claramente resaltada */
+.restore-choice-btn.selected{
+  background:#e8efe9;
+  border-color:var(--admin-sage-dark);
+  color:var(--admin-sage-dark);
+  box-shadow:0 0 0 3px rgba(64,91,75,.14);
+}
+
+.restore-choice-btn.selected::after{
+  content:'  ✓ SELECCIONADO';
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:.03em;
+}
+
+.restore-choice-btn.keep-current.selected{
+  background:#e6f1e9;
+}
+
+.restore-choice-btn.use-backup.selected{
+  background:#e8f0fb;
+  border-color:#4c78b9;
+  color:#315d9b;
+  box-shadow:0 0 0 3px rgba(76,120,185,.14);
+}
+
+@media(max-width:650px){
+  .restore-choice-btn{
+    min-height:58px;
+    padding:14px 16px;
+    font-size:14px;
+  }
+}
