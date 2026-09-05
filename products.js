@@ -88,7 +88,7 @@ const PRODUCTS = [
     availability: 'out',
     stock: 0,
     image: 'assets/products/reposteria-panaderia/macomsa.jpg',
-    description: 'LA COMPRA MÁXIMA POR CLIENTE PARA ESTE PRODUCTO ES DE XX UNIDADES'
+    description: ''
   },
   {
     id: 'manteca-masoliver',
