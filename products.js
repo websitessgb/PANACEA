@@ -20,8 +20,8 @@ const PRODUCTS = [
     price: 30000,
     currency: 'CUP',
     priceLabel: 'por saco',
-    availability: 'unlimited',
-    stock: null,
+    availability: 'out', 
+    stock: 0,
     image: 'assets/products/reposteria-panaderia/nucleo.jpg',
     description: ''
   },
@@ -75,7 +75,7 @@ const PRODUCTS = [
     availability: 'unlimited',
     stock: null,
     image: 'assets/products/reposteria-panaderia/blanco-negro.jpg',
-    description: 'Cobertura blanca, cobertura especial y cobertura sucedáneo con leche.'
+    description: 'Solo disponible cobertura sucedáneo con leche.'
   },
   {
     id: 'manteca-macomsa',
@@ -95,13 +95,13 @@ const PRODUCTS = [
     name: 'Manteca de cerdo Masoliver',
     category: 'reposteria-panaderia',
     presentation: 'Caja de 13 kg',
-    price: 41000,
+    price: 45500,
     currency: 'CUP',
     priceLabel: 'por caja',
     availability: 'out',
     stock: 0,
     image: 'assets/products/reposteria-panaderia/masoliver.jpg',
-    description: 'LA COMPRA MÁXIMA POR CLIENTE PARA ESTE PRODUCTO ES DE XX UNIDADES'
+    description: ''
   },
   {
     id: 'manteca-multiuso',
@@ -114,7 +114,7 @@ const PRODUCTS = [
     availability: 'out',
     stock: 0,
     image: 'assets/products/reposteria-panaderia/multiuso.jpg',
-    description: 'LA COMPRA MÁXIMA POR CLIENTE PARA ESTE PRODUCTO ES DE XX UNIDADES'
+    description: ''
   },
   {
     id: 'manteca-costa-brava',
@@ -127,7 +127,7 @@ const PRODUCTS = [
     availability: 'out',
     stock: 0,
     image: 'assets/products/reposteria-panaderia/costa-brava.jpg',
-    description: 'LA COMPRA MÁXIMA POR CLIENTE PARA ESTE PRODUCTO ES DE XX UNIDADES'
+    description: ''
   },
   {
     id: 'margarina-hojaldre',
