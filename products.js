@@ -35,7 +35,7 @@ const PRODUCTS = [
     priceLabel: 'por saco',
     availability: 'unlimited',
     stock: null,
-    image: 'assets/products/reposteria-panaderia/maicena.jpg',
+    image: 'assets/products/reposteria-panaderia/Maicena.jpg',
     description: 'Almidón de maíz modificado.'
   },
   {
@@ -61,7 +61,7 @@ const PRODUCTS = [
     priceLabel: 'por saco',
     availability: 'unlimited',
     stock: null,
-    image: 'assets/products/reposteria-panaderia/bicarbonato.jpg',
+    image: 'assets/products/reposteria-panaderia/Bicarbonato.jpg',
     description: 'Food grade. Origen España.'
   },
   {
