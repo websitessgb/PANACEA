@@ -17,7 +17,7 @@ const PRODUCTS = [
     name: 'Núcleo Enzimático Panacea 0.2 %',
     category: 'reposteria-panaderia',
     presentation: 'Saco de 10 kg',
-    price: 30000,
+    price: 35500,
     currency: 'CUP',
     priceLabel: 'por saco',
     availability: 'out', 
