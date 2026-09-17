@@ -189,8 +189,8 @@ const PRODUCTS = [
     price: 101000,
     currency: 'CUP',
     priceLabel: 'por cubeta',
-    availability: 'out',
-    stock: 0,
+    availability: 'unlimited',
+    stock: null,
     image: 'assets/products/reposteria-panaderia/supernortemul.jpg',
     description: ''
   },
