@@ -397,14 +397,14 @@ const PRODUCTS = [
     price: 36,
     currency: 'USD',
     priceLabel: 'por unidad',
-    availability: 'unlimited',
-    stock: null,
+    availability: 'out',
+    stock: 0,
     image: 'assets/products/ferreteria/aceite-castrol.jpg',
     description: ''
   },
   {
-    id: 'losa-gravel-calacatta-gold',
-    name: 'Losa de cerámica Gravel Calacatta Gold',
+    id: 'losa-portofino-polish',
+    name: 'Losa de cerámica Portofino Polish',
     category: 'ferreteria',
     presentation: 'Cajas de 2 unidades.',
     price: 24,
@@ -412,7 +412,7 @@ const PRODUCTS = [
     priceLabel: 'por caja',
     availability: 'unlimited',
     stock: null,
-    image: 'assets/products/ferreteria/losa-gravel-calacatta-gold.jpg',
+    image: 'assets/products/ferreteria/losa-portofino-polish.jpg',
     description: 'Medidas 60x120cm'
   },
   {
@@ -429,16 +429,16 @@ const PRODUCTS = [
     description: 'Medidas 60x120cm'
   },
   {
-    id: 'losa-marmol-carrara',
-    name: 'Losa de cerámica Mármol Carrara',
+    id: 'losa-acron-grey',
+    name: 'Losa de cerámica Acron Grey',
     category: 'ferreteria',
     presentation: 'Cajas de 2 unidades.',
-    price: 27,
+    price: 24,
     currency: 'USD',
     priceLabel: 'por caja',
     availability: 'unlimited',
     stock: null,
-    image: 'assets/products/ferreteria/losa-marmol-carrara.jpg',
+    image: 'assets/products/ferreteria/losa-acron-grey.jpg',
     description: 'Medidas 60x120cm'
   },
   {
