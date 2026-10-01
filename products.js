@@ -199,7 +199,7 @@ const PRODUCTS = [
     name: 'Supernortemul',
     category: 'reposteria-panaderia',
     presentation: 'Cubeta de 5 kg',
-    price: 65000,
+    price: 70000,
     currency: 'CUP',
     priceLabel: 'por cubeta',
     availability: 'unlimited',
