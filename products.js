@@ -25,19 +25,7 @@ const PRODUCTS = [
     image: 'assets/products/reposteria-panaderia/nucleo.jpg',
     description: ''
   },
-  {
-    id: 'nucleo-enzimatico-pallet',
-    name: 'Núcleo Enzimático Panacea 0.2 % Oferta por Pallet',
-    category: 'reposteria-panaderia',
-    presentation: 'Saco de 10 kg - Pallet de 120 sacos',
-    price: 42.5,
-    currency: 'USD',
-    priceLabel: 'por saco',
-    availability: 'unlimited', 
-    stock: null,
-    image: 'assets/products/reposteria-panaderia/nucleo_pallet.jpg',
-    description: ''
-  },
+
   {
     id: 'maicena',
     name: 'Maicena',
