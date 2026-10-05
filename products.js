@@ -9,7 +9,7 @@ const PRODUCTS = [
     priceLabel: 'por pack',
     availability: 'unlimited',
     stock: null,
-    image: 'assets/products/otros/bolsas.jpg',
+    image: 'assets/products/otros/bolsa.jpg',
     description: 'Material HDPE, material virgen no reciclado.'
   },
   {
@@ -22,7 +22,7 @@ const PRODUCTS = [
     priceLabel: 'por saco',
     availability: 'unlimited', 
     stock: null,
-    image: 'assets/products/reposteria-panaderia/nucleo.jpg',
+    image: 'assets/products/reposteria-panaderia/nucleo-1.jpg',
     description: ''
   },
 
@@ -49,7 +49,7 @@ const PRODUCTS = [
     priceLabel: 'por caja',
     availability: 'unlimited',
     stock: null,
-    image: 'assets/products/reposteria-panaderia/polvo.jpg',
+    image: 'assets/products/reposteria-panaderia/Polvo-hornear.jpg',
     description: ''
   },
   {
@@ -153,7 +153,7 @@ const PRODUCTS = [
     priceLabel: 'por caja',
     availability: 'unlimited',
     stock: null,
-    image: 'assets/products/reposteria-panaderia/nata-crem-pat.jpg',
+    image: 'assets/products/reposteria-panaderia/nata-crem-pat-1.jpg',
     description: 'Nata vegetal Crem Pat, presentación 1 L.'
   },
   {
@@ -166,7 +166,7 @@ const PRODUCTS = [
     priceLabel: 'por caja',
     availability: 'unlimited',
     stock: null,
-    image: 'assets/products/reposteria-panaderia/nata-hole.jpg',
+    image: 'assets/products/reposteria-panaderia/nata-hole-1.jpg',
     description: 'Nata vegetal Hole, presentación 1 L.'
   },
   {
@@ -179,7 +179,7 @@ const PRODUCTS = [
     priceLabel: 'por caja',
     availability: 'unlimited',
     stock: null,
-    image: 'assets/products/reposteria-panaderia/nata-hulala.jpg',
+    image: 'assets/products/reposteria-panaderia/nata-hulala-1.jpg',
     description: 'Nata vegetal Hulalá, presentación 1 L.'
   },
   {
@@ -192,7 +192,7 @@ const PRODUCTS = [
     priceLabel: 'por cubeta',
     availability: 'unlimited',
     stock: null,
-    image: 'assets/products/reposteria-panaderia/supernortemul.jpg',
+    image: 'assets/products/reposteria-panaderia/supernortemul-1.jpg',
     description: ''
   },
   {
