@@ -1,8 +1,10 @@
 const ADMIN_STORAGE_KEY='panacea-admin-orders';
 const BACKUP_META_KEY='panacea-admin-backup-meta';
 const BACKUP_SNAPSHOT_KEY='panacea-admin-backup-snapshot';
+const WAITING_STORAGE_KEY='panacea-admin-waiting-customers';
 
 let orders=loadOrders(),
+    waitingCustomers=loadWaitingCustomers(),
     activeStatus='all',
     searchTerm='',
     pendingParsedOrder=null,
@@ -50,7 +52,21 @@ previewImportBtn=document.getElementById('previewImportBtn'),
 saveFlexibleBtn=document.getElementById('saveFlexibleBtn'),
 previewFlexibleBtn=document.getElementById('previewFlexibleBtn'),
 orderDetail=document.getElementById('orderDetail'),
-adminToast=document.getElementById('adminToast');
+adminToast=document.getElementById('adminToast'),
+waitingList=document.getElementById('waitingList'),
+waitingSearch=document.getElementById('waitingSearch'),
+waitingStatusFilter=document.getElementById('waitingStatusFilter'),
+waitingCount=document.getElementById('waitingCount'),
+waitingEmpty=document.getElementById('waitingEmpty'),
+waitingDialog=document.getElementById('waitingDialog'),
+waitingForm=document.getElementById('waitingForm'),
+waitingCustomerInput=document.getElementById('waitingCustomer'),
+waitingPhoneInput=document.getElementById('waitingPhone'),
+waitingProductInput=document.getElementById('waitingProduct'),
+waitingQuantityInput=document.getElementById('waitingQuantity'),
+waitingNotesInput=document.getElementById('waitingNotes'),
+waitingSourceOrderInput=document.getElementById('waitingSourceOrder'),
+waitingStatusInput=document.getElementById('waitingStatus');
 
 
 /* ==========================================
@@ -144,6 +160,273 @@ function getISOYear(d=new Date()){
 }
 
 
+function loadWaitingCustomers(){
+  try{
+    const x=JSON.parse(
+      localStorage.getItem(WAITING_STORAGE_KEY)||'[]'
+    );
+    return Array.isArray(x)?x:[];
+  }catch(e){
+    return[];
+  }
+}
+
+function saveWaitingCustomers(){
+  localStorage.setItem(
+    WAITING_STORAGE_KEY,
+    JSON.stringify(waitingCustomers)
+  );
+  updateWaitingUI();
+}
+
+function waitingId(){
+  return `ESP-${Date.now()}-${Math.random().toString(36).slice(2,7)}`;
+}
+
+function waitingStatusLabel(status){
+  return {
+    waiting:'En espera',
+    available:'Disponible',
+    contacted:'Contactado',
+    completed:'Atendido',
+    cancelled:'Cancelado'
+  }[status]||'En espera';
+}
+
+function waitingStatusClass(status){
+  return {
+    waiting:'waiting',
+    available:'available',
+    contacted:'contacted',
+    completed:'completed',
+    cancelled:'cancelled'
+  }[status]||'waiting';
+}
+
+function normalizeWaitingText(value){
+  return String(value||'')
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g,'');
+}
+
+function addWaitingCustomer(data){
+  const customer=String(data.customer||'').trim();
+  const phone=String(data.phone||'').trim();
+  const product=String(data.product||'').trim();
+  const quantity=Math.max(1,Number(data.quantity)||1);
+
+  if(!customer||!phone||!product){
+    showToast('Completa cliente, teléfono y producto.');
+    return false;
+  }
+
+  const keyCustomer=normalizeWaitingText(customer);
+  const keyPhone=String(phone).replace(/\D/g,'');
+  const keyProduct=normalizeWaitingText(product);
+  const duplicate=waitingCustomers.find(x=>
+    normalizeWaitingText(x.customer)===keyCustomer &&
+    String(x.phone||'').replace(/\D/g,'')===keyPhone &&
+    normalizeWaitingText(x.product)===keyProduct &&
+    x.status!=='cancelled' && x.status!=='completed'
+  );
+
+  if(duplicate){
+    duplicate.quantity=Math.max(1,Number(duplicate.quantity)||1)+quantity;
+    duplicate.updatedAt=new Date().toISOString();
+    if(data.notes)duplicate.notes=String(data.notes).trim();
+    saveWaitingCustomers();
+    showToast('Ya existía una solicitud igual. Se actualizó la cantidad.');
+    return true;
+  }
+
+  const now=new Date().toISOString();
+  waitingCustomers.unshift({
+    id:waitingId(),
+    customer,
+    phone,
+    product,
+    quantity,
+    notes:String(data.notes||'').trim(),
+    status:data.status||'waiting',
+    sourceOrder:String(data.sourceOrder||'').trim(),
+    createdAt:now,
+    updatedAt:now,
+    lastContactAt:null
+  });
+
+  saveWaitingCustomers();
+  showToast('⏳ Cliente añadido a la lista de espera.');
+  return true;
+}
+
+function openWaitingDialog(prefill={}){
+  if(!waitingDialog)return;
+  waitingCustomerInput.value=prefill.customer||'';
+  waitingPhoneInput.value=prefill.phone||'';
+  waitingProductInput.value=prefill.product||'';
+  waitingQuantityInput.value=Math.max(1,Number(prefill.quantity)||1);
+  waitingNotesInput.value=prefill.notes||'';
+  waitingSourceOrderInput.value=prefill.sourceOrder||'';
+  waitingStatusInput.value=prefill.status||'waiting';
+  waitingDialog.showModal();
+  setTimeout(()=>waitingCustomerInput.focus(),80);
+}
+
+function closeWaitingDialog(){
+  if(waitingDialog?.open)waitingDialog.close();
+}
+
+function resetWaitingFormForNext(){
+  if(!waitingForm)return;
+  waitingProductInput.value='';
+  waitingQuantityInput.value='1';
+  waitingNotesInput.value='';
+  waitingSourceOrderInput.value='';
+  waitingStatusInput.value='waiting';
+  waitingProductInput.focus();
+}
+
+function saveWaitingForm({keepOpen=false}={}){
+  const ok=addWaitingCustomer({
+    customer:waitingCustomerInput.value,
+    phone:waitingPhoneInput.value,
+    product:waitingProductInput.value,
+    quantity:waitingQuantityInput.value,
+    notes:waitingNotesInput.value,
+    status:'waiting',
+    sourceOrder:waitingSourceOrderInput.value
+  });
+
+  if(!ok)return false;
+
+  if(keepOpen){
+    resetWaitingFormForNext();
+    showToast('✅ Solicitud guardada. Puedes registrar otro producto.');
+  }else{
+    closeWaitingDialog();
+  }
+
+  return true;
+}
+
+function filteredWaitingCustomers(){
+  const q=normalizeWaitingText(waitingSearch?.value||'');
+  const status=waitingStatusFilter?.value||'all';
+  return waitingCustomers.filter(item=>{
+    if(status!=='all'&&item.status!==status)return false;
+    if(!q)return true;
+    return [item.customer,item.phone,item.product,item.notes]
+      .some(v=>normalizeWaitingText(v).includes(q));
+  });
+}
+
+function renderWaitingList(){
+  if(!waitingList)return;
+  const list=filteredWaitingCustomers();
+  waitingCount.textContent=`${list.length} ${list.length===1?'solicitud':'solicitudes'}`;
+  waitingEmpty.hidden=list.length>0;
+  waitingList.innerHTML=list.map(item=>`
+    <article class="waiting-card">
+      <div class="waiting-card-main">
+        <div class="waiting-card-top">
+          <div>
+            <strong>${escapeHTML(item.customer)}</strong>
+            <span>${escapeHTML(item.phone)}</span>
+          </div>
+          <span class="waiting-status ${waitingStatusClass(item.status)}">${waitingStatusLabel(item.status)}</span>
+        </div>
+        <div class="waiting-product">
+          <span>📦</span>
+          <div>
+            <strong>${escapeHTML(item.product)}</strong>
+            <small>${item.quantity} unidad${Number(item.quantity)===1?'':'es'} · ${escapeHTML(formatDate(item.createdAt))}</small>
+          </div>
+        </div>
+        ${item.notes?`<p class="waiting-notes">📝 ${escapeHTML(item.notes)}</p>`:''}
+      </div>
+      <div class="waiting-card-actions">
+        <button type="button" data-waiting-whatsapp="${escapeHTML(item.id)}">📲 WhatsApp</button>
+        <button type="button" data-waiting-status="${escapeHTML(item.id)}">🔄 Estado</button>
+        <button type="button" class="danger" data-waiting-delete="${escapeHTML(item.id)}">🗑️</button>
+      </div>
+    </article>
+  `).join('');
+
+  waitingList.querySelectorAll('[data-waiting-whatsapp]').forEach(btn=>{
+    btn.onclick=()=>contactWaitingCustomer(btn.dataset.waitingWhatsapp);
+  });
+  waitingList.querySelectorAll('[data-waiting-status]').forEach(btn=>{
+    btn.onclick=()=>cycleWaitingStatus(btn.dataset.waitingStatus);
+  });
+  waitingList.querySelectorAll('[data-waiting-delete]').forEach(btn=>{
+    btn.onclick=()=>deleteWaitingCustomer(btn.dataset.waitingDelete);
+  });
+}
+
+function updateWaitingUI(){
+  renderWaitingList();
+}
+
+function contactWaitingCustomer(id){
+  const item=waitingCustomers.find(x=>x.id===id);
+  if(!item)return;
+  const phone=normalizeCubanPhone(item.phone);
+  if(!phone)return showToast('El teléfono de este cliente no es válido.');
+  const message=`Hola ${item.customer}, le contactamos de PANACEA. Ya tenemos disponibilidad de *${item.product}*. Usted había solicitado *${item.quantity}* unidad${Number(item.quantity)===1?'':'es'}. Si aún está interesado, por favor confírmenos.`;
+  const encoded=encodeURIComponent(message);
+  window.open(`https://wa.me/${phone}?text=${encoded}`,'_blank','noopener');
+  item.status='contacted';
+  item.lastContactAt=new Date().toISOString();
+  item.updatedAt=item.lastContactAt;
+  saveWaitingCustomers();
+}
+
+function cycleWaitingStatus(id){
+  const item=waitingCustomers.find(x=>x.id===id);
+  if(!item)return;
+  const sequence=['waiting','available','contacted','completed'];
+  const index=sequence.indexOf(item.status);
+  item.status=sequence[(index+1+sequence.length)%sequence.length];
+  item.updatedAt=new Date().toISOString();
+  saveWaitingCustomers();
+  showToast(`Estado: ${waitingStatusLabel(item.status)}.`);
+}
+
+function deleteWaitingCustomer(id){
+  const item=waitingCustomers.find(x=>x.id===id);
+  if(!item)return;
+  if(!confirm(`¿Eliminar la solicitud de ${item.customer} para ${item.product}?`))return;
+  waitingCustomers=waitingCustomers.filter(x=>x.id!==id);
+  saveWaitingCustomers();
+  showToast('Solicitud eliminada.');
+}
+
+function addWaitingFromOrder(order,productIndex){
+  const product=(order.products||[])[productIndex];
+  if(!product)return;
+  openWaitingDialog({
+    customer:order.customer,
+    phone:order.phone,
+    product:product.name,
+    quantity:product.quantity,
+    sourceOrder:order.orderNumber
+  });
+}
+
+function addWaitingFromPendingOrder(order){
+  if(!order)return;
+  const product=(order.products||[])[0];
+  openWaitingDialog({
+    customer:order.customer,
+    phone:order.phone,
+    product:product?.name||'',
+    quantity:product?.quantity||1,
+    sourceOrder:order.orderNumber
+  });
+}
+
 function loadOrders(){
 
   try{
@@ -163,7 +446,7 @@ function loadOrders(){
 
 function saveOrders(){
   localStorage.setItem(ADMIN_STORAGE_KEY,JSON.stringify(orders));
-  localStorage.setItem(BACKUP_SNAPSHOT_KEY,JSON.stringify({updatedAt:new Date().toISOString(),orders}));
+  localStorage.setItem(BACKUP_SNAPSHOT_KEY,JSON.stringify({updatedAt:new Date().toISOString(),orders,waitingCustomers}));
   updateBackupUI();
 }
 
@@ -1574,10 +1857,10 @@ function parseFlexibleOrder(text){
  const t=String(text||'').replace(/\r/g,'');if(!t.trim())throw new Error('Pega primero el mensaje del pedido.');const customer=flexibleCustomer(t);if(!customer)throw new Error('No pude encontrar el nombre. Usa: Nombre: Juan Pérez');const phone=flexiblePhone(t);if(!phone)throw new Error('No pude encontrar el teléfono. Usa: Teléfono: 55059588');const section=flexibleProductsSection(t);if(!section)throw new Error('No encontré la sección Productos:.');const products=section.split('\n').map(parseFlexibleProductLine).filter(Boolean);if(!products.length)throw new Error('No pude interpretar ningún producto.');products.forEach(p=>{p.candidates=flexibleCandidates(p.name);if(p.candidates.length&&p.candidates[0]._score>=.82){const b=p.candidates[0];p.name=b.name;p.unitPrice=Number(b.unitPrice)||0;p.currency=b.currency||'CUP';p.total=p.quantity*p.unitPrice;p.matched=true;}else p.matched=false;});const totals={CUP:0,USD:0};products.forEach(p=>{const c=String(p.currency||'CUP').toUpperCase()==='USD'?'USD':'CUP';totals[c]+=Number(p.total)||0;});const now=new Date();return {orderNumber:nextOrderNumber(now),createdAt:now.toISOString(),week:getISOWeek(now),year:getISOYear(now),customer,phone,products,totals,status:'pending',source:'flexible',rawMessage:t};
 }
 function renderFlexiblePreview(){
- if(!pendingFlexibleOrder)return; flexiblePreview.innerHTML=`<div class="preview-header"><strong>Vista previa</strong><span>${escapeHTML(pendingFlexibleOrder.orderNumber)}</span></div><div class="preview-grid"><div><small>Cliente</small><strong>${escapeHTML(pendingFlexibleOrder.customer)}</strong></div><div><small>Teléfono</small><strong>${escapeHTML(pendingFlexibleOrder.phone)}</strong></div></div><div class="flexible-products-preview"><div class="flexible-preview-title">Productos</div>${pendingFlexibleOrder.products.map((p,i)=>{const cs=p.candidates||[];const st=p.matched?'✓ Coincidencia encontrada':(cs.length?'⚠ Revisar coincidencia':'⚠ Producto no encontrado en pedidos anteriores');return `<div class="flexible-product-row"><div class="flexible-product-main"><strong>${p.quantity} × ${escapeHTML(p.name)}</strong><small>${escapeHTML(p.presentation)} · ${st}</small></div>${cs.length&&!p.matched?`<select data-flex-product="${i}"><option value="">Usar texto escrito</option>${cs.map((c,j)=>`<option value="${j}">${escapeHTML(c.name)}</option>`).join('')}</select>`:''}</div>`;}).join('')}</div><div class="flexible-preview-note">El formato flexible no exige precios. Si no hay coincidencia previa, se conserva el nombre escrito y el total queda en 0 hasta completar la facturación.</div>`; flexiblePreview.querySelectorAll('[data-flex-product]').forEach(sel=>sel.addEventListener('change',()=>{const p=pendingFlexibleOrder.products[Number(sel.dataset.flexProduct)],c=(p.candidates||[])[Number(sel.value)];if(c){p.name=c.name;p.unitPrice=Number(c.unitPrice)||0;p.currency=c.currency||'CUP';p.total=p.quantity*p.unitPrice;p.matched=true;}else{p.matched=false;p.unitPrice=0;p.total=0;}renderFlexiblePreview();})); }
+ if(!pendingFlexibleOrder)return; flexiblePreview.innerHTML=`<div class="preview-header"><strong>Vista previa</strong><span>${escapeHTML(pendingFlexibleOrder.orderNumber)}</span></div><div class="preview-grid"><div><small>Cliente</small><strong>${escapeHTML(pendingFlexibleOrder.customer)}</strong></div><div><small>Teléfono</small><strong>${escapeHTML(pendingFlexibleOrder.phone)}</strong></div></div><div class="flexible-products-preview"><div class="flexible-preview-title">Productos</div>${pendingFlexibleOrder.products.map((p,i)=>{const cs=p.candidates||[];const st=p.matched?'✓ Coincidencia encontrada':(cs.length?'⚠ Revisar coincidencia':'⚠ Producto no encontrado en pedidos anteriores');return `<div class="flexible-product-row"><div class="flexible-product-main"><strong>${p.quantity} × ${escapeHTML(p.name)}</strong><small>${escapeHTML(p.presentation)} · ${st}</small></div>${cs.length&&!p.matched?`<select data-flex-product="${i}"><option value="">Usar texto escrito</option>${cs.map((c,j)=>`<option value="${j}">${escapeHTML(c.name)}</option>`).join('')}</select>`:''}</div>`;}).join('')}</div><div class="flexible-preview-note">El formato flexible no exige precios. Si no hay coincidencia previa, se conserva el nombre escrito y el total queda en 0 hasta completar la facturación.</div><button type="button" class="waiting-preview-btn" id="addWaitingFromFlexibleBtn">⏳ Añadir a lista de espera</button>`; flexiblePreview.querySelectorAll('[data-flex-product]').forEach(sel=>sel.addEventListener('change',()=>{const p=pendingFlexibleOrder.products[Number(sel.dataset.flexProduct)],c=(p.candidates||[])[Number(sel.value)];if(c){p.name=c.name;p.unitPrice=Number(c.unitPrice)||0;p.currency=c.currency||'CUP';p.total=p.quantity*p.unitPrice;p.matched=true;}else{p.matched=false;p.unitPrice=0;p.total=0;}renderFlexiblePreview();})); }
 function openFlexibleImport(){flexibleMessage.value='';flexiblePreview.hidden=true;flexibleError.hidden=true;saveFlexibleBtn.hidden=true;previewFlexibleBtn.hidden=false;pendingFlexibleOrder=null;flexibleDialog.showModal();setTimeout(()=>flexibleMessage.focus(),100);}
 function closeFlexibleImport(){if(flexibleDialog.open)flexibleDialog.close();}
-function previewFlexibleImport(){flexibleError.hidden=true;try{pendingFlexibleOrder=parseFlexibleOrder(flexibleMessage.value);renderFlexiblePreview();flexiblePreview.hidden=false;saveFlexibleBtn.hidden=false;previewFlexibleBtn.hidden=true;}catch(e){pendingFlexibleOrder=null;flexiblePreview.hidden=true;saveFlexibleBtn.hidden=true;previewFlexibleBtn.hidden=false;flexibleError.textContent=e.message;flexibleError.hidden=false;}}
+function previewFlexibleImport(){flexibleError.hidden=true;try{pendingFlexibleOrder=parseFlexibleOrder(flexibleMessage.value);renderFlexiblePreview();flexiblePreview.hidden=false;saveFlexibleBtn.hidden=false;previewFlexibleBtn.hidden=true;const b=document.getElementById('addWaitingFromFlexibleBtn');if(b)b.onclick=()=>addWaitingFromPendingOrder(pendingFlexibleOrder);}catch(e){pendingFlexibleOrder=null;flexiblePreview.hidden=true;saveFlexibleBtn.hidden=true;previewFlexibleBtn.hidden=false;flexibleError.textContent=e.message;flexibleError.hidden=false;}}
 function createFlexibleOrder(){if(!pendingFlexibleOrder)return;const d=orders.find(o=>o.rawMessage===pendingFlexibleOrder.rawMessage);if(d){flexibleError.textContent=`Este pedido ya fue importado como ${d.orderNumber}.`;flexibleError.hidden=false;return;}orders.unshift(pendingFlexibleOrder);saveOrders();closeFlexibleImport();renderAll();showToast(`Pedido ${pendingFlexibleOrder.orderNumber} creado correctamente.`);pendingFlexibleOrder=null;}
 
 function openImport(){
@@ -1938,6 +2221,9 @@ function previewImport(){
         pendingParsedOrder.totals
       );
 
+    const waitingPreviewBtn=document.getElementById('addWaitingFromImportBtn');
+    if(waitingPreviewBtn)waitingPreviewBtn.onclick=()=>addWaitingFromPendingOrder(pendingParsedOrder);
+
 
   }catch(e){
 
@@ -2211,6 +2497,7 @@ function renderAll(){
 
   renderOrders();
 
+  renderWaitingList();
   updateCalendarActiveText();
 }
 
@@ -2563,6 +2850,17 @@ function openOrderEditor(orderNumber){
 
         </div>
 
+        <div class="waiting-from-order-box">
+          <strong>⏳ ¿Algún producto está agotado?</strong>
+          <span>Añádelo a la lista de espera del cliente con un clic.</span>
+          <div class="waiting-from-order-products">
+            ${(editableOrder.products||[]).map((product,index)=>`
+              <button type="button" data-add-waiting-product="${index}">
+                ⏳ ${escapeHTML(product.name||`Producto ${index+1}`)} · ${Number(product.quantity)||1}
+              </button>
+            `).join('')}
+          </div>
+        </div>
 
         <div
           class="order-editor-total-preview"
@@ -2979,6 +3277,17 @@ function openOrderEditor(orderNumber){
 
         }
       );
+
+
+    orderDetail
+      .querySelectorAll('[data-add-waiting-product]')
+      .forEach(button=>{
+        button.addEventListener('click',()=>{
+          const editableOrder=orders.find(o=>o.orderNumber===orderNumber);
+          if(!editableOrder)return;
+          addWaitingFromOrder(editableOrder,Number(button.dataset.addWaitingProduct));
+        });
+      });
 
 
     orderDetail
@@ -3436,6 +3745,14 @@ function openOrder(orderNumber){
 
         <button
           type="button"
+          data-add-waiting-order="${o.orderNumber}"
+        >
+          ⏳ Añadir a lista de espera
+        </button>
+
+
+        <button
+          type="button"
           data-copy-order="${o.orderNumber}"
         >
           📋 Copiar pedido
@@ -3499,6 +3816,11 @@ function openOrder(orderNumber){
       );
 
     });
+
+
+  orderDetail
+    .querySelector('[data-add-waiting-order]')
+    ?.addEventListener('click',()=>addWaitingFromOrder(o,0));
 
 
   orderDetail
@@ -4642,7 +4964,7 @@ function loadBackupMeta(){try{return JSON.parse(localStorage.getItem(BACKUP_META
 function updateBackupUI(){const m=loadBackupMeta(),l=document.getElementById('lastBackupDate'),c=document.getElementById('ordersSinceBackup'),s=document.getElementById('backupStatus');if(!l)return;const n=Math.max(0,orders.length-(m.lastBackupOrderCount||0));l.textContent=m.lastBackupDate?formatDate(m.lastBackupDate):'Nunca';c.textContent=n;s.textContent=!m.lastBackupDate?'Aún no has creado una copia externa':n?'Tienes cambios sin respaldar':'Todos los cambios están respaldados'}
 function downloadBlob(b,n){const u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=n;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),1000)}
 function stamp(){const d=new Date(),p=n=>String(n).padStart(2,'0');return`${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}_${p(d.getHours())}-${p(d.getMinutes())}`}
-function exportOrdersJSON(){const d=new Date().toISOString();downloadBlob(new Blob([JSON.stringify({app:'PANACEA',type:'orders-backup',version:1,exportedAt:d,totalOrders:orders.length,orders},null,2)],{type:'application/json'}),`panacea_respaldo_${stamp()}.json`);localStorage.setItem(BACKUP_META_KEY,JSON.stringify({lastBackupDate:d,lastBackupOrderCount:orders.length}));updateBackupUI();showToast(`✅ Respaldo creado correctamente. ${orders.length} pedidos guardados.`)}
+function exportOrdersJSON(){const d=new Date().toISOString();downloadBlob(new Blob([JSON.stringify({app:'PANACEA',type:'orders-backup',version:2,exportedAt:d,totalOrders:orders.length,totalWaitingCustomers:waitingCustomers.length,orders,waitingCustomers},null,2)],{type:'application/json'}),`panacea_respaldo_${stamp()}.json`);localStorage.setItem(BACKUP_META_KEY,JSON.stringify({lastBackupDate:d,lastBackupOrderCount:orders.length}));updateBackupUI();showToast(`✅ Respaldo creado correctamente. ${orders.length} pedidos y ${waitingCustomers.length} solicitudes en espera guardados.`)}
 /* CARGAR LIBRERÍA EXCEL */
 function loadXLSX(){
   return new Promise((resolve,reject)=>{
@@ -5040,6 +5362,7 @@ function renderRestoreSummary(){
         <p><span>🟢 Pedidos nuevos</span><b>${analysis.newOrders.length}</b></p>
         <p><span>🟡 Ya existentes e iguales</span><b>${analysis.equalOrders.length}</b></p>
         <p><span>🟠 Existentes con cambios</span><b>${changed}</b></p>
+        <p><span>⏳ Clientes en espera</span><b>${analysis.backupWaitingCustomers?.length||0}</b></p>
       </div>
     </div>
 
@@ -5203,6 +5526,24 @@ function finishRestore(){
   const kept=analysis.changedOrders.length-replaced;
 
   orders=restoredOrders;
+
+  if(analysis.backupWaitingCustomers?.length){
+    const currentWaitingById=new Map(
+      waitingCustomers.map(item=>[String(item.id),item])
+    );
+    analysis.backupWaitingCustomers.forEach(item=>{
+      if(!item||!item.id)return;
+      const current=currentWaitingById.get(String(item.id));
+      if(!current){
+        waitingCustomers.push(item);
+      }else if(new Date(item.updatedAt||item.createdAt||0)>new Date(current.updatedAt||current.createdAt||0)){
+        const index=waitingCustomers.findIndex(x=>String(x.id)===String(item.id));
+        if(index!==-1)waitingCustomers[index]=item;
+      }
+    });
+    saveWaitingCustomers();
+  }
+
   saveOrders();
   renderAll();
   closeRestoreDialog();
@@ -5261,6 +5602,7 @@ function handleRestoreFile(file){
     try{
       const parsed=JSON.parse(reader.result);
       const backupOrders=Array.isArray(parsed)?parsed:parsed.orders;
+      const backupWaitingCustomers=Array.isArray(parsed?.waitingCustomers)?parsed.waitingCustomers:[];
 
       if(!Array.isArray(backupOrders))throw Error();
 
@@ -5289,6 +5631,7 @@ function handleRestoreFile(file){
         }
       });
 
+      analysis.backupWaitingCustomers=backupWaitingCustomers;
       renderRestoreAnalysis(analysis);
 
     }catch(error){
@@ -5424,6 +5767,21 @@ function showToast(m){
 /* ==========================================
    EVENTOS
 ========================================== */
+
+if(waitingForm){
+  waitingForm.addEventListener('submit',e=>{
+    e.preventDefault();
+    saveWaitingForm();
+  });
+}
+
+document.getElementById('closeWaitingBtn')?.addEventListener('click',closeWaitingDialog);
+document.getElementById('cancelWaitingBtn')?.addEventListener('click',closeWaitingDialog);
+document.getElementById('saveAndNewWaitingBtn')?.addEventListener('click',()=>saveWaitingForm({keepOpen:true}));
+document.getElementById('openWaitingBtn')?.addEventListener('click',()=>openWaitingDialog());
+document.getElementById('waitingHeaderToggle')?.addEventListener('click',()=>document.getElementById('clientesEnEspera')?.scrollIntoView({behavior:'smooth',block:'start'}));
+waitingSearch?.addEventListener('input',renderWaitingList);
+waitingStatusFilter?.addEventListener('change',renderWaitingList);
 
 document
   .getElementById('openImportBtn')

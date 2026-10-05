@@ -226,6 +226,18 @@
 
         <button
           type="button"
+          class="backup-toggle waiting-toggle"
+          id="waitingHeaderToggle"
+          aria-label="Ir a clientes en espera"
+          title="Clientes en espera"
+        >
+          ⏳
+          <span>En espera</span>
+        </button>
+
+
+        <button
+          type="button"
           class="backup-toggle"
           id="backupToggle"
           aria-label="Ir a la sección de respaldos"
@@ -540,6 +552,65 @@
 
 
     <!-- ==========================================
+         CLIENTES EN ESPERA
+         ========================================== -->
+
+    <section
+      class="admin-container waiting-section"
+      id="clientesEnEspera"
+    >
+
+      <div class="waiting-card-shell">
+
+        <div class="waiting-heading">
+          <div>
+            <p class="admin-eyebrow">SEGUIMIENTO COMERCIAL</p>
+            <h2>Clientes en espera</h2>
+            <p class="waiting-heading-description">
+              Registra clientes interesados en productos sin existencia y contáctalos cuando vuelva la disponibilidad.
+            </p>
+          </div>
+
+          <button type="button" class="admin-primary-btn" id="openWaitingBtn">
+            ＋ Nueva solicitud
+          </button>
+        </div>
+
+        <div class="waiting-toolbar">
+          <div class="admin-search">
+            <span>⌕</span>
+            <input type="search" id="waitingSearch" placeholder="Buscar cliente, teléfono o producto..." autocomplete="off">
+          </div>
+          <select id="waitingStatusFilter" class="waiting-status-filter">
+            <option value="all">Todos los estados</option>
+            <option value="waiting">En espera</option>
+            <option value="available">Disponible</option>
+            <option value="contacted">Contactado</option>
+            <option value="completed">Atendido</option>
+            <option value="cancelled">Cancelado</option>
+          </select>
+        </div>
+
+        <div class="waiting-list-heading">
+          <h3>Solicitudes</h3>
+          <span id="waitingCount">0 solicitudes</span>
+        </div>
+
+        <div id="waitingList" class="waiting-list"></div>
+
+        <div id="waitingEmpty" class="waiting-empty" hidden>
+          <div>⏳</div>
+          <h3>No hay clientes en espera</h3>
+          <p>Puedes registrar directamente los datos del cliente y del producto que está esperando. Si ya existe un pedido, también puedes añadirlo desde el pedido con un clic.</p>
+          <button type="button" class="admin-secondary-btn" id="waitingEmptyBtn" onclick="openWaitingDialog()">＋ Crear solicitud</button>
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ==========================================
          SEGURIDAD / RESPALDOS
          ========================================== -->
 
@@ -837,6 +908,8 @@
 
         </div>
 
+        <button type="button" class="waiting-preview-btn" id="addWaitingFromImportBtn">⏳ Añadir producto a lista de espera</button>
+
       </div>
 
 
@@ -940,6 +1013,45 @@
 
 
   <!-- ==========================================
+       MODAL CLIENTE EN ESPERA
+       ========================================== -->
+
+  <dialog id="waitingDialog" class="admin-dialog waiting-dialog">
+    <form method="dialog" id="waitingForm">
+      <button type="button" class="dialog-x" id="closeWaitingBtn" aria-label="Cerrar">×</button>
+      <p class="admin-eyebrow">SEGUIMIENTO COMERCIAL</p>
+      <h2>Añadir cliente a espera</h2>
+      <p class="dialog-description">Registra el producto que el cliente quiere recibir cuando vuelva a estar disponible.</p>
+
+      <input type="hidden" id="waitingSourceOrder">
+
+      <label for="waitingCustomer">Cliente</label>
+      <input type="text" id="waitingCustomer" required autocomplete="name">
+
+      <label for="waitingPhone">Teléfono</label>
+      <input type="tel" id="waitingPhone" required autocomplete="tel">
+
+      <label for="waitingProduct">Producto</label>
+      <input type="text" id="waitingProduct" required>
+
+      <label for="waitingQuantity">Cantidad</label>
+      <input type="number" id="waitingQuantity" min="1" step="1" value="1" required>
+
+      <label for="waitingNotes">Observaciones</label>
+      <textarea id="waitingNotes" rows="3" placeholder="Opcional"></textarea>
+
+      <input type="hidden" id="waitingStatus" value="waiting">
+
+      <div class="dialog-actions waiting-dialog-actions">
+        <button type="button" class="admin-secondary-btn" id="cancelWaitingBtn">Cancelar</button>
+        <button type="button" class="admin-secondary-btn" id="saveAndNewWaitingBtn">Guardar y agregar otra</button>
+        <button type="submit" class="admin-primary-btn">✓ Guardar solicitud</button>
+      </div>
+    </form>
+  </dialog>
+
+
+  <!-- ==========================================
        MODAL RESTAURAR PEDIDOS
        ========================================== -->
 
@@ -1037,7 +1149,7 @@
        JAVASCRIPT
        ========================================== -->
 
-  <script src="admin.js?v=6"></script>
+  <script src="admin.js?v=7"></script>
 
 </body>
 </html>
