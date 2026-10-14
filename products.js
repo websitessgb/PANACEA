@@ -20,8 +20,8 @@ const PRODUCTS = [
     price: 38500,
     currency: 'CUP',
     priceLabel: 'por saco',
-    availability: 'unlimited', 
-    stock: null,
+    availability: 'out', 
+    stock: 0,
     image: 'assets/products/reposteria-panaderia/nucleo-1.jpg',
     description: ''
   },
