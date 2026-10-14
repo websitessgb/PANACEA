@@ -203,8 +203,8 @@ const PRODUCTS = [
     price: 101000,
     currency: 'CUP',
     priceLabel: 'por cubeta',
-    availability: 'out',
-    stock: 0,
+    availability: 'unlimited',
+    stock: null,
     image: 'assets/products/reposteria-panaderia/redolmy.jpg',
     description: ''
   },
@@ -398,8 +398,8 @@ const PRODUCTS = [
     price: 24,
     currency: 'USD',
     priceLabel: 'por caja',
-    availability: 'unlimited',
-    stock: null,
+    availability: 'out',
+    stock:0,
     image: 'assets/products/ferreteria/losa-portofino-polish.jpg',
     description: 'Medidas 60x120cm'
   },
@@ -411,8 +411,8 @@ const PRODUCTS = [
     price: 24,
     currency: 'USD',
     priceLabel: 'por caja',
-    availability: 'unlimited',
-    stock: null,
+    availability: 'out',
+    stock: 0,
     image: 'assets/products/ferreteria/losa-vanity-silver.jpg',
     description: 'Medidas 60x120cm'
   },
@@ -424,8 +424,8 @@ const PRODUCTS = [
     price: 24,
     currency: 'USD',
     priceLabel: 'por caja',
-    availability: 'unlimited',
-    stock: null,
+    availability: 'out',
+    stock:0,
     image: 'assets/products/ferreteria/losa-acron-grey.jpg',
     description: 'Medidas 60x120cm'
   },
@@ -437,8 +437,8 @@ const PRODUCTS = [
     price: 24,
     currency: 'USD',
     priceLabel: 'por caja',
-    availability: 'unlimited',
-    stock: null,
+    availability: 'out',
+    stock: 0,
     image: 'assets/products/ferreteria/losa-mainstream-sand-polish.jpg',
     description: 'Medidas 60x120cm'
   },
@@ -450,8 +450,8 @@ const PRODUCTS = [
     price: 24,
     currency: 'USD',
     priceLabel: 'por caja',
-    availability: 'unlimited',
-    stock: null,
+    availability: 'out',
+    stock: 0,
     image: 'assets/products/ferreteria/losa-denali-ash-polished.jpg',
     description: 'Medidas 60x60cm'
   },
@@ -463,8 +463,8 @@ const PRODUCTS = [
     price: 24,
     currency: 'USD',
     priceLabel: 'por caja',
-    availability: 'unlimited',
-    stock: null,
+    availability: 'out',
+    stock: 0,
     image: 'assets/products/ferreteria/losa-meek-pearl-pulida.jpg',
     description: 'Medidas 60x60cm'
   }
