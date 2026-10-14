@@ -73,8 +73,8 @@ const PRODUCTS = [
     price: 95500,
     currency: 'CUP',
     priceLabel: 'por caja',
-    availability: 'unlimited',
-    stock: null,
+    availability: 'out',
+    stock: 0,
     image: 'assets/products/reposteria-panaderia/blanco-negro.jpg',
     description: 'Solo disponible cobertura sucedáneo con leche.'
   },
