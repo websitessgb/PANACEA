@@ -231,7 +231,7 @@ const PRODUCTS = [
     priceLabel: 'por caja',
     availability: 'unlimited',
     stock: null,
-    image: 'assets/products/reposteria-panaderia/levadura.jpg',
+    image: 'assets/products/reposteria-panaderia/levadura_fabao.jpg',
     description: 'Levadura seca instantánea, presentación Pack 500 gr'
   },
   {
