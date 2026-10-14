@@ -151,8 +151,8 @@ const PRODUCTS = [
     price: 4050,
     currency: 'CUP',
     priceLabel: 'por caja',
-    availability: 'unlimited',
-    stock: null,
+    availability: 'out',
+    stock: 0,
     image: 'assets/products/reposteria-panaderia/nata-crem-pat-1.jpg',
     description: 'Nata vegetal Crem Pat, presentación 1 L.'
   },
@@ -164,8 +164,8 @@ const PRODUCTS = [
     price: 4250,
     currency: 'CUP',
     priceLabel: 'por caja',
-    availability: 'unlimited',
-    stock: null,
+    availability: 'out',
+    stock: 0,
     image: 'assets/products/reposteria-panaderia/nata-hole-1.jpg',
     description: 'Nata vegetal Hole, presentación 1 L.'
   },
@@ -177,8 +177,8 @@ const PRODUCTS = [
     price: 4350,
     currency: 'CUP',
     priceLabel: 'por caja',
-    availability: 'unlimited',
-    stock: null,
+    availability: 'out',
+    stock: 0,
     image: 'assets/products/reposteria-panaderia/nata-hulala-1.jpg',
     description: 'Nata vegetal Hulalá, presentación 1 L.'
   },
