@@ -226,7 +226,7 @@ const PRODUCTS = [
     name: 'Levadura seca instantánea Fabao',
     category: 'reposteria-panaderia',
     presentation: 'Caja de 20 unidades',
-    price: 45500,
+    price: 50000,
     currency: 'CUP',
     priceLabel: 'por caja',
     availability: 'unlimited',
