@@ -9,7 +9,7 @@ const PRODUCTS = [
     priceLabel: 'por pack',
     availability: 'unlimited',
     stock: null,
-    image: 'assets/products/otros/bolsa.jpg',
+    image: 'assets/products/otros/Bolsas.jpg',
     description: 'Material HDPE, material virgen no reciclado.'
   },
   {
@@ -127,7 +127,7 @@ const PRODUCTS = [
     priceLabel: 'por caja',
     availability: 'unlimited',
     stock: null,
-    image: 'assets/products/reposteria-panaderia/costa-brava.jpg',
+    image: 'assets/products/reposteria-panaderia/Costa-Brava.jpg',
     description: ''
   },
   {
