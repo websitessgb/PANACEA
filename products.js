@@ -192,7 +192,7 @@ const PRODUCTS = [
     priceLabel: 'por cubeta',
     availability: 'unlimited',
     stock: null,
-    image: 'assets/products/reposteria-panaderia/supernortemul-1.jpg',
+    image: 'assets/products/reposteria-panaderia/supernortemul.jpg',
     description: ''
   },
   {
