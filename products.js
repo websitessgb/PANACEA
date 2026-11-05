@@ -49,7 +49,7 @@ const PRODUCTS = [
     priceLabel: 'por caja',
     availability: 'unlimited',
     stock: null,
-    image: 'assets/products/reposteria-panaderia/Polvo-hornear.jpg',
+    image: 'assets/products/reposteria-panaderia/polvo-hornear.jpg',
     description: ''
   },
   {
