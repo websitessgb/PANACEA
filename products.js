@@ -9,7 +9,7 @@ const PRODUCTS = [
     priceLabel: 'por pack',
     availability: 'unlimited',
     stock: null,
-    image: 'assets/products/otros/Bolsas.jpg',
+    image: 'assets/products/otros/Bolsas_nylon.jpg',
     description: 'Material HDPE, material virgen no reciclado.'
   },
   {
