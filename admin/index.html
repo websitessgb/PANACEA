@@ -248,6 +248,14 @@
         </button>
 
 
+        <a
+          href="catalogo.html"
+          class="admin-public-link"
+          style="background:#315b43;color:#fff;border-color:#315b43"
+        >
+          🛍️ Gestionar catálogo
+        </a>
+
         <!-- ==========================================
              ENLACE A PÁGINA PÚBLICA
              ========================================== -->
@@ -968,20 +976,34 @@
 
       <h2>Nuevo pedido</h2>
 
-      <p class="dialog-description">Pega un mensaje sencillo. PANACEA reconocerá nombre, teléfono, cantidades, unidades y productos sin exigir el formato habitual.</p>
+      <p class="dialog-description">Completa los datos del cliente y agrega los productos del pedido en los campos correspondientes.</p>
 
-      <div class="flexible-guide">
-        <strong>Formato recomendado</strong>
-        <span>Nombre: Nombre del cliente</span>
-        <span>Teléfono: No. de teléfono</span>
-        <span>Productos:</span>
-        <span>[Cantidad] [Unidad] de [Producto]</span>
-        <span>[Producto] x [Cantidad]</span>
-        <span>[Cantidad] [Nombre del producto]</span>
+      <div class="flexible-form-grid">
+        <label>Nombre del cliente
+          <input id="flexibleCustomerInput" type="text" placeholder="Nombre y apellidos" autocomplete="name" required>
+        </label>
+        <label>Teléfono
+          <input id="flexiblePhoneInput" type="tel" placeholder="Número de contacto" autocomplete="tel" required>
+        </label>
       </div>
 
-      <label for="flexibleMessage">Mensaje del pedido</label>
-      <textarea id="flexibleMessage" rows="10" placeholder="Escribe aquí el mensaje completo del pedido, manteniendo el formato que se muestra arriba ☝️..." spellcheck="false" required></textarea>
+      <div class="flexible-form-grid flexible-rate-grid">
+        <label>Valor de El Toque (CUP por USD)
+          <input id="flexibleToqueInput" type="number" min="0.0001" step="any" placeholder="Ej. 450" required>
+        </label>
+        <label>Factor adicional (CUP)
+          <input id="flexibleFactorInput" type="number" step="any" value="0" required>
+        </label>
+      </div>
+      <p class="flexible-rate-help">El precio USD se calcula automáticamente: precio CUP ÷ (valor de El Toque + factor).</p>
+      <div class="flexible-items-heading">
+        <div><strong>Productos del pedido</strong><small>Indica producto, cantidad, presentación y precio en CUP.</small></div>
+        <button type="button" class="admin-secondary-btn" id="addFlexibleProductBtn">＋ Añadir producto</button>
+      </div>
+      <div id="flexibleProductFields" class="flexible-product-fields"></div>
+      <label class="flexible-notes-label">Observaciones (opcional)
+        <textarea id="flexibleNotesInput" rows="2" placeholder="Detalles adicionales del pedido..."></textarea>
+      </label>
 
       <div id="flexibleError" class="parse-error" hidden></div>
 

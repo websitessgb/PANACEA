@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PANACEA · Gestión de catálogo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
+<link rel="stylesheet" href="catalogo.css">
+</head>
+<body>
+<header class="cm-header">
+  <a class="cm-brand" href="../index.html"><span class="cm-mark">P</span><span>PANACEA<small>GESTIÓN DE CATÁLOGO</small></span></a>
+  <nav><a href="index.html">← Administración</a><a href="../index.html" target="_blank" rel="noopener">Ver tienda ↗</a></nav>
+</header>
+<main class="cm-wrap">
+  <section class="cm-intro">
+    <div><p class="cm-eyebrow">HERRAMIENTA DE ACTUALIZACIÓN</p><h1>Catálogo de productos</h1>
+    <p>Actualiza precios, disponibilidad e imágenes desde una sola pantalla. Revisa los cambios y publícalos en GitHub cuando estés listo.</p></div>
+    <div class="cm-count"><strong id="productCount">—</strong><span>productos cargados</span></div>
+  </section>
+
+  <section class="cm-publish">
+    <div class="cm-publish-head"><div><h2>Publicar cambios en GitHub</h2><p>El sitio se actualizará automáticamente después de confirmar la publicación.</p></div><span class="cm-status" id="connectionStatus">Sin publicar</span></div>
+    <div class="cm-github-grid">
+      <label>Repositorio<input id="repoName" value="websitessgb/PANACEA" autocomplete="off"></label>
+      <label>Rama<input id="branchName" value="main" autocomplete="off"></label>
+      <label class="cm-token-field">Token de acceso de GitHub<input id="githubToken" type="password" placeholder="Pega aquí tu token temporal" autocomplete="off"><small>Se usa solo en esta sesión; no se guarda en el sitio.</small></label>
+    </div>
+    <div class="cm-security">🔒 Usa un Fine-grained Personal Access Token limitado a este repositorio, con permiso <b>Contents: Read and write</b>. No compartas el token ni lo incluyas en archivos.</div>
+  </section>
+
+  <section class="cm-add-panel">
+    <div class="cm-add-head"><div><h2>＋ Agregar nuevo producto</h2><p>Completa los datos y selecciona una fotografía. El producto se incorporará al catálogo al publicar.</p></div></div>
+    <div class="cm-add-grid">
+      <label>Nombre del producto<input id="newName" type="text" maxlength="100" placeholder="Ej. Levadura seca"></label>
+      <label>Identificador (ID)<input id="newId" type="text" maxlength="60" placeholder="Se genera automáticamente si lo dejas vacío"></label>
+      <label>Categoría<select id="newCategory"><option value="reposteria-panaderia">Repostería y Panadería</option><option value="aseo">Aseo y Limpieza</option><option value="ferreteria">Ferretería</option><option value="otros">Otros</option></select></label>
+      <label>Presentación<input id="newPresentation" type="text" maxlength="120" placeholder="Ej. Caja de 10 kg"></label>
+      <label>Precio<input id="newPrice" type="number" min="0" step="any" placeholder="0"></label>
+      <label>Moneda<select id="newCurrency"><option value="CUP">CUP</option><option value="USD">USD</option></select></label>
+      <label>Texto del precio<input id="newPriceLabel" type="text" maxlength="50" placeholder="por unidad, por caja..."></label>
+      <label>Disponibilidad<select id="newAvailability"><option value="unlimited">Disponible</option><option value="limited">Existencias limitadas</option><option value="out">Agotado</option></select></label>
+      <label class="cm-new-description">Descripción<textarea id="newDescription" rows="2" maxlength="500" placeholder="Información adicional del producto (opcional)"></textarea></label>
+      <label class="cm-new-image">Fotografía del producto <input id="newImage" type="file" accept="image/jpeg,image/png,image/webp"><small>JPG, PNG o WEBP · máximo 8 MB · obligatoria</small></label>
+    </div>
+    <button class="cm-btn cm-btn-primary" id="addProductBtn" type="button">＋ Añadir al catálogo</button>
+  </section>
+
+  <section class="cm-tools">
+    <div class="cm-search"><span>⌕</span><input id="searchProducts" type="search" placeholder="Buscar por nombre o ID..."></div>
+    <select id="categoryFilter" aria-label="Filtrar categoría"><option value="">Todas las categorías</option><option value="reposteria-panaderia">Repostería y Panadería</option><option value="aseo">Aseo y Limpieza</option><option value="ferreteria">Ferretería</option><option value="otros">Otros</option></select>
+    <select id="availabilityFilter" aria-label="Filtrar disponibilidad"><option value="">Cualquier disponibilidad</option><option value="unlimited">Disponible</option><option value="limited">Existencias limitadas</option><option value="out">Agotado</option></select>
+    <button class="cm-btn cm-btn-light" id="exportCsvBtn">↓ Exportar Excel/CSV</button>
+    <label class="cm-btn cm-btn-light cm-file-btn">↑ Importar CSV<input id="importCsvInput" type="file" accept=".csv,text/csv"></label>
+  </section>
+
+  <section class="cm-bulk" id="bulkPanel">
+    <div><b><span id="selectedCount">0</span> seleccionados</b><small>Aplica un ajuste de precio a todos los productos seleccionados.</small></div>
+    <select id="bulkOperation"><option value="percent">Aumentar/disminuir %</option><option value="fixed">Sumar/restar importe</option></select>
+    <input id="bulkAmount" type="number" step="any" placeholder="Ej. 5 o -5">
+    <button class="cm-btn cm-btn-primary" id="applyBulkBtn">Aplicar ajuste</button>
+    <button class="cm-btn cm-btn-light" id="clearSelectionBtn">Quitar selección</button>
+  </section>
+
+  <div class="cm-table-wrap">
+    <table class="cm-table">
+      <thead><tr><th><input type="checkbox" id="selectAll" aria-label="Seleccionar todos"></th><th>Producto</th><th>Precio</th><th>Moneda</th><th>Disponibilidad</th><th>Imagen</th><th>Acciones</th></tr></thead>
+      <tbody id="productsBody"><tr><td colspan="7" class="cm-loading">Cargando catálogo…</td></tr></tbody>
+    </table>
+  </div>
+  <div class="cm-bottom"><span id="changeSummary">Sin cambios pendientes.</span><button class="cm-btn cm-btn-primary cm-publish-btn" id="publishBtn" disabled>✓ Revisar y publicar cambios</button></div>
+  <div class="cm-message" id="messageBox" role="status" aria-live="polite" hidden></div>
+  <section class="cm-help"><h2>Cómo usarlo</h2><ol><li>Edita directamente los precios, moneda o disponibilidad en la tabla.</li><li>Para cambiar una fotografía, pulsa <b>Reemplazar imagen</b> en la fila del producto. Se subirá a su carpeta de categoría.</li><li>También puedes exportar el catálogo a CSV, modificar muchos precios en Excel y volver a importarlo. Conserva la columna <b>id</b> para identificar cada producto.</li><li>Cuando termines, introduce tu token de GitHub y pulsa <b>Revisar y publicar cambios</b>. Se mostrará un resumen antes de enviar los cambios al repositorio.</li></ol><p><b>Consejo:</b> antes de una actualización grande, descarga una copia CSV del catálogo actual.</p></section>
+</main>
+<script src="../products.js"></script>
+<script src="catalogo.js"></script>
+</body></html>

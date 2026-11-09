@@ -42,7 +42,12 @@ importDialog=document.getElementById('importDialog'),
 flexibleDialog=document.getElementById('flexibleDialog'),
 orderDialog=document.getElementById('orderDialog'),
 whatsappMessage=document.getElementById('whatsappMessage'),
-flexibleMessage=document.getElementById('flexibleMessage'),
+flexibleCustomerInput=document.getElementById('flexibleCustomerInput'),
+flexiblePhoneInput=document.getElementById('flexiblePhoneInput'),
+flexibleProductFields=document.getElementById('flexibleProductFields'),
+flexibleNotesInput=document.getElementById('flexibleNotesInput'),
+flexibleToqueInput=document.getElementById('flexibleToqueInput'),
+flexibleFactorInput=document.getElementById('flexibleFactorInput'),
 importPreview=document.getElementById('importPreview'),
 flexiblePreview=document.getElementById('flexiblePreview'),
 parseError=document.getElementById('parseError'),
@@ -1857,10 +1862,41 @@ function parseFlexibleOrder(text){
  const t=String(text||'').replace(/\r/g,'');if(!t.trim())throw new Error('Pega primero el mensaje del pedido.');const customer=flexibleCustomer(t);if(!customer)throw new Error('No pude encontrar el nombre. Usa: Nombre: Juan Pérez');const phone=flexiblePhone(t);if(!phone)throw new Error('No pude encontrar el teléfono. Usa: Teléfono: 55059588');const section=flexibleProductsSection(t);if(!section)throw new Error('No encontré la sección Productos:.');const products=section.split('\n').map(parseFlexibleProductLine).filter(Boolean);if(!products.length)throw new Error('No pude interpretar ningún producto.');products.forEach(p=>{p.candidates=flexibleCandidates(p.name);if(p.candidates.length&&p.candidates[0]._score>=.82){const b=p.candidates[0];p.name=b.name;p.unitPrice=Number(b.unitPrice)||0;p.currency=b.currency||'CUP';p.total=p.quantity*p.unitPrice;p.matched=true;}else p.matched=false;});const totals={CUP:0,USD:0};products.forEach(p=>{const c=String(p.currency||'CUP').toUpperCase()==='USD'?'USD':'CUP';totals[c]+=Number(p.total)||0;});const now=new Date();return {orderNumber:nextOrderNumber(now),createdAt:now.toISOString(),week:getISOWeek(now),year:getISOYear(now),customer,phone,products,totals,status:'pending',source:'flexible',rawMessage:t};
 }
 function renderFlexiblePreview(){
- if(!pendingFlexibleOrder)return; flexiblePreview.innerHTML=`<div class="preview-header"><strong>Vista previa</strong><span>${escapeHTML(pendingFlexibleOrder.orderNumber)}</span></div><div class="preview-grid"><div><small>Cliente</small><strong>${escapeHTML(pendingFlexibleOrder.customer)}</strong></div><div><small>Teléfono</small><strong>${escapeHTML(pendingFlexibleOrder.phone)}</strong></div></div><div class="flexible-products-preview"><div class="flexible-preview-title">Productos</div>${pendingFlexibleOrder.products.map((p,i)=>{const cs=p.candidates||[];const st=p.matched?'✓ Coincidencia encontrada':(cs.length?'⚠ Revisar coincidencia':'⚠ Producto no encontrado en pedidos anteriores');return `<div class="flexible-product-row"><div class="flexible-product-main"><strong>${p.quantity} × ${escapeHTML(p.name)}</strong><small>${escapeHTML(p.presentation)} · ${st}</small></div>${cs.length&&!p.matched?`<select data-flex-product="${i}"><option value="">Usar texto escrito</option>${cs.map((c,j)=>`<option value="${j}">${escapeHTML(c.name)}</option>`).join('')}</select>`:''}</div>`;}).join('')}</div><div class="flexible-preview-note">El formato flexible no exige precios. Si no hay coincidencia previa, se conserva el nombre escrito y el total queda en 0 hasta completar la facturación.</div><button type="button" class="waiting-preview-btn" id="addWaitingFromFlexibleBtn">⏳ Añadir a lista de espera</button>`; flexiblePreview.querySelectorAll('[data-flex-product]').forEach(sel=>sel.addEventListener('change',()=>{const p=pendingFlexibleOrder.products[Number(sel.dataset.flexProduct)],c=(p.candidates||[])[Number(sel.value)];if(c){p.name=c.name;p.unitPrice=Number(c.unitPrice)||0;p.currency=c.currency||'CUP';p.total=p.quantity*p.unitPrice;p.matched=true;}else{p.matched=false;p.unitPrice=0;p.total=0;}renderFlexiblePreview();})); }
-function openFlexibleImport(){flexibleMessage.value='';flexiblePreview.hidden=true;flexibleError.hidden=true;saveFlexibleBtn.hidden=true;previewFlexibleBtn.hidden=false;pendingFlexibleOrder=null;flexibleDialog.showModal();setTimeout(()=>flexibleMessage.focus(),100);}
+ if(!pendingFlexibleOrder)return;
+ flexiblePreview.innerHTML=`<div class="preview-header"><strong>Vista previa</strong><span>${escapeHTML(pendingFlexibleOrder.orderNumber)}</span></div><div class="preview-grid"><div><small>Cliente</small><strong>${escapeHTML(pendingFlexibleOrder.customer)}</strong></div><div><small>Teléfono</small><strong>${escapeHTML(pendingFlexibleOrder.phone)}</strong></div></div><div class="flexible-products-preview"><div class="flexible-preview-title">Productos</div>${pendingFlexibleOrder.products.map(p=>`<div class="flexible-product-row"><div class="flexible-product-main"><strong>${p.quantity} × ${escapeHTML(p.name)}</strong><small>${escapeHTML(p.presentation)} · ${p.unitPrice.toLocaleString('es-ES')} CUP / ${p.unitPriceUSD.toFixed(2)} USD por unidad</small></div><strong>${p.total.toLocaleString('es-ES')} CUP<br>${p.totalUSD.toFixed(2)} USD</strong></div>`).join('')}</div><div class="flexible-preview-note">Cambio aplicado: ${pendingFlexibleOrder.exchangeRate} + ${pendingFlexibleOrder.exchangeFactor}. Total: ${pendingFlexibleOrder.totals.CUP.toLocaleString('es-ES')} CUP / ${pendingFlexibleOrder.totals.USD.toFixed(2)} USD.</div><button type="button" class="waiting-preview-btn" id="addWaitingFromFlexibleBtn">⏳ Añadir a lista de espera</button>`;
+}
+function updateFlexibleUsd(row){
+ const cup=Number(row.querySelector('.flex-entry-price-cup').value)||0;
+ const toque=Number(flexibleToqueInput.value),factor=Number(flexibleFactorInput.value)||0;
+ const denominator=toque+factor;
+ row.querySelector('.flex-entry-price-usd').value=(cup>0&&denominator>0)?(cup/denominator).toFixed(2):'';
+}
+function refreshFlexibleUsd(){flexibleProductFields.querySelectorAll('.flexible-entry-row').forEach(updateFlexibleUsd);}
+function addFlexibleProductField(name='',quantity='1',presentation='unidad'){
+ const row=document.createElement('div');row.className='flexible-entry-row';
+ row.innerHTML=`<label>Producto<input class="flex-entry-name" type="text" placeholder="Nombre del producto" required></label><label>Cantidad<input class="flex-entry-quantity" type="number" min="1" step="1" value="1" required></label><label>Presentación<input class="flex-entry-presentation" type="text" value="unidad" placeholder="unidad, caja, saco..."></label><label>Precio CUP<input class="flex-entry-price-cup" type="number" min="0" step="any" placeholder="0" required></label><label>Precio USD (calculado)<input class="flex-entry-price-usd" type="number" readonly tabindex="-1" placeholder="—"></label><button type="button" class="flex-entry-remove" aria-label="Eliminar producto" title="Eliminar producto">×</button>`;
+ row.querySelector('.flex-entry-name').value=name;row.querySelector('.flex-entry-quantity').value=quantity;row.querySelector('.flex-entry-presentation').value=presentation;
+ row.querySelector('.flex-entry-price-cup').addEventListener('input',()=>updateFlexibleUsd(row));
+ row.querySelector('.flex-entry-remove').addEventListener('click',()=>{if(flexibleProductFields.children.length===1){showToast('El pedido debe tener al menos un producto.');return;}row.remove();});
+ flexibleProductFields.appendChild(row);updateFlexibleUsd(row);
+}
+function buildFlexibleOrderFromForm(){
+ const customer=flexibleCustomerInput.value.trim(),phone=flexiblePhoneInput.value.trim();
+ if(!customer)throw new Error('Escribe el nombre del cliente.');if(!phone)throw new Error('Escribe el teléfono del cliente.');
+ const toque=Number(flexibleToqueInput.value),factor=Number(flexibleFactorInput.value);
+ if(!Number.isFinite(toque)||toque<=0)throw new Error('Introduce un valor válido de El Toque.');
+ if(!Number.isFinite(factor))throw new Error('Introduce un factor válido.');
+ const denominator=toque+factor;if(denominator<=0)throw new Error('El valor de El Toque más el factor debe ser mayor que cero.');
+ const rows=[...flexibleProductFields.querySelectorAll('.flexible-entry-row')];
+ const products=rows.map(row=>{const cup=Number(row.querySelector('.flex-entry-price-cup').value);return {name:row.querySelector('.flex-entry-name').value.trim(),quantity:Number(row.querySelector('.flex-entry-quantity').value),presentation:row.querySelector('.flex-entry-presentation').value.trim()||'unidad',unitPrice:cup,unitPriceUSD:Number((cup/denominator).toFixed(2)),currency:'CUP',total:cup*Number(row.querySelector('.flex-entry-quantity').value),totalUSD:Number((cup/denominator).toFixed(2))*Number(row.querySelector('.flex-entry-quantity').value),exchangeRate:toque,factor,matched:false};});
+ if(!products.length||products.some(p=>!p.name||!Number.isInteger(p.quantity)||p.quantity<1||!Number.isFinite(p.unitPrice)||p.unitPrice<0))throw new Error('Completa correctamente nombre, cantidad y precio CUP de cada producto.');
+ const totals={CUP:products.reduce((a,p)=>a+p.total,0),USD:products.reduce((a,p)=>a+p.totalUSD,0)};
+ const now=new Date(),notes=flexibleNotesInput.value.trim();const rawMessage=`Formulario flexible\nCliente: ${customer}\nTeléfono: ${phone}\n${products.map(p=>`${p.quantity} ${p.presentation} de ${p.name} - ${p.unitPrice} CUP / ${p.unitPriceUSD.toFixed(2)} USD`).join('\n')}\nEl Toque: ${toque}\nFactor: ${factor}${notes?'\nObservaciones: '+notes:''}\n${now.toISOString()}`;
+ return {orderNumber:nextOrderNumber(now),createdAt:now.toISOString(),week:getISOWeek(now),year:getISOYear(now),customer,phone,products,totals,status:'pending',source:'flexible',rawMessage,notes,exchangeRate:toque,exchangeFactor:factor};
+}
+function openFlexibleImport(){flexibleCustomerInput.value='';flexiblePhoneInput.value='';flexibleNotesInput.value='';flexibleToqueInput.value='';flexibleFactorInput.value='0';flexibleProductFields.innerHTML='';addFlexibleProductField();flexiblePreview.hidden=true;flexibleError.hidden=true;saveFlexibleBtn.hidden=true;previewFlexibleBtn.hidden=false;pendingFlexibleOrder=null;flexibleDialog.showModal();setTimeout(()=>flexibleCustomerInput.focus(),100);}
 function closeFlexibleImport(){if(flexibleDialog.open)flexibleDialog.close();}
-function previewFlexibleImport(){flexibleError.hidden=true;try{pendingFlexibleOrder=parseFlexibleOrder(flexibleMessage.value);renderFlexiblePreview();flexiblePreview.hidden=false;saveFlexibleBtn.hidden=false;previewFlexibleBtn.hidden=true;const b=document.getElementById('addWaitingFromFlexibleBtn');if(b)b.onclick=()=>addWaitingFromPendingOrder(pendingFlexibleOrder);}catch(e){pendingFlexibleOrder=null;flexiblePreview.hidden=true;saveFlexibleBtn.hidden=true;previewFlexibleBtn.hidden=false;flexibleError.textContent=e.message;flexibleError.hidden=false;}}
+function previewFlexibleImport(){flexibleError.hidden=true;try{pendingFlexibleOrder=buildFlexibleOrderFromForm();renderFlexiblePreview();flexiblePreview.hidden=false;saveFlexibleBtn.hidden=false;previewFlexibleBtn.hidden=true;const b=document.getElementById('addWaitingFromFlexibleBtn');if(b)b.onclick=()=>addWaitingFromPendingOrder(pendingFlexibleOrder);}catch(e){pendingFlexibleOrder=null;flexiblePreview.hidden=true;saveFlexibleBtn.hidden=true;previewFlexibleBtn.hidden=false;flexibleError.textContent=e.message;flexibleError.hidden=false;}}
 function createFlexibleOrder(){if(!pendingFlexibleOrder)return;const d=orders.find(o=>o.rawMessage===pendingFlexibleOrder.rawMessage);if(d){flexibleError.textContent=`Este pedido ya fue importado como ${d.orderNumber}.`;flexibleError.hidden=false;return;}orders.unshift(pendingFlexibleOrder);saveOrders();closeFlexibleImport();renderAll();showToast(`Pedido ${pendingFlexibleOrder.orderNumber} creado correctamente.`);pendingFlexibleOrder=null;}
 
 function openImport(){
@@ -5840,6 +5876,8 @@ document
     }
   );
 
+document.getElementById('addFlexibleProductBtn').addEventListener('click',()=>addFlexibleProductField());
+flexibleToqueInput.addEventListener('input',refreshFlexibleUsd);flexibleFactorInput.addEventListener('input',refreshFlexibleUsd);
 document.getElementById('closeFlexibleBtn').addEventListener('click',closeFlexibleImport);
 document.getElementById('cancelFlexibleBtn').addEventListener('click',closeFlexibleImport);
 previewFlexibleBtn.addEventListener('click',previewFlexibleImport);
