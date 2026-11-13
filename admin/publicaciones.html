@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#173c32">
+<title>PANACEA · Centro de publicaciones</title>
+<style>
+:root{--green:#173c32;--green2:#285b49;--cream:#f6f4ed;--paper:#fff;--ink:#202923;--muted:#68736c;--line:#dfe5dd;--orange:#c87536;--red:#a43d36}
+*{box-sizing:border-box}body{margin:0;background:var(--cream);color:var(--ink);font:15px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}
+header{background:var(--green);color:#fff;padding:24px max(20px,calc((100% - 1180px)/2))}header .eyebrow{letter-spacing:.13em;font-size:11px;opacity:.75;font-weight:700}h1{margin:4px 0;font-size:clamp(26px,4vw,38px)}header p{margin:5px 0 0;opacity:.85}
+main{max-width:1180px;margin:24px auto;padding:0 18px 60px}.notice{background:#fff6e9;border:1px solid #ead4b5;padding:13px 16px;border-radius:13px;margin-bottom:18px;color:#694b2b}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}.card{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 4px 18px #20332808}.span8{grid-column:span 8}.span4{grid-column:span 4}.span12{grid-column:span 12}
+h2{font-size:19px;margin:0 0 13px}h3{font-size:15px;margin:0 0 8px}
+label{display:block;font-size:13px;font-weight:650;margin:12px 0 5px}input,textarea,select{font:inherit;width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:#fff;color:var(--ink)}textarea{min-height:90px;resize:vertical}
+button,.button{border:0;border-radius:10px;background:var(--green);color:#fff;padding:10px 14px;font:650 14px system-ui;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:7px}
+button.secondary,.button.secondary{background:#edf2ed;color:var(--green);border:1px solid var(--line)}button.warn{background:#fff0e5;color:#84451d;border:1px solid #f0d4bd}button:disabled{opacity:.45;cursor:not-allowed}
+.row{display:flex;gap:9px;flex-wrap:wrap;align-items:center}.muted{color:var(--muted);font-size:13px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.stats.four{grid-template-columns:repeat(4,1fr)}.metric-list{display:grid;gap:7px}.metric-row{display:flex;justify-content:space-between;gap:10px;padding:8px 10px;background:#f7f8f5;border-radius:9px}.bar{height:8px;background:#e7ece6;border-radius:99px;overflow:hidden;min-width:90px}.bar span{display:block;height:100%;background:var(--green);border-radius:99px}@media(max-width:760px){.stats.four{grid-template-columns:repeat(2,1fr)}}.stat{background:#f4f7f3;border-radius:12px;padding:12px}.stat b{display:block;font-size:23px;color:var(--green)}
+.list{display:grid;gap:8px;max-height:330px;overflow:auto}.item{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);padding:10px;border-radius:11px}.item input[type=checkbox]{width:auto;margin-top:4px}.item .grow{flex:1;min-width:0}.item small{display:block;color:var(--muted)}.pill{font-size:11px;background:#edf2ed;color:var(--green);padding:3px 8px;border-radius:99px}
+#productList .item{align-items:center}.product-thumb{width:54px;height:54px;object-fit:contain;border-radius:8px;background:#f4f4f0}
+.task{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1px solid var(--line);padding:11px;border-radius:11px}.task.done{background:#f1f7f1}.week-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px}.day-card{border:1px solid var(--line);border-radius:12px;padding:10px;background:#fbfcfa;min-height:130px}.day-card.today{border:2px solid var(--green);background:#f2f7f2}.day-card h3{font-size:13px;margin:0 0 7px}.day-card .count{font-size:11px;color:var(--muted)}.day-group{font-size:12px;padding:6px 0;border-top:1px solid var(--line);overflow-wrap:anywhere}.day-group button{font-size:11px;padding:4px 7px;margin-top:4px}.calendar-tools{display:flex;gap:8px;align-items:center;justify-content:space-between;margin:12px 0}.task .grow{min-width:0}.task small{display:block;color:var(--muted)}
+.month-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}.month-day{border:1px solid var(--line);border-radius:9px;min-height:76px;padding:7px;background:#fafbf9}.month-day.head{min-height:auto;background:#edf2ed;font-size:12px;font-weight:700;text-align:center}.month-day.empty{background:transparent;border-style:dashed;opacity:.35}.month-day.active{background:#edf5ed;border-color:#b6cbb8}.month-day strong{display:block;font-size:13px}.month-day small{display:block;color:var(--muted);font-size:11px}.month-day.today{outline:2px solid var(--green)}@media(max-width:600px){.month-grid{gap:3px}.month-day{padding:5px;min-height:65px}.month-day small{font-size:10px}.month-day.head{font-size:10px}}
+.preview{white-space:pre-wrap;background:#f7f8f5;border:1px solid var(--line);padding:14px;border-radius:12px;min-height:150px}
+hr{border:0;border-top:1px solid var(--line);margin:16px 0}.hidden{display:none!important}
+footer{max-width:1180px;margin:auto;padding:0 18px 25px;color:var(--muted);font-size:12px}
+@media(max-width:760px){.week-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.span8,.span4{grid-column:span 12}.stats{grid-template-columns:repeat(3,1fr)}.task{align-items:flex-start;flex-direction:column}.task .row{width:100%}.task button{flex:1}}
+</style>
+</head>
+<body>
+<header><div class="eyebrow">PANACEA · MARKETING</div><h1>Centro de publicaciones</h1><p>Prepara campañas con productos del catálogo vigente y organiza su distribución.</p><p style="margin-top:12px"><a href="index.html" style="color:#fff">← Volver a administración</a></p></header>
+<main>
+<div class="notice"><b>Importante:</b> esta primera versión prepara el contenido, organiza los destinos y registra el avance. No publica ni comparte automáticamente en Facebook/WhatsApp. Cada envío a grupos externos requiere tu confirmación en la aplicación para evitar acciones masivas no autorizadas o restricciones antispam.</div>
+<section class="card span12" style="margin-bottom:16px">
+<h2>Respaldo y traslado entre dispositivos</h2>
+<p class="muted">Tus campañas y grupos se guardan en este navegador. Exporta un respaldo para trasladarlos a otro dispositivo o recuperarlos si cambias de navegador.</p>
+<div class="row">
+<button id="exportBackup">Descargar respaldo completo</button>
+<button class="secondary" id="chooseBackup">Importar respaldo</button>
+<input type="file" id="backupFile" accept=".json,application/json" class="hidden">
+<span class="pill" id="localStatus">Almacenamiento local activo</span>
+</div>
+<p class="muted" id="backupStatus" aria-live="polite">El respaldo incluye la lista de grupos, campañas y el estado de cada publicación. No incluye el catálogo, porque PANACEA lo carga automáticamente desde products.js.</p>
+</section>
+<div class="grid">
+<section class="card span8">
+<h2>1. Preparar una campaña</h2>
+<div class="row">
+<div style="flex:1;min-width:190px"><label for="campaignName">Nombre de la campaña</label><input id="campaignName" placeholder="Ej. Promoción de repostería – lunes"></div>
+<div style="flex:1;min-width:170px"><label for="contact">Contacto para pedidos</label><input id="contact" value="58051138 (ALEJANDRO)"></div>
+</div>
+<label>Selecciona los productos que incluirás</label>
+<div class="row" style="margin:6px 0 10px"><button class="secondary" id="selectAllProducts">Seleccionar todos</button><button class="secondary" id="clearProducts">Limpiar selección</button><label style="margin:0;min-width:170px;flex:1"><input id="productSearch" placeholder="Buscar producto" style="padding:8px"></label><label style="margin:0;min-width:180px;flex:1"><select id="categoryFilter" style="padding:8px"><option value="all">Todas las categorías</option><option value="reposteria-panaderia">Repostería y Panadería</option><option value="aseo">Aseo y Limpieza</option><option value="ferreteria">Ferretería</option><option value="otros">Otros</option></select></label></div>
+<div id="productList" class="list"><p class="muted">Cargando catálogo de PANACEA…</p></div>
+<div class="row" style="margin-top:14px"><button id="generateBtn">Generar contenido de campaña</button><button class="secondary" id="saveCampaignBtn" disabled>Guardar campaña</button></div>
+</section>
+<aside class="card span4">
+<h2>Datos y destinos</h2>
+<div class="stats"><div class="stat"><b id="productsCount">0</b><small>Productos</small></div><div class="stat"><b id="groupsCount">0</b><small>Grupos</small></div><div class="stat"><b id="campaignsCount">0</b><small>Campañas</small></div></div>
+<hr>
+<h3>Catálogo conectado</h3><p class="muted">Los productos se leen automáticamente desde <code>products.js</code>. Al actualizar el catálogo de PANACEA, el Centro de publicaciones mostrará los nuevos precios, imágenes y disponibilidad al recargar esta página.</p><p class="muted" id="catalogStatus">Conectando con el catálogo…</p><p class="muted">Los grupos y campañas se guardan localmente en este navegador. Usa respaldos para trasladarlos entre dispositivos.</p>
+<hr>
+<h3>Administrar grupos y destinos</h3>
+<div class="row" style="gap:8px;align-items:end;flex-wrap:wrap">
+ <div style="flex:1;min-width:180px"><label for="groupName">Nombre del grupo</label><input id="groupName" placeholder="Ej. Repostería Cuba"></div>
+ <div style="flex:1;min-width:220px"><label for="groupUrl">Enlace del grupo</label><input id="groupUrl" type="url" placeholder="https://facebook.com/groups/..."></div>
+ <div style="flex:1;min-width:160px"><label for="groupCategory">Categoría</label><select id="groupCategory"><option value="Repostería">Repostería</option><option value="Panadería">Panadería</option><option value="Compra y venta">Compra y venta</option><option value="Emprendimientos">Emprendimientos</option><option value="General">General</option><option value="Otros">Otros</option></select></div>
+ <div style="flex:1;min-width:150px"><label for="groupFrequency">Frecuencia recomendada</label><select id="groupFrequency"><option value="1">Cada día</option><option value="3" selected>Cada 3 días</option><option value="7">Cada semana</option><option value="14">Cada 2 semanas</option><option value="30">Cada mes</option></select></div>
+ <button id="saveGroupBtn">Agregar grupo</button><button class="secondary hidden" id="cancelGroupEdit">Cancelar</button>
+</div>
+<p class="muted" id="groupFormStatus">Puedes agregar grupos individualmente, editarlos o eliminarlos.</p>
+<h3>Importar grupos de Facebook</h3><p class="muted">Carga un CSV con columnas <code>name,url,category</code>. Puedes comenzar con una hoja de cálculo guardada como CSV.</p>
+<input type="file" id="groupsFile" accept=".csv,text/csv">
+<div class="row" style="margin-top:8px"><button class="secondary" id="downloadTemplate">Descargar plantilla CSV</button></div>
+<p class="muted" id="importStatus">Los datos se guardan localmente en este navegador.</p>
+</aside>
+<section class="card span12">
+<h2>Organización y frecuencia de grupos</h2>
+<p class="muted">Controla cuándo compartiste por última vez y cuándo conviene volver a publicar. Las fechas se actualizan cuando marcas una tarea de campaña como publicada.</p>
+<div class="stats"><div class="stat"><b id="groupsDue">0</b><small>Listos para publicar</small></div><div class="stat"><b id="groupsWaiting">0</b><small>En período de espera</small></div><div class="stat"><b id="groupsNever">0</b><small>Sin historial</small></div></div>
+<div class="row" style="margin-top:12px"><button class="secondary" id="filterDue">Ver grupos listos</button><button class="secondary" id="filterAll">Ver todos los grupos</button></div>
+<div id="scheduleList" class="list" style="margin-top:10px;max-height:420px"></div>
+<hr><h2>Calendario de distribución · próximos 7 días</h2>
+<p class="muted">Los grupos sin historial se proponen para hoy. Los demás se ubican según su próxima fecha permitida, calculada con la frecuencia configurada. El calendario es una guía: no publica automáticamente.</p>
+<div class="calendar-tools"><span class="pill" id="calendarRange">Esta semana</span><button class="secondary" id="refreshCalendar">Actualizar calendario</button></div>
+<div id="weeklyCalendar" class="week-grid" aria-live="polite"></div>
+</section>
+<section class="card span4">
+<h2>2. Destinos de la campaña</h2>
+<label class="item"><input type="checkbox" id="destOwnFb" checked><span class="grow">Tu grupo de Facebook<small>Publicación original</small></span></label>
+<label class="item"><input type="checkbox" id="destOtherFb" checked><span class="grow">Grupos externos<small>Distribución manual guiada</small></span></label>
+<label class="item"><input type="checkbox" id="destWa" checked><span class="grow">Comunidad de WhatsApp<small>Compartir en el espacio de anuncios adecuado</small></span></label>
+<label>Filtro de grupos externos</label><input id="groupFilter" placeholder="Filtrar por nombre o categoría">
+<div class="row" style="margin:8px 0"><button class="secondary" id="selectAllGroups">Seleccionar todos</button><button class="secondary" id="clearGroups">Limpiar</button></div>
+<div id="groupList" class="list"><p class="muted">Agrega o importa tu lista de grupos.</p></div>
+</section>
+<section class="card span8">
+<h2>3. Vista previa del contenido</h2>
+<p class="muted">El texto se genera a partir de los productos seleccionados. Revísalo antes de copiarlo o publicarlo.</p>
+<div id="preview" class="preview">Selecciona productos y pulsa «Generar contenido de campaña».</div>
+<div class="row" style="margin-top:10px"><button id="copyText" disabled>Copiar texto</button><button class="secondary" id="shareText" disabled>Compartir desde el dispositivo</button><button class="secondary" id="downloadCampaign" disabled>Exportar campaña</button></div>
+</section>
+<section class="card span12">
+<div class="row" style="justify-content:space-between"><div><h2 style="margin-bottom:3px">4. Plan de distribución y seguimiento</h2><p class="muted" style="margin:0">Marca cada destino cuando hayas completado la publicación o el uso de la opción nativa Compartir.</p></div><button class="secondary" id="resetTasks">Reiniciar estados de esta campaña</button></div>
+<div id="distributionTasks" class="list" style="margin-top:14px"><p class="muted">Guarda una campaña para crear su plan de distribución.</p></div>
+</section>
+<section class="card span12" id="goalsSection">
+<h2>5. Objetivos y control de actividad</h2>
+<p class="muted">Define metas de publicaciones registradas. El avance se calcula con las tareas que marques como realizadas; no representa publicaciones verificadas por Facebook o WhatsApp.</p>
+<div class="row" style="align-items:end">
+ <div style="flex:1;min-width:140px"><label for="dailyGoal">Objetivo diario</label><input id="dailyGoal" type="number" min="1" max="1000" value="10"></div>
+ <div style="flex:1;min-width:140px"><label for="weeklyGoal">Objetivo semanal</label><input id="weeklyGoal" type="number" min="1" max="7000" value="50"></div>
+ <button id="saveGoals">Guardar objetivos</button>
+</div>
+<div class="grid" style="margin-top:14px">
+ <div class="span6"><h3>Progreso de hoy</h3><div class="stats"><div class="stat"><b id="goalTodayCount">0</b><small>Registradas</small></div><div class="stat"><b id="goalTodayTarget">10</b><small>Meta</small></div><div class="stat"><b id="goalTodayPercent">0%</b><small>Cumplimiento</small></div></div><div class="bar" style="height:12px;margin-top:9px"><span id="goalTodayBar" style="width:0%"></span></div></div>
+ <div class="span6"><h3>Progreso de esta semana</h3><div class="stats"><div class="stat"><b id="goalWeekCount">0</b><small>Registradas</small></div><div class="stat"><b id="goalWeekTarget">50</b><small>Meta</small></div><div class="stat"><b id="goalWeekPercent">0%</b><small>Cumplimiento</small></div></div><div class="bar" style="height:12px;margin-top:9px"><span id="goalWeekBar" style="width:0%"></span></div></div>
+</div><p class="muted" id="goalAdvice" aria-live="polite"></p>
+</section>
+<section class="card span12" id="statisticsSection">
+<h2>6. Estadísticas de publicaciones</h2>
+<p class="muted">Indicadores calculados a partir de las publicaciones que registres. Desde esta versión también se contabilizan los productos y categorías incluidos en campañas completadas.</p>
+<div class="stats four">
+ <div class="stat"><b id="statToday">0</b><small>Hoy</small></div>
+ <div class="stat"><b id="statWeek">0</b><small>Últimos 7 días</small></div>
+ <div class="stat"><b id="statMonth">0</b><small>Últimos 30 días</small></div>
+ <div class="stat"><b id="statTotal">0</b><small>Registros históricos</small></div>
+</div>
+<hr><div class="grid">
+ <div class="span8"><h3>Actividad de los últimos 7 días</h3><div id="statsDaily" class="metric-list"></div></div>
+ <div class="span4"><h3>Avance de campañas</h3><div id="statsCampaigns" class="metric-list"></div></div>
+ <div class="span12"><h3>Grupos con más publicaciones registradas</h3><div id="statsGroups" class="metric-list"></div></div>
+ <div class="span6"><h3>Productos más promocionados</h3><div id="statsProducts" class="metric-list"></div></div>
+ <div class="span6"><h3>Actividad por categoría</h3><div id="statsCategories" class="metric-list"></div></div>
+</div>
+<p class="muted" id="statsNote">Los registros nuevos se guardan localmente y se incluyen en los respaldos. El análisis de productos y categorías se aplica a las publicaciones de campañas registradas desde esta versión; los registros antiguos sin detalle de productos solo cuentan para actividad y grupos.</p>
+<hr><h3>Productividad mensual</h3>
+<p class="muted">Consulta la actividad registrada en cada día. Los días con más publicaciones se resaltan; los días sin registros quedan identificados. Puedes cambiar de mes para revisar el historial disponible.</p>
+<div class="calendar-tools"><button class="secondary" id="monthPrev">← Mes anterior</button><b id="monthTitle">Mes</b><button class="secondary" id="monthNext">Mes siguiente →</button></div>
+<div id="monthlySummary" class="stats" style="margin-bottom:10px"></div>
+<div id="monthlyCalendar" class="month-grid" aria-live="polite"></div>
+</section>
+<section class="card span12" id="recommendationsSection">
+<h2>7. Recomendaciones de promoción</h2>
+<p class="muted">Sugerencias calculadas con el historial disponible, la actividad reciente y la disponibilidad del catálogo. Son orientativas; tú decides qué promocionar y dónde.</p>
+<div class="grid">
+ <div class="span6"><h3>Productos que conviene volver a promocionar</h3><div id="recommendProducts" class="metric-list"></div></div>
+ <div class="span6"><h3>Categorías con menor actividad</h3><div id="recommendCategories" class="metric-list"></div></div>
+ <div class="span12"><h3>Grupos disponibles para nuevas publicaciones</h3><div id="recommendGroups" class="metric-list"></div></div>
+</div>
+<p class="muted" id="recommendationNote"></p>
+</section>
+<section class="card span12" id="plannerSection">
+<h2>5. Programador de campañas</h2>
+<p class="muted">Selecciona una campaña guardada y distribuye sus grupos externos en días disponibles. El límite diario lo decides tú. El sistema crea una agenda manual: no publica ni abre grupos por sí solo.</p>
+<div class="row" style="align-items:end">
+ <div style="flex:2;min-width:220px"><label for="planCampaign">Campaña</label><select id="planCampaign"></select></div>
+ <div style="flex:1;min-width:150px"><label for="planDailyLimit">Máximo de grupos por día</label><input id="planDailyLimit" type="number" min="1" max="100" value="15"></div>
+ <div style="flex:1;min-width:150px"><label for="planStartDate">Comenzar desde</label><input id="planStartDate" type="date"></div>
+ <button id="generatePlan">Generar programación</button>
+</div>
+<p class="muted" id="planStatus" aria-live="polite">La programación se guarda en este navegador y se incluye en los respaldos.</p>
+<div id="plansList" class="list"></div>
+<hr style="margin:18px 0;border:0;border-top:1px solid var(--line,#ddd)">
+<h3>Campañas recurrentes</h3>
+<p class="muted">Define cada cuánto quieres repetir una campaña. PANACEA preparará cada nueva agenda cuando tú lo solicites; nunca publicará automáticamente.</p>
+<div class="row" style="align-items:end">
+ <div style="flex:2;min-width:220px"><label for="recCampaign">Campaña recurrente</label><select id="recCampaign"></select></div>
+ <div style="flex:1;min-width:130px"><label for="recInterval">Repetir cada (días)</label><input id="recInterval" type="number" min="1" max="365" value="7"></div>
+ <div style="flex:1;min-width:150px"><label for="recStart">Primera fecha</label><input id="recStart" type="date"></div>
+ <button id="saveRecurrence">Guardar recurrencia</button>
+</div>
+<div id="recurrenceList" class="list"></div>
+<hr style="margin:18px 0;border:0;border-top:1px solid var(--line,#ddd)">
+<h3>Control de contenido repetido</h3>
+<p class="muted">Compara los productos de una campaña con el historial real de publicaciones registradas. Es una advertencia para ayudarte a decidir; no elimina ni modifica campañas guardadas.</p>
+<div class="row" style="align-items:end">
+ <div style="flex:2;min-width:220px"><label for="auditCampaign">Campaña que deseas revisar</label><select id="auditCampaign"></select></div>
+ <div style="flex:1;min-width:150px"><label for="auditWindow">Considerar publicaciones recientes</label><select id="auditWindow"><option value="7">Últimos 7 días</option><option value="15" selected>Últimos 15 días</option><option value="30">Últimos 30 días</option></select></div>
+ <button type="button" id="refreshAudit" class="secondary">Analizar contenido</button>
+</div>
+<div id="contentAudit" class="list" aria-live="polite"><p class="muted">Selecciona una campaña para analizar sus productos.</p></div>
+</section>
+<section class="card span12">
+<h2>Campañas guardadas</h2><div id="campaignHistory" class="list"><p class="muted">Todavía no hay campañas guardadas.</p></div>
+</section>
+</div>
+</main>
+<footer>PANACEA · Centro de publicaciones · Los datos se conservan en el almacenamiento local del navegador. Mantén respaldos actualizados.</footer>
+<script src="../products.js"></script>
+<script>
+const OWN_FB='https://facebook.com/groups/1377320043857843/';
+const WA_COMMUNITY='https://chat.whatsapp.com/JjBmisU059PAruAXVWKO61';
+const KEYS={products:'panacea-marketing-products-v1',groups:'panacea-marketing-groups-v1',campaigns:'panacea-marketing-campaigns-v1',plans:'panacea-marketing-plans-v1',log:'panacea-marketing-log-v1',goals:'panacea-marketing-goals-v1',recurrences:'panacea-marketing-recurrences-v1'};
+let products=(typeof PRODUCTS!=='undefined' && Array.isArray(PRODUCTS)?PRODUCTS:[]).map(normalizeProduct),groups=load(KEYS.groups,[]),campaigns=load(KEYS.campaigns,[]),plans=load(KEYS.plans,[]),publicationLog=load(KEYS.log,[]),goals=load(KEYS.goals,{daily:10,weekly:50}),recurrences=load(KEYS.recurrences,[]),selectedProducts=new Set(),selectedGroups=new Set(),draft=null,activeCampaignId=null,monthOffset=0;
+const $=id=>document.getElementById(id);
+function load(k,f){try{return JSON.parse(localStorage.getItem(k))??f}catch{return f}}
+function persist(){
+ try{
+  localStorage.setItem(KEYS.products,JSON.stringify(products));
+  localStorage.setItem(KEYS.groups,JSON.stringify(groups));
+  localStorage.setItem(KEYS.campaigns,JSON.stringify(campaigns));
+  localStorage.setItem(KEYS.plans,JSON.stringify(plans));
+  localStorage.setItem(KEYS.log,JSON.stringify(publicationLog));
+  localStorage.setItem(KEYS.goals,JSON.stringify(goals));
+  localStorage.setItem(KEYS.recurrences,JSON.stringify(recurrences));
+  $('localStatus').textContent='Almacenamiento local activo';
+ }catch(err){
+  $('localStatus').textContent='No se pudo guardar';
+  $('backupStatus').textContent='El navegador no pudo guardar los cambios. Descarga un respaldo y libera espacio. Detalle: '+err.message;
+  alert('No se pudieron guardar los cambios en este navegador. Descarga un respaldo y revisa el espacio disponible.');
+ }
+}
+function backupData(){return {app:'PANACEA Centro de publicaciones',schemaVersion:1,exportedAt:new Date().toISOString(),groups,campaigns,plans,publicationLog,goals,recurrences};}
+function downloadJSON(data,filename){const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+function validBackup(data){return !!data&&data.app==='PANACEA Centro de publicaciones'&&data.schemaVersion===1&&Array.isArray(data.groups)&&Array.isArray(data.campaigns)&&(data.plans===undefined||Array.isArray(data.plans))&&(data.publicationLog===undefined||Array.isArray(data.publicationLog))&&(data.goals===undefined||(data.goals&&typeof data.goals==='object'))&&(data.recurrences===undefined||Array.isArray(data.recurrences))&&data.groups.every(g=>g&&typeof g.name==='string')&&data.campaigns.every(c=>c&&typeof c.id==='string'&&Array.isArray(c.tasks)&&Array.isArray(c.products));}
+async function importBackup(file){
+ const data=JSON.parse(await file.text());
+ if(!validBackup(data))throw new Error('El archivo no tiene el formato de respaldo de PANACEA o está incompleto.');
+ const date=data.exportedAt?new Date(data.exportedAt).toLocaleString('es-CU'):'fecha desconocida';
+ if(!confirm(`El respaldo contiene ${data.groups.length} grupos y ${data.campaigns.length} campañas (creado: ${date}).
+
+Al continuar, reemplazará los grupos y campañas de este navegador. Se recomienda exportar primero un respaldo actual. ¿Deseas continuar?`))return;
+ groups=data.groups;campaigns=data.campaigns;plans=Array.isArray(data.plans)?data.plans:[];publicationLog=Array.isArray(data.publicationLog)?data.publicationLog:[];goals=data.goals&&typeof data.goals==='object'?{daily:Math.max(1,Number(data.goals.daily)||10),weekly:Math.max(1,Number(data.goals.weekly)||50)}:{daily:10,weekly:50};recurrences=Array.isArray(data.recurrences)?data.recurrences:[];selectedGroups=new Set();selectedProducts.clear();activeCampaignId=campaigns[0]?.id||null;draft=null;
+ persist();renderGroups();renderStats();renderGoals();renderHistory();renderTasks();renderPlanner();renderRecurrences();renderContentAudit();$('preview').textContent='Selecciona una campaña guardada o prepara una nueva.';$('copyText').disabled=$('shareText').disabled=$('downloadCampaign').disabled=true;$('saveCampaignBtn').disabled=true;
+ $('backupStatus').textContent=`Respaldo importado correctamente: ${groups.length} grupos, ${campaigns.length} campañas y ${plans.length} programaciones.`;
+}
+
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function money(v,c){let n=Number(v)||0;return new Intl.NumberFormat('es-CU',{maximumFractionDigits:2}).format(n)+' '+(c||'CUP')}
+function normalizeProduct(p,i){return {id:String(p.id??p.sku??`p-${i}-${(p.name||p.title||'').slice(0,10)}`),name:p.name||p.title||p.product||'Producto sin nombre',description:p.description||'',presentation:p.presentation||p.format||'',price:Number(p.price??p.priceCUP??p.precio??0),currency:p.currency||p.currencyCode||'CUP',image:p.image||p.imageUrl||p.photo||'',availability:p.availability||'available',category:p.category||'otros',priceLabel:p.priceLabel||''};}
+function categoryName(c){return ({'reposteria-panaderia':'Repostería y Panadería','aseo':'Aseo y Limpieza','ferreteria':'Ferretería','otros':'Otros'})[c]||c||'Otros';}
+function renderProducts(){let q=$('productSearch').value.toLowerCase(),cat=$('categoryFilter').value;let shown=products.filter(p=>(cat==='all'||p.category===cat)&&(p.name+' '+p.description+' '+categoryName(p.category)).toLowerCase().includes(q));$('productList').innerHTML=shown.length?shown.map(p=>`<label class="item"><input type="checkbox" data-product="${esc(p.id)}" ${selectedProducts.has(p.id)?'checked':''} ${p.availability==='out'?'disabled':''}><img class="product-thumb" src="../${esc(p.image).replace(/^\//,'')}" onerror="this.style.display='none'" alt=""><span class="grow"><b>${esc(p.name)}</b><small>${esc(categoryName(p.category))} · ${esc(p.presentation)} · ${money(p.price,p.currency)}</small></span><span class="pill">${p.availability==='out'?'Agotado':p.availability==='limited'?`Stock: ${p.stock??'limitado'}`:'Disponible'}</span></label>`).join(''):'<p class="muted">No hay productos para mostrar.</p>';document.querySelectorAll('[data-product]').forEach(el=>el.onchange=()=>{el.checked?selectedProducts.add(el.dataset.product):selectedProducts.delete(el.dataset.product);});$('productsCount').textContent=products.length;}
+function nextDate(g){if(!g.lastPublishedAt)return null;const d=new Date(g.lastPublishedAt);d.setDate(d.getDate()+Math.max(1,Number(g.frequencyDays)||3));return d;}
+function groupState(g){if(!g.lastPublishedAt)return 'never';return nextDate(g)<=new Date()?'due':'waiting';}
+function renderGroups(){let q=$('groupFilter').value.toLowerCase();let shown=groups.filter(g=>(g.name+' '+(g.category||'')+' '+(g.url||'')).toLowerCase().includes(q));$('groupList').innerHTML=shown.length?shown.map(g=>{let due=nextDate(g),state=groupState(g);return `<div class="item"><input type="checkbox" data-group="${esc(g.id)}" ${selectedGroups.has(g.id)?'checked':''}><span class="grow"><b>${esc(g.name)}</b><small>${esc(g.category||'Sin categoría')} · ${g.url?'Con enlace':'Sin enlace'} · Frecuencia: cada ${Math.max(1,Number(g.frequencyDays)||3)} días</small><small>${g.lastPublishedAt?'Última publicación: '+new Date(g.lastPublishedAt).toLocaleDateString('es-CU'):'Sin publicaciones registradas'}${due?' · Próxima fecha: '+due.toLocaleDateString('es-CU'):''}</small><span class="pill">${state==='never'?'Sin historial':state==='due'?'Listo para publicar':'En período de espera'}</span></span><button type="button" class="secondary" data-edit-group="${esc(g.id)}">Editar</button><button type="button" class="secondary" data-delete-group="${esc(g.id)}">Eliminar</button></div>`}).join(''):'<p class="muted">No hay grupos que coincidan.</p>';document.querySelectorAll('[data-group]').forEach(el=>el.onchange=()=>{el.checked?selectedGroups.add(el.dataset.group):selectedGroups.delete(el.dataset.group);});document.querySelectorAll('[data-edit-group]').forEach(b=>b.onclick=()=>editGroup(b.dataset.editGroup));document.querySelectorAll('[data-delete-group]').forEach(b=>b.onclick=()=>deleteGroup(b.dataset.deleteGroup));$('groupsCount').textContent=groups.length;renderSchedule();}
+function localDayKey(date){const d=new Date(date);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+function goalCounts(){const now=new Date(),today=localDayKey(now),start=new Date(now);start.setHours(0,0,0,0);const weekday=(start.getDay()+6)%7;start.setDate(start.getDate()-weekday);const end=new Date(start);end.setDate(start.getDate()+7);const valid=publicationLog.filter(x=>x&&x.date&&x.groupId);return {today:valid.filter(x=>localDayKey(x.date)===today).length,week:valid.filter(x=>new Date(x.date)>=start&&new Date(x.date)<end).length};}
+function renderGoals(){if(!$('dailyGoal'))return;const counts=goalCounts(),daily=Math.max(1,Number(goals.daily)||10),weekly=Math.max(1,Number(goals.weekly)||50),dp=Math.round(counts.today/daily*100),wp=Math.round(counts.week/weekly*100);$('dailyGoal').value=daily;$('weeklyGoal').value=weekly;$('goalTodayCount').textContent=counts.today;$('goalTodayTarget').textContent=daily;$('goalTodayPercent').textContent=dp+'%';$('goalTodayBar').style.width=Math.min(100,dp)+'%';$('goalWeekCount').textContent=counts.week;$('goalWeekTarget').textContent=weekly;$('goalWeekPercent').textContent=wp+'%';$('goalWeekBar').style.width=Math.min(100,wp)+'%';const remaining=Math.max(0,daily-counts.today);$('goalAdvice').textContent=dp>=100?'¡Objetivo diario alcanzado!':`Te ${remaining===1?'falta':'faltan'} ${remaining} publicación(es) registrada(s) para alcanzar la meta de hoy. Esta semana: ${Math.max(0,weekly-counts.week)} para completar el objetivo semanal.`;}
+function renderStats(){
+ $('campaignsCount').textContent=campaigns.length;
+ const now=new Date(),today=localDateValue(now),cut7=new Date(now);cut7.setHours(0,0,0,0);cut7.setDate(cut7.getDate()-6);const cut30=new Date(now);cut30.setHours(0,0,0,0);cut30.setDate(cut30.getDate()-29);
+ const valid=publicationLog.filter(x=>x&&x.date&&x.groupId);const countSince=d=>valid.filter(x=>new Date(x.date)>=d).length;
+ $('statToday').textContent=valid.filter(x=>localDateValue(new Date(x.date))===today).length;$('statWeek').textContent=countSince(cut7);$('statMonth').textContent=countSince(cut30);$('statTotal').textContent=valid.length;
+ const labels=[];for(let i=6;i>=0;i--){let d=new Date(now);d.setHours(0,0,0,0);d.setDate(d.getDate()-i);labels.push({date:localDateValue(d),label:d.toLocaleDateString('es-CU',{weekday:'short',day:'numeric'})});}
+ const daily=labels.map(x=>({...x,n:valid.filter(v=>localDateValue(new Date(v.date))===x.date).length}));const max=Math.max(1,...daily.map(x=>x.n));$('statsDaily').innerHTML=daily.map(x=>`<div class="metric-row"><span>${esc(x.label)}</span><span class="bar"><span style="width:${x.n/max*100}%"></span></span><b>${x.n}</b></div>`).join('');
+ $('statsCampaigns').innerHTML=campaigns.length?campaigns.slice(0,8).map(c=>{const total=(c.tasks||[]).length,done=(c.tasks||[]).filter(t=>t.done).length,pct=total?Math.round(done/total*100):0;return `<div class="metric-row"><span>${esc(c.name)}</span><b>${pct}% (${done}/${total})</b></div>`}).join(''):'<p class="muted">Todavía no hay campañas.</p>';
+ const byGroup={};valid.forEach(x=>{const key=x.groupId;byGroup[key]??={name:x.groupName||groups.find(g=>g.id===key)?.name||'Grupo eliminado',n:0};byGroup[key].n++;});const top=Object.values(byGroup).sort((a,b)=>b.n-a.n).slice(0,10);$('statsGroups').innerHTML=top.length?top.map(x=>`<div class="metric-row"><span>${esc(x.name)}</span><b>${x.n} publicación(es)</b></div>`).join(''):'<p class="muted">Aún no hay registros estadísticos. Marca las publicaciones realizadas para comenzar a medir la actividad.</p>';
+ const productCounts={},categoryCounts={};valid.forEach(x=>(x.products||[]).forEach(p=>{const key=p.id||p.name;productCounts[key]??={name:p.name||'Producto',n:0};productCounts[key].n++;const cat=p.category||'otros';categoryCounts[cat]??={name:categoryName(cat),n:0};categoryCounts[cat].n++;}));
+ const topProducts=Object.values(productCounts).sort((a,b)=>b.n-a.n).slice(0,10);$('statsProducts').innerHTML=topProducts.length?topProducts.map(x=>`<div class="metric-row"><span>${esc(x.name)}</span><b>${x.n} promoción(es)</b></div>`).join(''):'<p class="muted">Todavía no hay datos de productos. Registra publicaciones de campañas nuevas.</p>';
+ const cats=Object.values(categoryCounts).sort((a,b)=>b.n-a.n);$('statsCategories').innerHTML=cats.length?cats.map(x=>`<div class="metric-row"><span>${esc(x.name)}</span><b>${x.n} promoción(es)</b></div>`).join(''):'<p class="muted">Todavía no hay datos por categoría.</p>';
+ renderRecommendations();
+ renderGoals();renderMonthlyCalendar(); } 
+function renderMonthlyCalendar(){const host=$('monthlyCalendar');if(!host)return;const now=new Date(),month=new Date(now.getFullYear(),now.getMonth()+monthOffset,1),year=month.getFullYear(),m=month.getMonth(),first=(month.getDay()+6)%7,days=new Date(year,m+1,0).getDate(),counts={};publicationLog.filter(x=>x&&x.date&&x.groupId).forEach(x=>{const k=localDateValue(new Date(x.date));counts[k]=(counts[k]||0)+1;});$('monthTitle').textContent=month.toLocaleDateString('es-CU',{month:'long',year:'numeric'});const total=Object.entries(counts).filter(([k])=>k.startsWith(`${year}-${String(m+1).padStart(2,'0')}-`)).reduce((n,[,v])=>n+v,0),active=Object.entries(counts).filter(([k,v])=>k.startsWith(`${year}-${String(m+1).padStart(2,'0')}-`)&&v>0).length,zero=days-active;$('monthlySummary').innerHTML=`<div class="stat"><b>${total}</b><small>Publicaciones registradas</small></div><div class="stat"><b>${active}</b><small>Días con actividad</small></div><div class="stat"><b>${zero}</b><small>Días sin actividad</small></div>`;const heads=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];let html=heads.map(x=>`<div class="month-day head">${x}</div>`).join('');for(let i=0;i<first;i++)html+='<div class="month-day empty"></div>';for(let d=1;d<=days;d++){const date=new Date(year,m,d),key=localDateValue(date),n=counts[key]||0;html+=`<div class="month-day ${n?'active':''} ${key===localDateValue(now)?'today':''}"><strong>${d}</strong><small>${n?`${n} publicación(es)`:'Sin registros'}</small></div>`;}host.innerHTML=html;}
+function renderRecommendations(){
+ const host=$('recommendProducts');if(!host)return;
+ const exposure={};publicationLog.forEach(entry=>(entry.products||[]).forEach(p=>{const id=p.id||p.name;if(!id)return;const d=new Date(entry.date);if(!exposure[id])exposure[id]={count:0,last:null,name:p.name||'Producto'};exposure[id].count++;if(!exposure[id].last||d>exposure[id].last)exposure[id].last=d;}));
+ const available=products.filter(p=>p.availability!=='out');
+ const ranked=available.map(p=>{const x=exposure[p.id]||{count:0,last:null};const days=x.last?Math.floor((Date.now()-x.last.getTime())/86400000):9999;return {...p,promoCount:x.count,lastPromo:x.last,daysSince:days};}).sort((a,b)=>{const score=x=>x.promoCount===0?10000+x.daysSince:x.daysSince*2-x.promoCount;return score(b)-score(a);}).slice(0,6);
+ $('recommendProducts').innerHTML=ranked.length?ranked.map(p=>`<div class="metric-row"><span><b>${esc(p.name)}</b><br><small>${p.promoCount===0?'Sin promociones registradas':p.lastPromo?'Última promoción: '+p.lastPromo.toLocaleDateString('es-CU'):'Sin fecha disponible'} · ${p.promoCount} registro(s)</small></span><button class="secondary" data-recommend-product="${esc(p.id)}">Añadir</button></div>`).join(''):'<p class="muted">No hay productos disponibles en el catálogo.</p>';
+ const cats=['reposteria-panaderia','aseo','ferreteria','otros'].map(id=>{const count=publicationLog.reduce((n,e)=>n+(e.products||[]).filter(p=>(p.category||'otros')===id).length,0);return {id,name:categoryName(id),count};}).sort((a,b)=>a.count-b.count);
+ $('recommendCategories').innerHTML=cats.map(c=>`<div class="metric-row"><span>${esc(c.name)}</span><b>${c.count} promoción(es)</b></div>`).join('');
+ const ready=groups.filter(g=>groupState(g)!=='waiting').sort((a,b)=>{const r=x=>x.lastPublishedAt?0:1;return r(b)-r(a)||a.name.localeCompare(b.name);}).slice(0,12);
+ $('recommendGroups').innerHTML=ready.length?ready.map(g=>`<div class="metric-row"><span>${esc(g.name)}<br><small>${g.lastPublishedAt?'Listo según frecuencia':'Sin historial de publicaciones'}</small></span><span class="row">${g.url?`<a class="button secondary" target="_blank" rel="noopener" href="${esc(g.url)}">Abrir ↗</a>`:''}</span></div>`).join(''):'<p class="muted">Todos los grupos tienen una frecuencia de espera o no hay grupos registrados.</p>';
+ $('recommendationNote').textContent=publicationLog.length?'Las recomendaciones se actualizan al registrar o deshacer publicaciones. Un producto sin historial aparece como prioritario, no significa que tenga mayor demanda.':'Todavía no hay historial suficiente. Inicialmente se priorizan productos disponibles que aún no tienen promociones registradas.';
+ document.querySelectorAll('[data-recommend-product]').forEach(b=>b.onclick=()=>{selectedProducts.add(b.dataset.recommendProduct);renderProducts();$('productList').scrollIntoView({behavior:'smooth',block:'center'});$('recommendationNote').textContent='Producto seleccionado. Puedes combinarlo con otros y generar una campaña.';});
+}
+function logPublication(ref,group,done,campaign=null){publicationLog=publicationLog.filter(x=>x.ref!==ref);if(done&&group){const products=(campaign?.products||[]).map(p=>({id:p.id,name:p.name,category:p.category||'otros'}));publicationLog.push({ref,groupId:group.id,groupName:group.name,date:new Date().toISOString(),campaignId:campaign?.id||null,campaignName:campaign?.name||null,products});}}
+function renderSchedule(onlyDue=false){const due=groups.filter(g=>groupState(g)==='due').length,waiting=groups.filter(g=>groupState(g)==='waiting').length,never=groups.filter(g=>groupState(g)==='never').length;$('groupsDue').textContent=due;$('groupsWaiting').textContent=waiting;$('groupsNever').textContent=never;let list=groups.filter(g=>!onlyDue||groupState(g)!=='waiting').sort((a,b)=>{const rank={due:0,never:1,waiting:2};return rank[groupState(a)]-rank[groupState(b)]||a.name.localeCompare(b.name);});$('scheduleList').innerHTML=list.length?list.map(g=>{let n=nextDate(g),st=groupState(g);return `<div class="task"><div class="grow"><b>${esc(g.name)}</b><small>${esc(g.category||'Sin categoría')} · ${st==='never'?'Nunca publicado':st==='due'?'Puede recibir una nueva publicación':'Esperar hasta '+n.toLocaleDateString('es-CU')}</small></div><div class="row"><button class="secondary" data-mark-group="${esc(g.id)}">Registrar publicación</button>${g.url?`<a class="button secondary" target="_blank" rel="noopener" href="${esc(g.url)}">Abrir grupo ↗</a>`:''}</div></div>`}).join(''):'<p class="muted">No hay grupos para mostrar.</p>';document.querySelectorAll('[data-mark-group]').forEach(b=>b.onclick=()=>{let g=groups.find(x=>x.id===b.dataset.markGroup);if(g){g.lastPublishedAt=new Date().toISOString();persist();renderGroups();}});renderWeeklyCalendar();}
+function renderWeeklyCalendar(){const host=$('weeklyCalendar');if(!host)return;const start=new Date();start.setHours(0,0,0,0);const days=[];for(let i=0;i<7;i++){const d=new Date(start);d.setDate(start.getDate()+i);days.push(d);}const buckets=days.map(()=>[]);groups.forEach(g=>{let due=g.lastPublishedAt?nextDate(g):new Date(start);if(!due)return;due=new Date(due);due.setHours(0,0,0,0);let idx=Math.floor((due-start)/86400000);if(idx<0)idx=0;if(idx<7)buckets[idx].push(g);});host.innerHTML=days.map((d,i)=>{const label=d.toLocaleDateString('es-CU',{weekday:'short',day:'numeric',month:'short'});const entries=buckets[i].sort((a,b)=>a.name.localeCompare(b.name));return `<div class="day-card ${i===0?'today':''}"><h3>${esc(label)}</h3><div class="count">${entries.length} grupo(s)</div>${entries.length?entries.map(g=>`<div class="day-group"><b>${esc(g.name)}</b><br><span class="muted">${esc(g.category||'Sin categoría')}</span><br><button class="secondary" data-calendar-mark="${esc(g.id)}">Registrar</button>${g.url?` <a href="${esc(g.url)}" target="_blank" rel="noopener">Abrir</a>`:''}</div>`).join(''):'<p class="muted">Sin grupos previstos</p>'}</div>`}).join('');$('calendarRange').textContent=days[0].toLocaleDateString('es-CU')+' – '+days[6].toLocaleDateString('es-CU');document.querySelectorAll('[data-calendar-mark]').forEach(b=>b.onclick=()=>{const g=groups.find(x=>x.id===b.dataset.calendarMark);if(g){g.lastPublishedAt=new Date().toISOString();logPublication('calendar-'+g.id+'-'+Date.now(),g,true);persist();renderGroups();renderStats();}});}
+function campaignText(items){let lines=['📢 ¡PRODUCTOS PANACEA DISPONIBLES!',''];items.forEach(p=>{lines.push('▪ '+p.name);if(p.presentation)lines.push(p.presentation);if(p.description)lines.push(p.description);lines.push('💰 '+money(p.price,p.currency));lines.push('');});lines.push('📲 Pedidos: '+$('contact').value.trim());lines.push('¡Escríbenos para realizar tu pedido!');return lines.join('\\n');}
+function makeDraft(){let items=products.filter(p=>selectedProducts.has(p.id)&&p.availability!=='out');if(!items.length){alert('Selecciona al menos un producto disponible.');return;}draft={name:$('campaignName').value.trim()||'Campaña '+new Date().toLocaleDateString('es-CU'),createdAt:new Date().toISOString(),productIds:items.map(p=>p.id),products:items.map(p=>({...p})),text:campaignText(items),destinations:{ownFb:$('destOwnFb').checked,otherFb:$('destOtherFb').checked,wa:$('destWa').checked},groupIds:$('destOtherFb').checked?[...selectedGroups]:[]};$('preview').textContent=draft.text;['copyText','shareText','downloadCampaign','saveCampaignBtn'].forEach(id=>$(id).disabled=false);}
+function saveDraft(){if(!draft)return;let tasks=[];if(draft.destinations.ownFb)tasks.push({id:'own-fb',label:'Publicar en tu grupo de Facebook',url:OWN_FB,type:'facebook',done:false});for(let id of draft.groupIds){let g=groups.find(x=>x.id===id);if(g)tasks.push({id:'group-'+id,label:'Compartir en: '+g.name,url:g.url,type:'facebook',done:false});}if(draft.destinations.wa)tasks.push({id:'whatsapp',label:'Compartir en la comunidad de WhatsApp',url:WA_COMMUNITY,type:'whatsapp',done:false});let c={...draft,id:'camp-'+Date.now(),tasks};campaigns.unshift(c);activeCampaignId=c.id;persist();renderTasks();renderHistory();renderStats();$('saveCampaignBtn').disabled=true;alert('Campaña guardada. Ya puedes seguir el plan de distribución.');}
+function activeCampaign(){return campaigns.find(c=>c.id===activeCampaignId)}
+function renderTasks(){let c=activeCampaign();if(!c){$('distributionTasks').innerHTML='<p class="muted">Guarda una campaña para crear su plan de distribución.</p>';return;}let done=c.tasks.filter(t=>t.done).length;$('distributionTasks').innerHTML=`<p class="muted">${done} de ${c.tasks.length} destinos completados.</p>`+c.tasks.map(t=>`<div class="task ${t.done?'done':''}"><div class="grow"><b>${t.done?'✓ ':''}${esc(t.label)}</b><small>${t.done?'Completado · fecha registrada':t.type==='facebook'?'Abre el destino y utiliza Compartir → Compartir en un grupo.':'Abre la comunidad y comparte en el espacio correspondiente.'}</small></div><div class="row">${t.url?`<a class="button secondary" href="${esc(t.url)}" target="_blank" rel="noopener">Abrir destino ↗</a>`:''}<button data-done="${esc(t.id)}" class="${t.done?'secondary':''}">${t.done?'Deshacer':'Marcar publicado'}</button></div></div>`).join('');document.querySelectorAll('[data-done]').forEach(b=>b.onclick=()=>{let t=c.tasks.find(x=>x.id===b.dataset.done);if(t){t.done=!t.done;if(t.id.startsWith('group-')){let g=groups.find(x=>x.id===t.id.slice(6));if(g){g.lastPublishedAt=t.done?new Date().toISOString():null;logPublication('campaign-'+c.id+'-'+t.id,g,t.done,c);}}persist();renderGroups();renderTasks();renderHistory();renderStats();}});}
+function renderHistory(){$('campaignHistory').innerHTML=campaigns.length?campaigns.map(c=>{let d=c.tasks.filter(t=>t.done).length;return `<div class="task"><div class="grow"><b>${esc(c.name)}</b><small>${new Date(c.createdAt).toLocaleString('es-CU')} · ${c.products.length} productos · ${d}/${c.tasks.length} destinos</small></div><button data-open="${esc(c.id)}" class="secondary">Abrir campaña</button></div>`}).join(''):'<p class="muted">Todavía no hay campañas guardadas.</p>';document.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>{activeCampaignId=b.dataset.open;let c=activeCampaign();draft=c;$('preview').textContent=c.text;$('campaignName').value=c.name;$('copyText').disabled=$('shareText').disabled=$('downloadCampaign').disabled=false;renderTasks();});}
+function dateOnly(d){const x=new Date(d);x.setHours(0,0,0,0);return x;}
+function localDateValue(d){const x=dateOnly(d);return `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}-${String(x.getDate()).padStart(2,'0')}`;}
+function renderPlanner(){const select=$('planCampaign');if(!select)return;const old=select.value;select.innerHTML=campaigns.length?campaigns.map(c=>`<option value="${esc(c.id)}">${esc(c.name)} · ${new Date(c.createdAt).toLocaleDateString('es-CU')}</option>`).join(''):'<option value="">No hay campañas guardadas</option>';if(campaigns.some(c=>c.id===old))select.value=old;$('generatePlan').disabled=!campaigns.length;const host=$('plansList');host.innerHTML=plans.length?plans.slice().sort((a,b)=>String(b.createdAt).localeCompare(String(a.createdAt))).map(plan=>{const total=plan.items.length,done=plan.items.filter(x=>x.done).length;const days={};plan.items.forEach(x=>(days[x.date]??=[]).push(x));return `<div class="task"><div class="grow"><b>${esc(plan.campaignName)}</b><small>${esc(plan.createdAt?new Date(plan.createdAt).toLocaleString('es-CU'):'')} · ${done}/${total} grupos completados · máximo ${plan.dailyLimit} por día</small><div class="row" style="margin-top:8px"><button class="secondary" data-plan-toggle="${esc(plan.id)}">${plan.expanded?'Ocultar agenda':'Ver agenda'}</button><button class="secondary" data-plan-delete="${esc(plan.id)}">Eliminar programación</button></div>${plan.expanded?Object.keys(days).sort().map(day=>`<div class="task" style="margin-top:8px"><div class="grow"><b>${new Date(day+'T12:00:00').toLocaleDateString('es-CU',{weekday:'long',day:'numeric',month:'long'})}</b>${days[day].map(item=>{const g=groups.find(x=>x.id===item.groupId);return `<div class="task ${item.done?'done':''}" style="margin-top:6px"><div class="grow"><b>${item.done?'✓ ':''}${esc(item.groupName)}</b><small>${item.done?'Realizada':'Pendiente'}${g&&g.category?' · '+esc(g.category):''}</small></div><div class="row">${item.url?`<a class="button secondary" href="${esc(item.url)}" target="_blank" rel="noopener">Abrir grupo ↗</a>`:''}<button class="secondary" data-plan-done="${esc(plan.id)}" data-item="${esc(item.id)}">${item.done?'Deshacer':'Marcar realizada'}</button></div></div>`}).join('')}</div></div>`).join(''):''}</div></div>`}).join(''):'<p class="muted">Todavía no has creado programaciones.</p>';
+ document.querySelectorAll('[data-plan-toggle]').forEach(b=>b.onclick=()=>{const p=plans.find(x=>x.id===b.dataset.planToggle);if(p){p.expanded=!p.expanded;persist();renderPlanner();}});
+ document.querySelectorAll('[data-plan-delete]').forEach(b=>b.onclick=()=>{const p=plans.find(x=>x.id===b.dataset.planDelete);if(p&&confirm('¿Eliminar esta programación? Las campañas y el historial de grupos no se eliminarán.')){plans=plans.filter(x=>x.id!==p.id);persist();renderPlanner();}});
+ document.querySelectorAll('[data-plan-done]').forEach(b=>b.onclick=()=>{const p=plans.find(x=>x.id===b.dataset.planDone),it=p?.items.find(x=>x.id===b.dataset.item);if(!it)return;it.done=!it.done;const g=groups.find(x=>x.id===it.groupId);if(g&&it.done){it.previousLastPublishedAt=g.lastPublishedAt||null;g.lastPublishedAt=new Date().toISOString();logPublication('plan-'+p.id+'-'+it.id,g,true,campaigns.find(c=>c.id===p.campaignId)||null);}else if(g&&!it.done){g.lastPublishedAt=it.previousLastPublishedAt||null;logPublication('plan-'+p.id+'-'+it.id,g,false);}persist();renderGroups();renderPlanner();renderStats();});
+}
+function renderRecurrences(){const sel=$('recCampaign');if(!sel)return;const old=sel.value;sel.innerHTML=campaigns.length?campaigns.map(c=>`<option value="${esc(c.id)}">${esc(c.name)}</option>`).join(''):'<option value="">No hay campañas</option>';if(campaigns.some(c=>c.id===old))sel.value=old;$('saveRecurrence').disabled=!campaigns.length;$('recurrenceList').innerHTML=recurrences.length?recurrences.map(r=>{const c=campaigns.find(x=>x.id===r.campaignId);return `<div class="task"><div class="grow"><b>${esc(r.campaignName)}</b><small>Cada ${r.intervalDays} días · Próxima preparación: ${esc(r.nextDate)} · ${r.active?'Activa':'Pausada'}</small></div><div class="row"><button class="secondary" data-rec-generate="${esc(r.id)}">Preparar próxima agenda</button><button class="secondary" data-rec-toggle="${esc(r.id)}">${r.active?'Pausar':'Activar'}</button><button class="secondary" data-rec-delete="${esc(r.id)}">Eliminar</button></div></div>`}).join(''):'<p class="muted">Todavía no has definido campañas recurrentes.</p>';
+ document.querySelectorAll('[data-rec-generate]').forEach(b=>b.onclick=()=>{const r=recurrences.find(x=>x.id===b.dataset.recGenerate);if(!r||!r.active)return;const c=campaigns.find(x=>x.id===r.campaignId);if(!c){alert('La campaña original ya no existe.');return;}const day=dateOnly(new Date(r.nextDate+'T12:00:00'));$('planCampaign').value=c.id;$('planStartDate').value=localDateValue(day);$('planDailyLimit').value=String(r.dailyLimit||15);generatePlan();const next=new Date(day);next.setDate(next.getDate()+r.intervalDays);r.nextDate=localDateValue(next);persist();renderRecurrences();});
+ document.querySelectorAll('[data-rec-toggle]').forEach(b=>b.onclick=()=>{const r=recurrences.find(x=>x.id===b.dataset.recToggle);if(r){r.active=!r.active;persist();renderRecurrences();}});
+ document.querySelectorAll('[data-rec-delete]').forEach(b=>b.onclick=()=>{if(confirm('¿Eliminar esta regla recurrente? Las agendas ya creadas se conservarán.')){recurrences=recurrences.filter(x=>x.id!==b.dataset.recDelete);persist();renderRecurrences();}});
+}
+function saveRecurrence(){const c=campaigns.find(x=>x.id===$('recCampaign').value);if(!c)return;const interval=Math.max(1,Math.min(365,Number($('recInterval').value)||7));const date=$('recStart').value||localDateValue(new Date());if(recurrences.some(r=>r.campaignId===c.id&&r.active)){alert('Esta campaña ya tiene una recurrencia activa. Puedes modificarla desde la lista o pausarla primero.');return;}recurrences.unshift({id:'rec-'+Date.now(),campaignId:c.id,campaignName:c.name,intervalDays:interval,nextDate:date,dailyLimit:Math.max(1,Number($('planDailyLimit').value)||15),active:true,createdAt:new Date().toISOString()});persist();renderRecurrences();alert('Recurrencia guardada. La próxima agenda se preparará cuando pulses «Preparar próxima agenda».');}
+function generatePlan(){const c=campaigns.find(x=>x.id===$('planCampaign').value);if(!c)return;const limit=Math.max(1,Math.min(100,Number($('planDailyLimit').value)||1));const start=dateOnly($('planStartDate').value?new Date($('planStartDate').value+'T12:00:00'):new Date());const groupTasks=(c.tasks||[]).filter(t=>String(t.id).startsWith('group-'));if(!groupTasks.length){alert('Esta campaña no contiene grupos externos. Crea o guarda una campaña con grupos seleccionados.');return;}const slots={};const items=[];groupTasks.forEach(t=>{const id=t.id.slice(6),g=groups.find(x=>x.id===id);if(!g)return;let available=g.lastPublishedAt?dateOnly(nextDate(g)):new Date(start);if(available<start)available=new Date(start);let day=new Date(available);while((slots[localDateValue(day)]||0)>=limit){day.setDate(day.getDate()+1);}const date=localDateValue(day);slots[date]=(slots[date]||0)+1;items.push({id:'pi-'+Date.now()+'-'+Math.random().toString(36).slice(2,8),groupId:g.id,groupName:g.name,url:g.url||t.url||'',date,done:false,previousLastPublishedAt:g.lastPublishedAt||null,sourceTaskId:t.id});});if(!items.length){alert('No se encontraron grupos válidos para esta campaña.');return;}const plan={id:'plan-'+Date.now(),campaignId:c.id,campaignName:c.name,createdAt:new Date().toISOString(),dailyLimit:limit,items,expanded:true};plans.unshift(plan);persist();renderPlanner();$('planStatus').textContent=`Programación creada: ${items.length} grupos distribuidos en ${Object.keys(slots).length} día(s). Revisa cada destino y realiza las publicaciones manualmente.`;}
+
+function renderContentAudit(){
+ const sel=$('auditCampaign');if(!sel)return;const old=sel.value;
+ sel.innerHTML=campaigns.length?campaigns.map(c=>`<option value="${esc(c.id)}">${esc(c.name)}</option>`).join(''):'<option value="">No hay campañas guardadas</option>';
+ if(campaigns.some(c=>c.id===old))sel.value=old;
+ const c=campaigns.find(x=>x.id===sel.value),host=$('contentAudit');if(!c){host.innerHTML='<p class="muted">Guarda una campaña para poder analizarla.</p>';return;}
+ const days=Math.max(1,Number($('auditWindow').value)||15),cutoff=Date.now()-days*86400000;
+ const rows=(c.products||[]).map(p=>{const matches=publicationLog.filter(e=>new Date(e.date).getTime()>=cutoff&&(e.products||[]).some(x=>(x.id&&p.id&&x.id===p.id)||(!x.id&&x.name&&x.name.toLowerCase()===String(p.name).toLowerCase()))).sort((a,b)=>new Date(b.date)-new Date(a.date));const all=publicationLog.filter(e=>(e.products||[]).some(x=>(x.id&&p.id&&x.id===p.id)||(!x.id&&x.name&&x.name.toLowerCase()===String(p.name).toLowerCase()))).sort((a,b)=>new Date(b.date)-new Date(a.date));return {p,recent:matches.length,last:all[0]?.date||null,groups:[...new Set(matches.map(x=>x.groupName).filter(Boolean))]};});
+ const repeated=rows.filter(x=>x.recent).length;
+ host.innerHTML=`<div class="stats"><div class="stat"><b>${rows.length}</b><small>Productos analizados</small></div><div class="stat"><b>${repeated}</b><small>Con promoción reciente</small></div><div class="stat"><b>${rows.length-repeated}</b><small>Sin repetición en el período</small></div></div>`+rows.map(x=>`<div class="task"><div class="grow"><b>${esc(x.p.name)}</b><small>${x.recent?`⚠ ${x.recent} publicación(es) en los últimos ${days} días`:'✓ Sin publicaciones en el período'} · Última registrada: ${x.last?new Date(x.last).toLocaleDateString('es-CU'):'Sin historial'}</small>${x.groups.length?`<small>Grupos recientes: ${esc(x.groups.join(', '))}</small>`:''}</div><span class="pill">${x.recent?'Revisar repetición':'Contenido fresco'}</span></div>`).join('')+(rows.length?`<div class="row" style="margin-top:10px"><button type="button" id="selectFreshProducts">Seleccionar productos sin repetición para una nueva campaña</button></div>`:'<p class="muted">La campaña no tiene productos asociados.</p>');
+ const btn=$('selectFreshProducts');if(btn)btn.onclick=()=>{selectedProducts=new Set(rows.filter(x=>!x.recent&&x.p.availability!=='out').map(x=>String(x.p.id)));renderProducts();$('productList').scrollIntoView({behavior:'smooth',block:'center'});alert(`${selectedProducts.size} producto(s) sin promoción reciente seleccionados. Revisa la selección antes de generar una nueva campaña.`);};
+}
+
+function parseCSV(text){let rows=[],row=[],v='',quoted=false;for(let i=0;i<text.length;i++){let ch=text[i];if(ch==='"'&&quoted&&text[i+1]==='"'){v+='"';i++;}else if(ch==='"')quoted=!quoted;else if(ch===','&&!quoted){row.push(v);v='';}else if((ch==='\\n'||ch==='\\r')&&!quoted){if(ch==='\\r'&&text[i+1]==='\\n')i++;row.push(v);if(row.some(x=>x.trim()))rows.push(row);row=[];v='';}else v+=ch;}row.push(v);if(row.some(x=>x.trim()))rows.push(row);let headers=(rows.shift()||[]).map(x=>x.trim().toLowerCase());return rows.map(r=>Object.fromEntries(headers.map((h,i)=>[h,(r[i]||'').trim()])));}
+
+
+let editingGroupId=null;
+function resetGroupForm(){editingGroupId=null;$('groupName').value='';$('groupUrl').value='';$('groupCategory').value='Repostería';$('groupFrequency').value='3';$('saveGroupBtn').textContent='Agregar grupo';$('cancelGroupEdit').classList.add('hidden');}
+function editGroup(id){const g=groups.find(x=>x.id===id);if(!g)return;editingGroupId=id;$('groupName').value=g.name;$('groupUrl').value=g.url||'';$('groupCategory').value=['Repostería','Panadería','Compra y venta','Emprendimientos','General','Otros'].includes(g.category)?g.category:'Otros';$('groupFrequency').value=String(g.frequencyDays||3);$('saveGroupBtn').textContent='Guardar cambios';$('cancelGroupEdit').classList.remove('hidden');$('groupName').focus();$('groupFormStatus').textContent='Editando: '+g.name;}
+function deleteGroup(id){const g=groups.find(x=>x.id===id);if(!g||!confirm(`¿Eliminar el grupo «${g.name}»? Las campañas ya guardadas conservarán su historial.`))return;groups=groups.filter(x=>x.id!==id);selectedGroups.delete(id);persist();renderGroups();$('groupFormStatus').textContent='Grupo eliminado.';}
+$('saveGroupBtn').onclick=()=>{const name=$('groupName').value.trim(),url=$('groupUrl').value.trim(),category=$('groupCategory').value,frequencyDays=Number($('groupFrequency').value)||3;if(!name){alert('Escribe el nombre del grupo.');return;}if(url){try{const u=new URL(url);if(!['http:','https:'].includes(u.protocol))throw Error();}catch{alert('Introduce un enlace válido que comience con https:// o http://');return;}}const duplicate=groups.find(g=>g.id!==editingGroupId&&(name.toLowerCase()===g.name.toLowerCase()||(url&&url===g.url)));if(duplicate){alert('Ya existe un grupo con ese nombre o enlace.');return;}if(editingGroupId){const g=groups.find(x=>x.id===editingGroupId);Object.assign(g,{name,url,category,frequencyDays});$('groupFormStatus').textContent='Cambios guardados.';}else{const id='g-'+Date.now()+'-'+Math.random().toString(36).slice(2,7);groups.push({id,name,url,category,frequencyDays,lastPublishedAt:null});$('groupFormStatus').textContent='Grupo agregado correctamente.';}persist();resetGroupForm();renderGroups();};
+$('cancelGroupEdit').onclick=()=>{resetGroupForm();$('groupFormStatus').textContent='Edición cancelada.';};
+
+$('groupsFile').onchange=async e=>{let f=e.target.files[0];if(!f)return;try{let rows=parseCSV(await f.text());if(!rows.length)throw Error('El CSV está vacío.');const incoming=rows.map((g,i)=>({id:String(g.id||`g-${Date.now()}-${i}`),name:g.name||g.nombre||`Grupo ${i+1}`,url:g.url||g.link||'',category:g.category||g.categoria||'',frequencyDays:Number(g.frequencyDays||g.frecuencia||3),lastPublishedAt:g.lastPublishedAt||null}));let added=0;incoming.forEach(g=>{const exists=groups.some(x=>(g.url&&x.url===g.url)||x.name.trim().toLowerCase()===g.name.trim().toLowerCase());if(!exists){groups.push(g);added++;}});persist();renderGroups();$('importStatus').textContent=`Importación completada: ${added} grupos nuevos. Total: ${groups.length}. Los duplicados se omitieron.`;}catch(err){alert(err.message)}e.target.value='';};
+$('selectAllProducts').onclick=()=>{products.forEach(p=>selectedProducts.add(p.id));renderProducts();};$('clearProducts').onclick=()=>{selectedProducts.clear();renderProducts();};$('selectAllGroups').onclick=()=>{groups.forEach(g=>selectedGroups.add(g.id));renderGroups();};$('clearGroups').onclick=()=>{selectedGroups.clear();renderGroups();};
+$('filterDue').onclick=()=>renderSchedule(true);$('filterAll').onclick=()=>renderSchedule(false);$('refreshCalendar').onclick=()=>renderWeeklyCalendar();$('monthPrev').onclick=()=>{monthOffset--;renderMonthlyCalendar();};$('monthNext').onclick=()=>{monthOffset++;renderMonthlyCalendar();};$('productSearch').oninput=renderProducts;$('categoryFilter').onchange=renderProducts;$('groupFilter').oninput=renderGroups;$('generateBtn').onclick=makeDraft;$('saveCampaignBtn').onclick=saveDraft;
+$('copyText').onclick=async()=>{if(!draft)return;try{await navigator.clipboard.writeText(draft.text);alert('Texto copiado.')}catch{alert('El navegador no permitió copiar automáticamente. Selecciona el texto de la vista previa.')}};
+$('shareText').onclick=async()=>{if(!draft)return;if(navigator.share){try{await navigator.share({title:draft.name,text:draft.text});}catch(e){}}else alert('La función Compartir no está disponible en este navegador. Usa «Copiar texto».');};
+$('downloadCampaign').onclick=()=>{if(!draft)return;let blob=new Blob([JSON.stringify(draft,null,2)],{type:'application/json'});let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='panacea-campana-'+Date.now()+'.json';a.click();URL.revokeObjectURL(a.href);};
+$('generatePlan').onclick=generatePlan;
+$('saveRecurrence').onclick=saveRecurrence;
+$('refreshAudit').onclick=renderContentAudit;$('auditCampaign').onchange=renderContentAudit;$('auditWindow').onchange=renderContentAudit;
+$('saveGoals').onclick=()=>{goals={daily:Math.max(1,Math.min(1000,Number($('dailyGoal').value)||10)),weekly:Math.max(1,Math.min(7000,Number($('weeklyGoal').value)||50))};persist();renderGoals();$('goalAdvice').textContent='Objetivos guardados correctamente.';};
+$('resetTasks').onclick=()=>{let c=activeCampaign();if(!c||!confirm('¿Reiniciar todos los estados de esta campaña?'))return;c.tasks.forEach(t=>{t.done=false;logPublication('campaign-'+c.id+'-'+t.id,null,false);});persist();renderTasks();renderHistory();renderStats();};
+
+$('exportBackup').onclick=()=>{downloadJSON(backupData(),'panacea-respaldo-'+new Date().toISOString().slice(0,10)+'.json');$('backupStatus').textContent=`Respaldo descargado: ${groups.length} grupos, ${campaigns.length} campañas, ${plans.length} programaciones y ${publicationLog.length} registros estadísticos.`;};
+$('chooseBackup').onclick=()=>$('backupFile').click();
+$('backupFile').onchange=async e=>{const file=e.target.files[0];if(!file)return;try{await importBackup(file);}catch(err){alert(err.message||'No se pudo importar el respaldo.');$('backupStatus').textContent='Error al importar el respaldo: '+(err.message||err);}e.target.value='';};
+$('downloadTemplate').onclick=()=>{let csv='name,url,category\\n\"Grupo de ejemplo\",\"https://facebook.com/groups/ID/\",\"Repostería\"\\n';let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='plantilla-grupos-panacea.csv';a.click();URL.revokeObjectURL(a.href);};
+function init(){if($('planStartDate'))$('planStartDate').value=localDateValue(new Date());if($('recStart'))$('recStart').value=localDateValue(new Date());renderProducts();renderGroups();renderStats();renderGoals();renderHistory();renderTasks();renderPlanner();renderRecurrences();renderContentAudit();$('catalogStatus').textContent=products.length?`Catálogo conectado: ${products.length} productos en ${new Set(products.map(p=>p.category)).size} categorías. Los agotados aparecen identificados y no se pueden seleccionar.`:'No se pudo cargar products.js. Comprueba que este archivo esté junto al catálogo de PANACEA.';let c=activeCampaign();if(c)$('preview').textContent=c.text;}
+init();
+</script>
+</body>
+</html>
